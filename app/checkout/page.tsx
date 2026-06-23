@@ -399,15 +399,21 @@ export default function CheckoutPage() {
               {/* Transporte */}
               <div>
                 <label className="block text-gray-700 font-semibold mb-2 text-sm">Transporte de Preferencia *</label>
-                <input
-                  type="text"
+                <select
                   name="transporte"
-                  placeholder="Ej: Moto, Auto, Camión, etc."
                   value={formData.transporte}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
                   required
-                />
+                >
+                  <option value="">Selecciona un transporte</option>
+                  <option value="Moto">Moto</option>
+                  <option value="Auto">Auto</option>
+                  <option value="Camión">Camión</option>
+                  <option value="Utilitario">Utilitario</option>
+                  <option value="Bicicleta">Bicicleta</option>
+                  <option value="Otro">Otro</option>
+                </select>
               </div>
 
               {/* Aviso de Envío */}
