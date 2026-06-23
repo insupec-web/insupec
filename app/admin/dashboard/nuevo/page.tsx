@@ -5,10 +5,13 @@ export const dynamic = 'force-dynamic';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
 import AdminNav from '@/components/AdminNav';
+import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function NuevoProductoPage() {
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+function NuevoProductoContent() {
   const [formData, setFormData] = useState({
     nombre: '',
     precio: '',
@@ -33,6 +36,17 @@ export default function NuevoProductoPage() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setError('El archivo es demasiado grande. Máximo 5MB.');
+        return;
+      }
+
+      if (!selectedFile.type.startsWith('image/')) {
+        setError('El archivo debe ser una imagen válida.');
+        return;
+      }
+
+      setError(null);
       setFile(selectedFile);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -98,15 +112,15 @@ export default function NuevoProductoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <AdminNav />
 
-      <div className="max-w-2xl mx-auto px-4 py-20">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Crear Nuevo Producto</h1>
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28 pb-8 sm:pb-12">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-800">Crear Nuevo Producto</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
           {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -212,6 +226,16 @@ export default function NuevoProductoPage() {
           </form>
         </div>
       </div>
-    </div>
+    </>
+  );
+}
+
+export default function NuevoProductoPage() {
+  return (
+    <ProtectedAdminRoute>
+      <div className="min-h-screen bg-white">
+        <NuevoProductoContent />
+      </div>
+    </ProtectedAdminRoute>
   );
 }

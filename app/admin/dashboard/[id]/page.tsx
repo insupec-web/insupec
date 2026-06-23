@@ -5,10 +5,13 @@ export const dynamic = 'force-dynamic';
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import AdminNav from '@/components/AdminNav';
+import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-export default function EditProductoPage({ params }: { params: { id: string } }) {
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+function EditProductoContent({ params }: { params: { id: string } }) {
   const [formData, setFormData] = useState({
     nombre: '',
     precio: '',
@@ -67,6 +70,17 @@ export default function EditProductoPage({ params }: { params: { id: string } })
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setError('El archivo es demasiado grande. Máximo 5MB.');
+        return;
+      }
+
+      if (!selectedFile.type.startsWith('image/')) {
+        setError('El archivo debe ser una imagen válida.');
+        return;
+      }
+
+      setError(null);
       setFile(selectedFile);
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -133,39 +147,39 @@ export default function EditProductoPage({ params }: { params: { id: string } })
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <>
         <AdminNav />
-        <div className="max-w-2xl mx-auto px-4 py-20">
+        <div className="max-w-2xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28">
           <p className="text-gray-600">Cargando...</p>
         </div>
-      </div>
+      </>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white">
+      <>
         <AdminNav />
-        <div className="max-w-2xl mx-auto px-4 py-20">
+        <div className="max-w-2xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28">
           <p className="text-red-600 font-semibold mb-4">{error}</p>
           <Link href="/admin/dashboard" className="text-black hover:text-gray-700">
             Volver al dashboard
           </Link>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <AdminNav />
 
-      <div className="max-w-2xl mx-auto px-4 py-20">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800">Editar Producto</h1>
+      <div className="max-w-2xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28 pb-8 sm:pb-12">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-4xl font-bold text-gray-800">Editar Producto</h1>
         </div>
 
-        <div className="bg-white rounded-lg shadow-md p-8">
+        <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
           {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -267,6 +281,16 @@ export default function EditProductoPage({ params }: { params: { id: string } })
           </form>
         </div>
       </div>
-    </div>
+    </>
+  );
+}
+
+export default function EditProductoPage({ params }: { params: { id: string } }) {
+  return (
+    <ProtectedAdminRoute>
+      <div className="min-h-screen bg-white">
+        <EditProductoContent params={params} />
+      </div>
+    </ProtectedAdminRoute>
   );
 }

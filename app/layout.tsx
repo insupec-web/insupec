@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/hooks/CartProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
-import Header from '@/components/Header';
+import ConditionalHeader from '@/components/ConditionalHeader';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -30,7 +30,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-white text-black">
         <CartProvider>
           <AuthProvider>
-            <Header />
+            <ConditionalHeader />
             <main className="pt-24 sm:pt-36 flex-1">{children}</main>
           </AuthProvider>
         </CartProvider>

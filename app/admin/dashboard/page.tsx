@@ -5,11 +5,12 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import AdminNav from '@/components/AdminNav';
+import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Edit2, Trash2, Plus } from 'lucide-react';
 
-export default function AdminDashboardPage() {
+function AdminDashboardContent() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,10 +56,10 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <AdminNav />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-12 sm:py-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28 pb-8 sm:pb-12">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
           <Link
@@ -154,6 +155,16 @@ export default function AdminDashboardPage() {
           </div>
         )}
       </div>
-    </div>
+    </>
+  );
+}
+
+export default function AdminDashboardPage() {
+  return (
+    <ProtectedAdminRoute>
+      <div className="min-h-screen bg-white">
+        <AdminDashboardContent />
+      </div>
+    </ProtectedAdminRoute>
   );
 }
