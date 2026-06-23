@@ -20,6 +20,7 @@ export default function AdminLoginPage() {
     const success = loginAdmin(username, password);
 
     if (success) {
+      // Pequeño delay para asegurar que el estado se actualice
       setTimeout(() => {
         router.push('/admin/dashboard');
       }, 300);

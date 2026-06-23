@@ -67,14 +67,54 @@ export default function CheckoutPage() {
 
     for (const field of requiredFields) {
       if (!formData[field]) {
-        setError(`El campo ${field} es requerido`);
+        const fieldNames: Record<string, string> = {
+          nombre: 'Nombre',
+          apellido: 'Apellido',
+          razonSocial: 'Razón Social',
+          email: 'Email',
+          telefono: 'Teléfono',
+          direccion: 'Dirección',
+          ciudad: 'Ciudad',
+          codigoPostal: 'Código Postal',
+        };
+        setError(`${fieldNames[field]} es requerido`);
         return false;
       }
     }
 
+    if (formData.nombre.trim().length < 2) {
+      setError('El nombre debe tener al menos 2 caracteres');
+      return false;
+    }
+
+    if (formData.apellido.trim().length < 2) {
+      setError('El apellido debe tener al menos 2 caracteres');
+      return false;
+    }
+
+    if (formData.razonSocial.trim().length < 2) {
+      setError('La razón social debe tener al menos 2 caracteres');
+      return false;
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      setError('El email no es válido');
+      setError('El email no es válido. Ej: usuario@ejemplo.com');
+      return false;
+    }
+
+    if (formData.telefono.trim().length < 7) {
+      setError('El teléfono no es válido');
+      return false;
+    }
+
+    if (formData.direccion.trim().length < 5) {
+      setError('La dirección debe tener al menos 5 caracteres');
+      return false;
+    }
+
+    if (formData.ciudad.trim().length < 2) {
+      setError('La ciudad debe tener al menos 2 caracteres');
       return false;
     }
 
@@ -169,114 +209,149 @@ export default function CheckoutPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         <div className="lg:col-span-2">
           <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">Información de Envío</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Información de Envío</h1>
+            <p className="text-gray-600 text-sm mb-6 sm:mb-8">Completa tus datos para procesar el pedido</p>
 
-            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
+            {error && (
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-4 rounded mb-6 flex gap-3 text-sm">
+                <span className="flex-shrink-0">⚠️</span>
+                <p>{error}</p>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Datos Personales</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div>
+                    <input
+                      type="text"
+                      name="nombre"
+                      placeholder="Nombre *"
+                      value={formData.nombre}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      name="apellido"
+                      placeholder="Apellido *"
+                      value={formData.apellido}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Datos de la Empresa</label>
                 <input
                   type="text"
-                  name="nombre"
-                  placeholder="Nombre *"
-                  value={formData.nombre}
+                  name="razonSocial"
+                  placeholder="Razón Social / Empresa *"
+                  value={formData.razonSocial}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
-                  required
-                />
-                <input
-                  type="text"
-                  name="apellido"
-                  placeholder="Apellido *"
-                  value={formData.apellido}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
                   required
                 />
               </div>
 
-              <input
-                type="text"
-                name="razonSocial"
-                placeholder="Razón Social *"
-                value={formData.razonSocial}
-                onChange={handleInputChange}
-                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
-                required
-              />
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Contacto</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Email *"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    name="telefono"
+                    placeholder="Teléfono *"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    required
+                  />
+                </div>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email *"
-                  value={formData.email}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Dirección de Entrega</label>
+                <textarea
+                  name="direccion"
+                  placeholder="Calle, número, piso, apto, etc. *"
+                  value={formData.direccion}
                   onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
-                  required
-                />
-                <input
-                  type="tel"
-                  name="telefono"
-                  placeholder="Teléfono *"
-                  value={formData.telefono}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                  rows={3}
                   required
                 />
               </div>
 
-              <textarea
-                name="direccion"
-                placeholder="Dirección *"
-                value={formData.direccion}
-                onChange={handleInputChange}
-                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
-                rows={3}
-                required
-              />
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <input
-                  type="text"
-                  name="ciudad"
-                  placeholder="Ciudad *"
-                  value={formData.ciudad}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
-                  required
-                />
-                <input
-                  type="text"
-                  name="codigoPostal"
-                  placeholder="Código Postal *"
-                  value={formData.codigoPostal}
-                  onChange={handleInputChange}
-                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
-                  required
-                />
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Localidad</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <input
+                    type="text"
+                    name="ciudad"
+                    placeholder="Ciudad *"
+                    value={formData.ciudad}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    required
+                  />
+                  <input
+                    type="text"
+                    name="codigoPostal"
+                    placeholder="Código Postal *"
+                    value={formData.codigoPostal}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    required
+                  />
+                </div>
               </div>
 
-              <label className="flex items-center gap-3 cursor-pointer text-sm">
-                <input
-                  type="checkbox"
-                  name="factura"
-                  checked={formData.factura}
-                  onChange={handleInputChange}
-                  className="w-4 h-4"
-                />
-                <span className="text-gray-700">¿Necesitas factura?</span>
-              </label>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="factura"
+                    checked={formData.factura}
+                    onChange={handleInputChange}
+                    className="w-5 h-5 rounded border-gray-300 focus:ring-2 focus:ring-black"
+                  />
+                  <span className="text-gray-700 text-sm font-medium">¿Necesitas factura?</span>
+                </label>
+              </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full py-2 sm:py-3 rounded-lg font-bold text-sm sm:text-base text-white transition-colors ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
-                }`}
-              >
-                {loading ? 'Procesando...' : 'ENVIAR PEDIDO POR WHATSAPP'}
-              </button>
+              <div className="flex gap-3 pt-4">
+                <Link
+                  href="/carrito"
+                  className="flex-1 py-3 rounded-lg font-bold text-center text-sm sm:text-base border-2 border-gray-300 text-gray-800 hover:bg-gray-50 transition-colors"
+                >
+                  VOLVER
+                </Link>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`flex-1 py-3 rounded-lg font-bold text-sm sm:text-base text-white transition-colors ${
+                    loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
+                  }`}
+                >
+                  {loading ? '⏳ Procesando...' : '💬 ENVIAR POR WHATSAPP'}
+                </button>
+              </div>
             </form>
           </div>
         </div>
