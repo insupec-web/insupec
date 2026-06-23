@@ -29,11 +29,11 @@ export default function Header() {
         <Link href="/productos" className="flex-1 flex justify-center">
           <Image
             src="/logo.svg"
-            alt="INSUPEC"
-            width={140}
-            height={140}
+            alt="INSUPEC - Insumos Pecuarios"
+            width={340}
+            height={88}
             priority
-            className="h-20 sm:h-28 w-auto"
+            className="h-12 sm:h-16 w-auto"
           />
         </Link>
 

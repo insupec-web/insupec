@@ -31,7 +31,7 @@ export default function RootLayout({
         <CartProvider>
           <AuthProvider>
             <ConditionalHeader />
-            <main className="pt-24 sm:pt-36 flex-1">{children}</main>
+            <main className="pt-20 sm:pt-24 flex-1">{children}</main>
           </AuthProvider>
         </CartProvider>
       </body>
