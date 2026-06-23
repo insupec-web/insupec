@@ -21,7 +21,7 @@ interface FormData {
   codigoPostal: string;
   factura: boolean;
   metodoPago: 'efectivo' | 'transferencia';
-  transporte: string;
+  transporte: 'envio' | 'retiro';
 }
 
 export default function CheckoutPage() {
@@ -38,7 +38,7 @@ export default function CheckoutPage() {
     codigoPostal: '',
     factura: false,
     metodoPago: 'efectivo',
-    transporte: '',
+    transporte: 'envio',
   });
 
   const [loading, setLoading] = useState(false);
@@ -69,7 +69,7 @@ export default function CheckoutPage() {
   };
 
   const validateForm = (): boolean => {
-    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal', 'transporte'];
+    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
 
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -82,7 +82,6 @@ export default function CheckoutPage() {
           direccion: 'Dirección',
           ciudad: 'Ciudad',
           codigoPostal: 'Código Postal',
-          transporte: 'Transporte de preferencia',
         };
         setError(`${fieldNames[field]} es requerido`);
         return false;
@@ -398,21 +397,38 @@ export default function CheckoutPage() {
 
               {/* Transporte */}
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">Transporte de Preferencia *</label>
-                <input
-                  type="text"
-                  name="transporte"
-                  placeholder="Ej: Moto, Auto, Camión, etc."
-                  value={formData.transporte}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
-                  required
-                />
-              </div>
+                <label className="block text-gray-700 font-semibold mb-3 text-sm">Forma de Entrega</label>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors" style={{borderColor: formData.transporte === 'envio' ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)'}}>
+                    <input
+                      type="radio"
+                      name="transporte"
+                      value="envio"
+                      checked={formData.transporte === 'envio'}
+                      onChange={(e) => setFormData(prev => ({...prev, transporte: e.target.value as 'envio' | 'retiro'}))}
+                      className="w-5 h-5"
+                    />
+                    <div>
+                      <span className="text-gray-800 font-semibold text-sm">Enviar por Transporte</span>
+                      <p className="text-gray-600 text-xs">El envío corre por cuenta del comprador y se abona al transporte en destino</p>
+                    </div>
+                  </label>
 
-              {/* Aviso de Envío */}
-              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                <p className="text-sm text-gray-700"><strong className="text-yellow-700">⚠️ Importante:</strong> El envío corre por cuenta del comprador y se abona al transporte en destino.</p>
+                  <label className="flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors" style={{borderColor: formData.transporte === 'retiro' ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)'}}>
+                    <input
+                      type="radio"
+                      name="transporte"
+                      value="retiro"
+                      checked={formData.transporte === 'retiro'}
+                      onChange={(e) => setFormData(prev => ({...prev, transporte: e.target.value as 'envio' | 'retiro'}))}
+                      className="w-5 h-5"
+                    />
+                    <div>
+                      <span className="text-gray-800 font-semibold text-sm">Retiro en Casa Central</span>
+                      <p className="text-gray-600 text-xs">Bv Lehmann 601, Rafaela, Santa Fe</p>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
