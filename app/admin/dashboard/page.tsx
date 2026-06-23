@@ -119,17 +119,22 @@ function AdminDashboardContent() {
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm truncate">{producto.nombre}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${producto.precio.toFixed(2)}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <span
-                        className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold inline-block ${
-                          producto.stock === 0
-                            ? 'bg-red-100 text-red-800'
-                            : producto.stock < 5
-                              ? 'bg-orange-100 text-orange-800'
-                              : 'bg-green-100 text-green-800'
-                        }`}
-                      >
-                        {producto.stock}
-                      </span>
+                      {(() => {
+                        const stock = producto.cantidad ?? producto.stock ?? 0;
+                        return (
+                          <span
+                            className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold inline-block ${
+                              stock === 0
+                                ? 'bg-red-100 text-red-800'
+                                : stock < 5
+                                  ? 'bg-orange-100 text-orange-800'
+                                  : 'bg-green-100 text-green-800'
+                            }`}
+                          >
+                            {stock}
+                          </span>
+                        );
+                      })()}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{new Date(producto.vencimiento).toLocaleDateString('es-AR')}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
