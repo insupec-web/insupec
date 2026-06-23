@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
+import { DollarSign, Package, Calendar, Building2 } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
   const [quantity, setQuantity] = useState(1);
@@ -30,7 +31,8 @@ export default function ProductCard({ producto }: { producto: Producto }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden h-full flex flex-col border-l-4 border-l-green-600 hover:shadow-lg transition-shadow">
+      {/* Foto del producto */}
       <div className="relative h-40 sm:h-48 bg-gray-200 overflow-hidden">
         {producto.foto_url ? (
           <Image
@@ -41,7 +43,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-300">
-            <span className="text-gray-500">Sin imagen</span>
+            <span className="text-gray-500 text-sm">Sin imagen</span>
           </div>
         )}
         {isAboutToExpire && (
@@ -51,30 +53,58 @@ export default function ProductCard({ producto }: { producto: Producto }) {
         )}
       </div>
 
-      <div className="p-3 sm:p-4 flex flex-col flex-1">
+      <div className="p-4 sm:p-5 flex flex-col flex-1">
+        {/* Nombre del producto */}
         <Link href={`/productos/${producto.id}`}>
-          <h3 className="font-semibold text-base sm:text-lg text-black mb-2 hover:text-gray-700 transition-colors line-clamp-2">
+          <h3 className="font-bold text-lg sm:text-xl text-black mb-4 hover:text-gray-700 transition-colors line-clamp-2">
             {producto.nombre}
           </h3>
         </Link>
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 gap-1 sm:gap-0">
-          <span className="text-lg sm:text-xl font-bold text-black">${producto.precio.toFixed(2)}</span>
-          <span className={`text-xs sm:text-sm font-semibold ${isAboutToExpire ? 'text-red-600' : 'text-gray-600'}`}>
-            Vence: {vencimiento.toLocaleDateString('es-AR')}
-          </span>
+        {/* Información con iconos */}
+        <div className="space-y-3 mb-4 flex-1">
+          {/* Precio */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <DollarSign size={16} className="text-gray-400" />
+              <span className="text-gray-500 font-semibold text-xs sm:text-sm">PRECIO</span>
+            </div>
+            <span className="text-green-600 font-bold text-sm sm:text-base">${producto.precio.toFixed(2)}</span>
+          </div>
+
+          {/* Stock */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Package size={16} className="text-gray-400" />
+              <span className="text-gray-500 font-semibold text-xs sm:text-sm">STOCK</span>
+            </div>
+            <span className={`font-bold text-sm sm:text-base ${isOutOfStock ? 'text-red-600' : 'text-red-600'}`}>
+              {isOutOfStock ? 'Sin stock' : `${producto.stock} unidades`}
+            </span>
+          </div>
+
+          {/* Vencimiento */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Calendar size={16} className="text-gray-400" />
+              <span className="text-gray-500 font-semibold text-xs sm:text-sm">VENCE</span>
+            </div>
+            <span className="text-orange-600 font-semibold text-sm sm:text-base">
+              {vencimiento.toLocaleDateString('es-AR')}
+            </span>
+          </div>
+
+          {/* Laboratorio */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 size={16} className="text-gray-400" />
+              <span className="text-gray-500 font-semibold text-xs sm:text-sm">LAB</span>
+            </div>
+            <span className="text-green-600 font-semibold text-sm sm:text-base">Producto</span>
+          </div>
         </div>
 
-        <div className="mb-3 sm:mb-4">
-          {isOutOfStock ? (
-            <span className="text-red-600 font-bold text-xs sm:text-sm">SIN STOCK</span>
-          ) : isLowStock ? (
-            <span className="text-orange-600 font-bold text-xs sm:text-sm">STOCK BAJO: {producto.stock} unidades</span>
-          ) : (
-            <span className="text-gray-600 text-xs sm:text-sm">Stock: {producto.stock} unidades</span>
-          )}
-        </div>
-
+        {/* Controles de cantidad y compra */}
         <div className="flex gap-2 mt-auto">
           <input
             type="number"
