@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS productos (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   nombre VARCHAR(255) NOT NULL,
   precio DECIMAL(10, 2) NOT NULL,
-  stock INTEGER NOT NULL DEFAULT 0,
+  cantidad INTEGER NOT NULL DEFAULT 0,
   vencimiento DATE NOT NULL,
   foto_url VARCHAR(500),
   laboratorio VARCHAR(255),
