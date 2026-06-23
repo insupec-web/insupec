@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS productos (
   precio DECIMAL(10, 2) NOT NULL,
   stock INTEGER NOT NULL DEFAULT 0,
   vencimiento DATE NOT NULL,
-  foto_url VARCHAR(500) NOT NULL,
+  foto_url VARCHAR(500),
+  laboratorio VARCHAR(255),
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
@@ -60,11 +61,11 @@ CREATE POLICY "Productos: Lectura pública"
   TO public
   USING (true);
 
--- Permitir insert, update, delete solo desde admin (sin RLS, requiere app key)
+-- Permitir insert, update, delete desde anon (admin usa anon key con verificación en app)
 CREATE POLICY "Productos: Admin puede modificar"
   ON productos
   FOR ALL
-  TO authenticated
+  TO anon
   USING (true)
   WITH CHECK (true);
 
