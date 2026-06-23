@@ -243,7 +243,7 @@ export default function ProductosPage() {
               }}
               className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
             >
-              🔄 Limpiar todos los filtros
+              Limpiar todos los filtros
             </button>
           </div>
         )}
