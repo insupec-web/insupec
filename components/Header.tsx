@@ -11,7 +11,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
         {/* Carrito a la izquierda en mobile */}
         <Link
           href="/carrito"
@@ -30,10 +30,10 @@ export default function Header() {
           <Image
             src="/logo.jpg"
             alt="INSUPEC"
-            width={140}
-            height={60}
+            width={280}
+            height={120}
             priority
-            className="h-12 sm:h-14 w-auto"
+            className="h-20 sm:h-28 w-auto"
           />
         </Link>
 
