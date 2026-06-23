@@ -201,7 +201,6 @@ function NuevoProductoContent() {
                   onChange={handleFileChange}
                   className="hidden"
                   id="file-input"
-                  required
                 />
                 <label htmlFor="file-input" className="cursor-pointer">
                   {preview ? (
