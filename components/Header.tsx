@@ -28,7 +28,7 @@ export default function Header() {
         {/* Logo centrado */}
         <Link href="/productos" className="flex-1 flex justify-center">
           <Image
-            src="/logo.jpg"
+            src="/logo.svg"
             alt="INSUPEC"
             width={280}
             height={120}
