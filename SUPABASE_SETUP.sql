@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS pedidos (
   ciudad VARCHAR(255) NOT NULL,
   codigo_postal VARCHAR(10) NOT NULL,
   factura BOOLEAN DEFAULT false,
+  metodo_pago VARCHAR(50) DEFAULT 'efectivo',
+  transporte VARCHAR(100),
+  confirmado BOOLEAN DEFAULT false,
   productos JSONB NOT NULL,
   total DECIMAL(10, 2) NOT NULL,
   timestamp TIMESTAMP DEFAULT now()
