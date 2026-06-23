@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { loginAdmin } from '@/lib/auth';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -10,7 +10,6 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,16 +17,17 @@ export default function AdminLoginPage() {
     setError(null);
     setLoading(true);
 
-    const success = login(username, password);
+    const success = loginAdmin(username, password);
 
     if (success) {
-      router.push('/admin/dashboard');
+      setTimeout(() => {
+        router.push('/admin/dashboard');
+      }, 300);
     } else {
       setError('Usuario o contraseña incorrectos');
       setPassword('');
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
