@@ -8,12 +8,14 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
 import { Upload, CheckCircle } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 interface ProductoCSV {
   nombre: string;
   precio: string;
   stock: string;
   vencimiento: string;
+  laboratorio?: string;
 }
 
 function ImportarProductosContent() {
@@ -40,41 +42,80 @@ function ImportarProductosContent() {
 
   const parseFile = async (file: File) => {
     try {
-      const text = await file.text();
-      const lines = text.trim().split('\n');
+      const isExcel = file.name.match(/\.(xlsx|xls)$/i);
+      let productos: ProductoCSV[] = [];
 
-      if (lines.length < 2) {
-        setError('El archivo debe tener encabezados y al menos 1 fila de datos');
-        return;
-      }
+      if (isExcel) {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
-      const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-      const nameIndex = headers.findIndex((h) => h.includes('nombre'));
-      const priceIndex = headers.findIndex((h) => h.includes('precio'));
-      const stockIndex = headers.findIndex((h) => h.includes('stock'));
-      const expireIndex = headers.findIndex((h) => h.includes('vencimiento'));
-
-      if (nameIndex === -1 || priceIndex === -1 || stockIndex === -1 || expireIndex === -1) {
-        setError('El CSV debe tener columnas: nombre, precio, stock, vencimiento');
-        return;
-      }
-
-      const productos: ProductoCSV[] = [];
-      for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',').map((p) => p.trim());
-        if (parts[nameIndex]) {
-          productos.push({
-            nombre: parts[nameIndex],
-            precio: parts[priceIndex] || '0',
-            stock: parts[stockIndex] || '0',
-            vencimiento: parts[expireIndex] || new Date().toISOString().split('T')[0],
-          });
+        if (data.length === 0) {
+          setError('El archivo Excel debe tener al menos 1 fila de datos');
+          return;
         }
+
+        productos = data
+          .filter((row: any) => row.nombre || row.Nombre || row.NOMBRE)
+          .map((row: any) => ({
+            nombre: row.nombre || row.Nombre || row.NOMBRE || '',
+            precio: String(row.precio || row.Precio || row.PRECIO || '0'),
+            stock: String(row.stock || row.Stock || row.STOCK || '0'),
+            vencimiento:
+              row.vencimiento ||
+              row.Vencimiento ||
+              row.VENCIMIENTO ||
+              row.fecha ||
+              row.Fecha ||
+              row.FECHA ||
+              new Date().toISOString().split('T')[0],
+            laboratorio: row.laboratorio || row.Laboratorio || row.LABORATORIO || '',
+          }));
+      } else {
+        const text = await file.text();
+        const lines = text.trim().split('\n');
+
+        if (lines.length < 2) {
+          setError('El archivo debe tener encabezados y al menos 1 fila de datos');
+          return;
+        }
+
+        const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+        const nameIndex = headers.findIndex((h) => h.includes('nombre'));
+        const priceIndex = headers.findIndex((h) => h.includes('precio'));
+        const stockIndex = headers.findIndex((h) => h.includes('stock'));
+        const expireIndex = headers.findIndex((h) => h.includes('vencimiento'));
+        const laborIndex = headers.findIndex((h) => h.includes('laboratorio'));
+
+        if (nameIndex === -1 || priceIndex === -1 || stockIndex === -1 || expireIndex === -1) {
+          setError('El CSV debe tener columnas: nombre, precio, stock, vencimiento');
+          return;
+        }
+
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',').map((p) => p.trim());
+          if (parts[nameIndex]) {
+            productos.push({
+              nombre: parts[nameIndex],
+              precio: parts[priceIndex] || '0',
+              stock: parts[stockIndex] || '0',
+              vencimiento: parts[expireIndex] || new Date().toISOString().split('T')[0],
+              laboratorio: laborIndex !== -1 ? parts[laborIndex] : '',
+            });
+          }
+        }
+      }
+
+      if (productos.length === 0) {
+        setError('No se encontraron productos válidos en el archivo');
+        return;
       }
 
       setPreview(productos.slice(0, 5));
     } catch (err) {
-      setError('Error al leer el archivo. Asegúrate que sea un CSV válido.');
+      console.error('Error parsing file:', err);
+      setError('Error al leer el archivo. Asegúrate que sea un CSV o Excel válido.');
     }
   };
 
@@ -90,25 +131,57 @@ function ImportarProductosContent() {
     setLoading(true);
 
     try {
-      const text = await file.text();
-      const lines = text.trim().split('\n');
-      const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-      const nameIndex = headers.findIndex((h) => h.includes('nombre'));
-      const priceIndex = headers.findIndex((h) => h.includes('precio'));
-      const stockIndex = headers.findIndex((h) => h.includes('stock'));
-      const expireIndex = headers.findIndex((h) => h.includes('vencimiento'));
-
+      const isExcel = file.name.match(/\.(xlsx|xls)$/i);
       const productos = [];
-      for (let i = 1; i < lines.length; i++) {
-        const parts = lines[i].split(',').map((p) => p.trim());
-        if (parts[nameIndex]) {
-          productos.push({
-            nombre: parts[nameIndex],
-            precio: parseFloat(parts[priceIndex] || '0'),
-            stock: parseInt(parts[stockIndex] || '0'),
-            vencimiento: parts[expireIndex] || new Date().toISOString().split('T')[0],
-            foto_url: 'https://via.placeholder.com/400?text=' + encodeURIComponent(parts[nameIndex]),
-          });
+
+      if (isExcel) {
+        const buffer = await file.arrayBuffer();
+        const workbook = XLSX.read(buffer, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+
+        for (const row of data) {
+          const nombre = row.nombre || row.Nombre || row.NOMBRE;
+          if (nombre) {
+            productos.push({
+              nombre,
+              precio: parseFloat(row.precio || row.Precio || row.PRECIO || '0'),
+              stock: parseInt(row.stock || row.Stock || row.STOCK || '0'),
+              vencimiento:
+                row.vencimiento ||
+                row.Vencimiento ||
+                row.VENCIMIENTO ||
+                row.fecha ||
+                row.Fecha ||
+                row.FECHA ||
+                new Date().toISOString().split('T')[0],
+              laboratorio: row.laboratorio || row.Laboratorio || row.LABORATORIO || '',
+              foto_url: 'https://via.placeholder.com/400?text=' + encodeURIComponent(nombre),
+            });
+          }
+        }
+      } else {
+        const text = await file.text();
+        const lines = text.trim().split('\n');
+        const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+        const nameIndex = headers.findIndex((h) => h.includes('nombre'));
+        const priceIndex = headers.findIndex((h) => h.includes('precio'));
+        const stockIndex = headers.findIndex((h) => h.includes('stock'));
+        const expireIndex = headers.findIndex((h) => h.includes('vencimiento'));
+        const laborIndex = headers.findIndex((h) => h.includes('laboratorio'));
+
+        for (let i = 1; i < lines.length; i++) {
+          const parts = lines[i].split(',').map((p) => p.trim());
+          if (parts[nameIndex]) {
+            productos.push({
+              nombre: parts[nameIndex],
+              precio: parseFloat(parts[priceIndex] || '0'),
+              stock: parseInt(parts[stockIndex] || '0'),
+              vencimiento: parts[expireIndex] || new Date().toISOString().split('T')[0],
+              laboratorio: laborIndex !== -1 ? parts[laborIndex] : '',
+              foto_url: 'https://via.placeholder.com/400?text=' + encodeURIComponent(parts[nameIndex]),
+            });
+          }
         }
       }
 
@@ -132,7 +205,11 @@ function ImportarProductosContent() {
       }, 2000);
     } catch (err) {
       console.error('Error importing productos:', err);
-      setError('Error al importar los productos. Intenta nuevamente.');
+      const msg =
+        (err as { message?: string; details?: string })?.message ||
+        (err as { details?: string })?.details ||
+        'Error desconocido';
+      setError(`Error al importar: ${msg}`);
     } finally {
       setLoading(false);
     }
@@ -165,17 +242,17 @@ function ImportarProductosContent() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-gray-700 font-semibold mb-4">Formato esperado del CSV:</label>
+              <label className="block text-gray-700 font-semibold mb-4">Formato esperado del CSV o Excel:</label>
               <div className="bg-gray-50 p-4 rounded border border-gray-200 mb-4">
                 <code className="text-xs sm:text-sm text-gray-800">
-                  nombre,precio,stock,vencimiento
+                  nombre,precio,stock,vencimiento,laboratorio
                   <br />
-                  Leche 1L,2.50,100,2025-12-31
+                  Leche 1L,2.50,100,2025-12-31,Bayer
                   <br />
-                  Queso,5.00,50,2025-11-30
+                  Queso,5.00,50,2025-11-30,Zoetis
                 </code>
               </div>
-              <p className="text-xs text-gray-600 mb-4">Las columnas deben ser: nombre, precio, stock, vencimiento (YYYY-MM-DD)</p>
+              <p className="text-xs text-gray-600 mb-4">Columnas requeridas: nombre, precio, stock, vencimiento (YYYY-MM-DD). Laboratorio es opcional.</p>
             </div>
 
             <div>
@@ -210,6 +287,7 @@ function ImportarProductosContent() {
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Precio</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Stock</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Vencimiento</th>
+                        <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Laboratorio</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -219,6 +297,7 @@ function ImportarProductosContent() {
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">${p.precio}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.stock}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.vencimiento}</td>
+                          <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.laboratorio || '-'}</td>
                         </tr>
                       ))}
                     </tbody>
