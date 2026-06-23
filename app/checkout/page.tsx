@@ -69,7 +69,7 @@ export default function CheckoutPage() {
   };
 
   const validateForm = (): boolean => {
-    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal', 'transporte'];
+    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
 
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -82,7 +82,6 @@ export default function CheckoutPage() {
           direccion: 'Dirección',
           ciudad: 'Ciudad',
           codigoPostal: 'Código Postal',
-          transporte: 'Transporte de preferencia',
         };
         setError(`${fieldNames[field]} es requerido`);
         return false;
@@ -398,15 +397,14 @@ export default function CheckoutPage() {
 
               {/* Transporte */}
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">Transporte de Preferencia *</label>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Transporte de Preferencia</label>
                 <select
                   name="transporte"
                   value={formData.transporte}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
-                  required
                 >
-                  <option value="">Selecciona un transporte</option>
+                  <option value="">Sin preferencia</option>
                   <option value="Moto">Moto</option>
                   <option value="Auto">Auto</option>
                   <option value="Camión">Camión</option>
