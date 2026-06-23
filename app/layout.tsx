@@ -16,8 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'INSUPEC - Plataforma de Pedidos',
-  description: 'Plataforma de pedidos online de INSUPEC',
+  title: 'INSUPEC - Plataforma de Pedidos Online',
+  description: 'Plataforma de pedidos online de INSUPEC. Compra productos frescos en línea.',
 };
 
 export default function RootLayout({
