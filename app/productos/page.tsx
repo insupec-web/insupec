@@ -57,16 +57,16 @@ export default function ProductosPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-bold text-gray-800 mb-2">Catálogo de Productos</h1>
-      <p className="text-gray-600 mb-8">Bienvenido a INSUPEC. Selecciona los productos que necesitas.</p>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+      <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">Catálogo de Productos</h1>
+      <p className="text-sm sm:text-base text-gray-600 mb-6 sm:mb-8">Bienvenido a INSUPEC. Selecciona los productos que necesitas.</p>
 
       {productos.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">No hay productos disponibles en este momento.</p>
+          <p className="text-gray-600 text-base sm:text-lg">No hay productos disponibles en este momento.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
           {productos.map((producto) => (
             <ProductCard key={producto.id} producto={producto} />
           ))}

@@ -11,21 +11,36 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        <Link href="/productos" className="flex-1">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
+        {/* Carrito a la izquierda en mobile */}
+        <Link
+          href="/carrito"
+          className="flex sm:hidden items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+        >
+          <ShoppingCart size={20} className="text-black" />
+          {itemCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+              {itemCount}
+            </span>
+          )}
+        </Link>
+
+        {/* Logo centrado */}
+        <Link href="/productos" className="flex-1 flex justify-center">
           <Image
             src="/logo.jpg"
             alt="INSUPEC"
-            width={120}
-            height={50}
+            width={140}
+            height={60}
             priority
-            className="h-12 w-auto"
+            className="h-12 sm:h-14 w-auto"
           />
         </Link>
 
+        {/* Carrito a la derecha en desktop */}
         <Link
           href="/carrito"
-          className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+          className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative"
         >
           <ShoppingCart size={24} className="text-black" />
           {itemCount > 0 && (

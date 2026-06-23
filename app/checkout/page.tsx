@@ -42,11 +42,11 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-12">
-        <div className="bg-white rounded-lg shadow-md p-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">Tu carrito está vacío</h1>
-          <p className="text-gray-600 mb-6">No hay productos en tu carrito.</p>
-          <Link href="/productos" className="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800">
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
+        <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 text-center">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Tu carrito está vacío</h1>
+          <p className="text-sm sm:text-base text-gray-600 mb-6">No hay productos en tu carrito.</p>
+          <Link href="/productos" className="bg-black text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-gray-800 inline-block text-sm sm:text-base">
             Ir al catálogo
           </Link>
         </div>
@@ -156,32 +156,32 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
+    <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
       {showSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 text-center max-w-sm">
-            <h2 className="text-2xl font-bold text-black mb-4">¡Éxito!</h2>
-            <p className="text-gray-700 mb-6">Tu pedido fue enviado a Insupec. Se abrirá WhatsApp automáticamente.</p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-lg p-6 sm:p-8 text-center max-w-sm w-full">
+            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">¡Éxito!</h2>
+            <p className="text-sm sm:text-base text-gray-700 mb-6">Tu pedido fue enviado a Insupec. Se abrirá WhatsApp automáticamente.</p>
           </div>
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-md p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-8">Información de Envío</h1>
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">Información de Envío</h1>
 
-            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">{error}</div>}
+            {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <input
                   type="text"
                   name="nombre"
                   placeholder="Nombre *"
                   value={formData.nombre}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                   required
                 />
                 <input
@@ -190,7 +190,7 @@ export default function CheckoutPage() {
                   placeholder="Apellido *"
                   value={formData.apellido}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                   required
                 />
               </div>
@@ -201,18 +201,18 @@ export default function CheckoutPage() {
                 placeholder="Razón Social *"
                 value={formData.razonSocial}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                 required
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <input
                   type="email"
                   name="email"
                   placeholder="Email *"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                   required
                 />
                 <input
@@ -221,7 +221,7 @@ export default function CheckoutPage() {
                   placeholder="Teléfono *"
                   value={formData.telefono}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                   required
                 />
               </div>
@@ -231,19 +231,19 @@ export default function CheckoutPage() {
                 placeholder="Dirección *"
                 value={formData.direccion}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                 rows={3}
                 required
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <input
                   type="text"
                   name="ciudad"
                   placeholder="Ciudad *"
                   value={formData.ciudad}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                   required
                 />
                 <input
@@ -252,18 +252,18 @@ export default function CheckoutPage() {
                   placeholder="Código Postal *"
                   value={formData.codigoPostal}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
                   required
                 />
               </div>
 
-              <label className="flex items-center gap-3 cursor-pointer">
+              <label className="flex items-center gap-3 cursor-pointer text-sm">
                 <input
                   type="checkbox"
                   name="factura"
                   checked={formData.factura}
                   onChange={handleInputChange}
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                 />
                 <span className="text-gray-700">¿Necesitas factura?</span>
               </label>
@@ -271,7 +271,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3 rounded-lg font-bold text-lg text-white transition-colors ${
+                className={`w-full py-2 sm:py-3 rounded-lg font-bold text-sm sm:text-base text-white transition-colors ${
                   loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
                 }`}
               >
@@ -282,25 +282,25 @@ export default function CheckoutPage() {
         </div>
 
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Resumen del Pedido</h2>
+          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 sticky top-24">
+            <h2 className="text-lg sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Resumen del Pedido</h2>
 
-            <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+            <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6 max-h-48 sm:max-h-64 overflow-y-auto">
               {items.map((item) => (
-                <div key={item.id} className="flex justify-between pb-4 border-b border-gray-200">
+                <div key={item.id} className="flex justify-between pb-3 sm:pb-4 border-b border-gray-200">
                   <div>
-                    <p className="font-semibold text-gray-800">{item.nombre}</p>
-                    <p className="text-sm text-gray-600">Cantidad: {item.cantidad}</p>
+                    <p className="font-semibold text-gray-800 text-sm line-clamp-2">{item.nombre}</p>
+                    <p className="text-xs text-gray-600">Cantidad: {item.cantidad}</p>
                   </div>
-                  <p className="font-semibold text-gray-800">${(item.precio * item.cantidad).toFixed(2)}</p>
+                  <p className="font-semibold text-gray-800 text-sm">${(item.precio * item.cantidad).toFixed(2)}</p>
                 </div>
               ))}
             </div>
 
-            <div className="border-t border-gray-300 pt-4 space-y-3">
-              <div className="flex justify-between text-lg">
-                <span className="font-semibold">Subtotal:</span>
-                <span className="font-bold text-black">${total.toFixed(2)}</span>
+            <div className="border-t border-gray-300 pt-3 sm:pt-4 space-y-2 sm:space-y-3">
+              <div className="flex justify-between text-base sm:text-lg">
+                <span className="font-semibold text-sm sm:text-base">Subtotal:</span>
+                <span className="font-bold text-black text-sm sm:text-base">${total.toFixed(2)}</span>
               </div>
             </div>
           </div>
