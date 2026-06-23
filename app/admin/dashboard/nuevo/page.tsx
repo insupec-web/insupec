@@ -65,9 +65,10 @@ function NuevoProductoContent() {
       throw error;
     }
 
-    const { data: publicUrl } = supabase.storage.from('productos').getPublicUrl(fileName);
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+    const publicUrl = `${supabaseUrl}/storage/v1/object/public/productos/${fileName}`;
 
-    return publicUrl.publicUrl;
+    return publicUrl;
   };
 
   const handleSubmit = async (e: FormEvent) => {
