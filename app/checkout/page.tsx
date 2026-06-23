@@ -40,6 +40,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [whatsappUrl, setWhatsappUrl] = useState('');
 
   if (items.length === 0) {
     return (
@@ -179,15 +180,13 @@ export default function CheckoutPage() {
 
       const whatsappLink = getWhatsAppLink(whatsappMessage);
 
+      setWhatsappUrl(whatsappLink);
       setShowSuccess(true);
       clearCart();
 
-      setTimeout(() => {
-        window.open(whatsappLink, '_blank');
-        setTimeout(() => {
-          router.push('/productos');
-        }, 1000);
-      }, 2000);
+      // Abrir WhatsApp inmediatamente, aprovechando el gesto del usuario (evita
+      // que Safari/Chrome bloqueen el popup). El modal ofrece un botón de respaldo.
+      window.location.href = whatsappLink;
     } catch (err) {
       console.error('Error submitting order:', err);
       setError('Error al enviar el pedido. Intenta nuevamente.');
@@ -205,7 +204,21 @@ export default function CheckoutPage() {
               <CheckCircle size={32} className="text-brand-600" />
             </div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">¡Pedido enviado!</h2>
-            <p className="text-sm sm:text-base text-gray-600">Tu pedido fue enviado a INSUPEC. Se abrirá WhatsApp automáticamente.</p>
+            <p className="text-sm sm:text-base text-gray-600 mb-5">Se abrirá WhatsApp para confirmar tu pedido con INSUPEC. Si no se abre automáticamente, tocá el botón.</p>
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-3 rounded-lg font-bold text-white bg-brand-600 hover:bg-brand-700 transition-colors mb-3"
+            >
+              Abrir WhatsApp
+            </a>
+            <button
+              onClick={() => router.push('/productos')}
+              className="block w-full py-3 rounded-lg font-semibold text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              Volver al catálogo
+            </button>
           </div>
         </div>
       )}
