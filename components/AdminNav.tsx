@@ -37,6 +37,9 @@ export default function AdminNav() {
           <Link href="/admin/dashboard/nuevo" className="text-black hover:text-gray-600 transition-colors text-sm">
             Crear Producto
           </Link>
+          <Link href="/admin/pedidos" className="text-black hover:text-gray-600 transition-colors text-sm font-semibold text-brand-600">
+            Pedidos
+          </Link>
           <Link href="/admin/importar" className="text-black hover:text-gray-600 transition-colors text-sm">
             Importar
           </Link>
@@ -74,6 +77,13 @@ export default function AdminNav() {
               onClick={handleNavClick}
             >
               Crear Producto
+            </Link>
+            <Link
+              href="/admin/pedidos"
+              className="text-black hover:text-gray-600 transition-colors text-sm py-2 font-semibold text-brand-600"
+              onClick={handleNavClick}
+            >
+              Pedidos
             </Link>
             <Link
               href="/admin/importar"

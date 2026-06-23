@@ -12,6 +12,7 @@ export default function ProductosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [sortPrice, setSortPrice] = useState<'asc' | 'desc' | null>(null);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -38,10 +39,25 @@ export default function ProductosPage() {
   }, []);
 
   const productosFiltrados = useMemo(() => {
+    let filtered = productos;
+
+    // Filtrar por búsqueda
     const q = query.trim().toLowerCase();
-    if (!q) return productos;
-    return productos.filter((p) => p.nombre.toLowerCase().includes(q));
-  }, [productos, query]);
+    if (q) {
+      filtered = filtered.filter((p) => p.nombre.toLowerCase().includes(q));
+    }
+
+    // Ordenar por precio
+    if (sortPrice) {
+      filtered = [...filtered].sort((a, b) => {
+        const priceA = a.precio || 0;
+        const priceB = b.precio || 0;
+        return sortPrice === 'asc' ? priceA - priceB : priceB - priceA;
+      });
+    }
+
+    return filtered;
+  }, [productos, query, sortPrice]);
 
   if (loading) {
     return (
@@ -73,16 +89,51 @@ export default function ProductosPage() {
         </p>
       </div>
 
-      {/* Buscador */}
-      <div className="relative mb-6 sm:mb-8 max-w-xl">
-        <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar producto por nombre..."
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-        />
+      {/* Buscador y Filtros */}
+      <div className="mb-6 sm:mb-8 space-y-4">
+        <div className="relative max-w-xl">
+          <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Buscar producto por nombre..."
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+          />
+        </div>
+
+        {/* Filtro de Precios */}
+        <div className="flex gap-2 flex-wrap">
+          <span className="text-sm font-semibold text-gray-700 flex items-center">Ordenar por precio:</span>
+          <button
+            onClick={() => setSortPrice(sortPrice === 'asc' ? null : 'asc')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              sortPrice === 'asc'
+                ? 'bg-brand-600 text-white'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }`}
+          >
+            ↑ Menor a Mayor
+          </button>
+          <button
+            onClick={() => setSortPrice(sortPrice === 'desc' ? null : 'desc')}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              sortPrice === 'desc'
+                ? 'bg-brand-600 text-white'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }`}
+          >
+            ↓ Mayor a Menor
+          </button>
+          {sortPrice && (
+            <button
+              onClick={() => setSortPrice(null)}
+              className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              Limpiar filtro
+            </button>
+          )}
+        </div>
       </div>
 
       {productos.length === 0 ? (

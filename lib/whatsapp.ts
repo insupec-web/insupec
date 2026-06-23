@@ -10,6 +10,8 @@ interface ClientData {
   ciudad: string;
   codigoPostal: string;
   factura: boolean;
+  metodoPago?: 'efectivo' | 'transferencia';
+  transporte?: string;
 }
 
 export function generateWhatsAppMessage(
@@ -18,6 +20,7 @@ export function generateWhatsAppMessage(
   total: number
 ): string {
   const factura = clientData.factura ? 'Sí' : 'No';
+  const metodoPago = clientData.metodoPago === 'transferencia' ? 'Transferencia Bancaria (Alias: HORA.COCTEL.CETRO)' : 'Efectivo';
 
   const productosList = items
     .map((item) => `• ${item.nombre} - Cantidad: ${item.cantidad} - $${item.precio.toFixed(2)}`)
@@ -35,11 +38,19 @@ Dirección: ${clientData.direccion}
 Ciudad: ${clientData.ciudad}
 Código Postal: ${clientData.codigoPostal}
 
+*ENVÍO:*
+Transporte de preferencia: ${clientData.transporte || '-'}
+
 *PRODUCTOS:*
 ${productosList}
 
 *SUBTOTAL:* $${total.toFixed(2)}
+
+*MÉTODO DE PAGO:* ${metodoPago}
 *¿NECESITA FACTURA?:* ${factura}
+
+⚠️ El envío corre por cuenta del comprador y se abona al transporte en destino.
+✓ Acepto pagar el envío al recibir el pedido.
 
 ---
 Pedido realizado desde la plataforma online.

@@ -20,6 +20,8 @@ interface FormData {
   ciudad: string;
   codigoPostal: string;
   factura: boolean;
+  metodoPago: 'efectivo' | 'transferencia';
+  transporte: string;
 }
 
 export default function CheckoutPage() {
@@ -35,6 +37,8 @@ export default function CheckoutPage() {
     ciudad: '',
     codigoPostal: '',
     factura: false,
+    metodoPago: 'efectivo',
+    transporte: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -65,7 +69,7 @@ export default function CheckoutPage() {
   };
 
   const validateForm = (): boolean => {
-    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
+    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal', 'transporte'];
 
     for (const field of requiredFields) {
       if (!formData[field]) {
@@ -78,6 +82,7 @@ export default function CheckoutPage() {
           direccion: 'Dirección',
           ciudad: 'Ciudad',
           codigoPostal: 'Código Postal',
+          transporte: 'Transporte de preferencia',
         };
         setError(`${fieldNames[field]} es requerido`);
         return false;
@@ -152,8 +157,11 @@ export default function CheckoutPage() {
           ciudad: formData.ciudad,
           codigo_postal: formData.codigoPostal,
           factura: formData.factura,
+          metodo_pago: formData.metodoPago,
+          transporte: formData.transporte,
           productos: productosData,
           total,
+          confirmado: false,
           timestamp: new Date().toISOString(),
         },
       ]);
@@ -173,6 +181,8 @@ export default function CheckoutPage() {
           ciudad: formData.ciudad,
           codigoPostal: formData.codigoPostal,
           factura: formData.factura,
+          metodoPago: formData.metodoPago,
+          transporte: formData.transporte,
         },
         items,
         total
@@ -337,6 +347,72 @@ export default function CheckoutPage() {
                     required
                   />
                 </div>
+              </div>
+
+              {/* Métodos de Pago */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-3 text-sm">Método de Pago</label>
+                <div className="space-y-3">
+                  <label className="flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors" style={{borderColor: formData.metodoPago === 'efectivo' ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)'}}>
+                    <input
+                      type="radio"
+                      name="metodoPago"
+                      value="efectivo"
+                      checked={formData.metodoPago === 'efectivo'}
+                      onChange={(e) => setFormData(prev => ({...prev, metodoPago: e.target.value as 'efectivo' | 'transferencia'}))}
+                      className="w-5 h-5"
+                    />
+                    <div>
+                      <span className="text-gray-800 font-semibold text-sm">Efectivo</span>
+                      <p className="text-gray-600 text-xs">Se abona al recibir o retirar el pedido</p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors" style={{borderColor: formData.metodoPago === 'transferencia' ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)'}}>
+                    <input
+                      type="radio"
+                      name="metodoPago"
+                      value="transferencia"
+                      checked={formData.metodoPago === 'transferencia'}
+                      onChange={(e) => setFormData(prev => ({...prev, metodoPago: e.target.value as 'efectivo' | 'transferencia'}))}
+                      className="w-5 h-5"
+                    />
+                    <div>
+                      <span className="text-gray-800 font-semibold text-sm">Transferencia Bancaria</span>
+                      <p className="text-gray-600 text-xs">Completa los datos abajo</p>
+                    </div>
+                  </label>
+                </div>
+
+                {formData.metodoPago === 'transferencia' && (
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm font-semibold text-gray-800 mb-2">Datos Bancarios:</p>
+                    <div className="space-y-1 text-sm text-gray-700">
+                      <p><strong>Alias:</strong> HORA.COCTEL.CETRO</p>
+                      <p><strong>Nombre de cuenta:</strong> Insupec SA</p>
+                      <p><strong>Banco:</strong> Comafi</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Transporte */}
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2 text-sm">Transporte de Preferencia *</label>
+                <input
+                  type="text"
+                  name="transporte"
+                  placeholder="Ej: Moto, Auto, Camión, etc."
+                  value={formData.transporte}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
+                  required
+                />
+              </div>
+
+              {/* Aviso de Envío */}
+              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                <p className="text-sm text-gray-700"><strong className="text-yellow-700">⚠️ Importante:</strong> El envío corre por cuenta del comprador y se abona al transporte en destino.</p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">
