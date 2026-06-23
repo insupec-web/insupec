@@ -221,25 +221,27 @@ function PedidosContent() {
                     </div>
 
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-brand-600">${pedido.total.toFixed(2)}</p>
-                      <button
-                        onClick={() => handleConfirmar(pedido.id, pedido.confirmado)}
-                        className={`mt-3 px-4 py-2 rounded-lg font-semibold text-white text-sm flex items-center gap-2 transition-colors ${
-                          pedido.confirmado
-                            ? 'bg-green-600 hover:bg-green-700'
-                            : 'bg-yellow-600 hover:bg-yellow-700'
-                        }`}
-                      >
-                        {pedido.confirmado ? (
-                          <>
-                            <Check size={16} /> Confirmado
-                          </>
-                        ) : (
-                          <>
-                            <X size={16} /> Pendiente
-                          </>
-                        )}
-                      </button>
+                      <p className="text-2xl font-bold text-brand-600 mb-4">${pedido.total.toFixed(2)}</p>
+                      {!pedido.confirmado ? (
+                        <div className="flex gap-2 justify-end">
+                          <button
+                            onClick={() => handleConfirmar(pedido.id, false)}
+                            className="px-4 py-2 rounded-lg font-semibold text-white text-sm bg-green-600 hover:bg-green-700 transition-colors flex items-center gap-2"
+                          >
+                            <Check size={16} /> Confirmar
+                          </button>
+                          <button
+                            onClick={() => handleConfirmar(pedido.id, true)}
+                            className="px-4 py-2 rounded-lg font-semibold text-white text-sm bg-red-600 hover:bg-red-700 transition-colors flex items-center gap-2"
+                          >
+                            <X size={16} /> Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="px-4 py-2 rounded-lg font-semibold text-white text-sm bg-green-600 flex items-center gap-2 justify-center">
+                          <Check size={16} /> Confirmado
+                        </div>
+                      )}
                     </div>
                   </div>
 
