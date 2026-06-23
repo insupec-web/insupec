@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, use, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { mesAnioADate, dateAMesAnio } from '@/lib/format';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -45,7 +46,7 @@ function EditProductoContent({ id }: { id: string }) {
             nombre: data.nombre,
             precio: data.precio.toString(),
             stock: data.stock.toString(),
-            vencimiento: data.vencimiento,
+            vencimiento: dateAMesAnio(data.vencimiento),
             laboratorio: data.laboratorio || '',
           });
           setPreview(data.foto_url);
@@ -130,7 +131,7 @@ function EditProductoContent({ id }: { id: string }) {
           nombre: formData.nombre,
           precio: parseFloat(formData.precio),
           stock: parseInt(formData.stock),
-          vencimiento: formData.vencimiento,
+          vencimiento: mesAnioADate(formData.vencimiento),
           laboratorio: formData.laboratorio,
           foto_url,
         })
@@ -232,9 +233,9 @@ function EditProductoContent({ id }: { id: string }) {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 font-semibold mb-2">Fecha de Vencimiento *</label>
+                <label className="block text-gray-700 font-semibold mb-2">Vencimiento (Mes/Año) *</label>
                 <input
-                  type="date"
+                  type="month"
                   name="vencimiento"
                   value={formData.vencimiento}
                   onChange={handleInputChange}

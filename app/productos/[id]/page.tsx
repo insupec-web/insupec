@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
+import { formatMesAnio } from '@/lib/format';
 
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -117,7 +118,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
               <Calendar size={18} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
               <span className="text-gray-500">Vencimiento:</span>
               <span className={`font-semibold ${isAboutToExpire ? 'text-red-600' : 'text-gray-800'}`}>
-                {vencimiento.toLocaleDateString('es-AR')}
+                {formatMesAnio(producto.vencimiento)}
               </span>
             </div>
             <div className="flex items-center gap-3 text-sm">

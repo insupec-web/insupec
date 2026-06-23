@@ -9,6 +9,7 @@ import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
 import { Upload, CheckCircle } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import { formatMesAnio } from '@/lib/format';
 
 interface ProductoCSV {
   nombre: string;
@@ -16,6 +17,108 @@ interface ProductoCSV {
   stock: string;
   vencimiento: string;
   laboratorio?: string;
+}
+
+interface ProductoImport {
+  nombre: string;
+  precio: number;
+  stock: number;
+  vencimiento: string;
+  laboratorio: string;
+  foto_url: string;
+}
+
+// Normaliza las claves de una fila: sin espacios y en minúscula.
+function normalizeRow(row: Record<string, unknown>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  for (const key of Object.keys(row)) {
+    out[key.trim().toLowerCase()] = row[key];
+  }
+  return out;
+}
+
+// Devuelve el primer valor no vacío entre varias claves posibles.
+function pick(row: Record<string, unknown>, ...keys: string[]): unknown {
+  for (const k of keys) {
+    const v = row[k];
+    if (v !== undefined && v !== null && String(v).trim() !== '') return v;
+  }
+  return '';
+}
+
+// Convierte distintos formatos de fecha a YYYY-MM-DD.
+function parseVencimiento(value: unknown): string {
+  const fallback = new Date().toISOString().split('T')[0];
+  if (value === undefined || value === null || value === '') return fallback;
+
+  // Número de serie de Excel (días desde 1900).
+  if (typeof value === 'number') {
+    const d = new Date(Math.round((value - 25569) * 86400 * 1000));
+    if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+  }
+
+  const str = String(value).trim();
+  let m = str.match(/^(\d{1,2})\/(\d{4})$/); // MM/YYYY
+  if (m) return `${m[2]}-${m[1].padStart(2, '0')}-01`;
+  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); // DD/MM/YYYY
+  if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str; // YYYY-MM-DD
+  m = str.match(/^(\d{4})-(\d{1,2})$/); // YYYY-MM
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-01`;
+
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? fallback : d.toISOString().split('T')[0];
+}
+
+// Convierte a número tolerando strings con símbolos o separadores.
+function parseNumero(value: unknown): number {
+  if (typeof value === 'number') return value;
+  const cleaned = String(value || '').replace(/[^0-9.,-]/g, '').replace(',', '.');
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
+}
+
+// Lee un archivo CSV/Excel y devuelve los productos listos para guardar.
+async function extractProductos(file: File): Promise<ProductoImport[]> {
+  const isExcel = /\.(xlsx|xls)$/i.test(file.name);
+  let rawRows: Record<string, unknown>[] = [];
+
+  if (isExcel) {
+    const buffer = await file.arrayBuffer();
+    const workbook = XLSX.read(buffer, { type: 'array' });
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as Record<string, unknown>[];
+  } else {
+    const text = await file.text();
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(',').map((h) => h.trim());
+    for (let i = 1; i < lines.length; i++) {
+      const parts = lines[i].split(',');
+      const obj: Record<string, unknown> = {};
+      headers.forEach((h, idx) => (obj[h] = (parts[idx] ?? '').trim()));
+      rawRows.push(obj);
+    }
+  }
+
+  const productos: ProductoImport[] = [];
+  for (const raw of rawRows) {
+    const row = normalizeRow(raw);
+    const nombre = String(pick(row, 'nombre', 'producto', 'descripcion')).trim();
+    if (!nombre) continue;
+
+    // Preferir "precio final" sobre "precio" si existe.
+    const precioRaw = pick(row, 'precio final', 'precio', 'precio venta');
+    productos.push({
+      nombre,
+      precio: Math.round(parseNumero(precioRaw) * 100) / 100,
+      stock: Math.round(parseNumero(pick(row, 'stock', 'cantidad'))),
+      vencimiento: parseVencimiento(pick(row, 'vencimiento', 'fecha', 'vto')),
+      laboratorio: String(pick(row, 'laboratorio', 'lab', 'marca')).trim(),
+      foto_url: '',
+    });
+  }
+  return productos;
 }
 
 function ImportarProductosContent() {
@@ -42,77 +145,22 @@ function ImportarProductosContent() {
 
   const parseFile = async (file: File) => {
     try {
-      const isExcel = file.name.match(/\.(xlsx|xls)$/i);
-      let productos: ProductoCSV[] = [];
-
-      if (isExcel) {
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'array' });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-
-        if (data.length === 0) {
-          setError('El archivo Excel debe tener al menos 1 fila de datos');
-          return;
-        }
-
-        productos = data
-          .filter((row: any) => row.nombre || row.Nombre || row.NOMBRE)
-          .map((row: any) => ({
-            nombre: row.nombre || row.Nombre || row.NOMBRE || '',
-            precio: String(row.precio || row.Precio || row.PRECIO || '0'),
-            stock: String(row.stock || row.Stock || row.STOCK || '0'),
-            vencimiento:
-              row.vencimiento ||
-              row.Vencimiento ||
-              row.VENCIMIENTO ||
-              row.fecha ||
-              row.Fecha ||
-              row.FECHA ||
-              new Date().toISOString().split('T')[0],
-            laboratorio: row.laboratorio || row.Laboratorio || row.LABORATORIO || '',
-          }));
-      } else {
-        const text = await file.text();
-        const lines = text.trim().split('\n');
-
-        if (lines.length < 2) {
-          setError('El archivo debe tener encabezados y al menos 1 fila de datos');
-          return;
-        }
-
-        const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-        const nameIndex = headers.findIndex((h) => h.includes('nombre'));
-        const priceIndex = headers.findIndex((h) => h.includes('precio'));
-        const stockIndex = headers.findIndex((h) => h.includes('stock'));
-        const expireIndex = headers.findIndex((h) => h.includes('vencimiento'));
-        const laborIndex = headers.findIndex((h) => h.includes('laboratorio'));
-
-        if (nameIndex === -1 || priceIndex === -1 || stockIndex === -1 || expireIndex === -1) {
-          setError('El CSV debe tener columnas: nombre, precio, stock, vencimiento');
-          return;
-        }
-
-        for (let i = 1; i < lines.length; i++) {
-          const parts = lines[i].split(',').map((p) => p.trim());
-          if (parts[nameIndex]) {
-            productos.push({
-              nombre: parts[nameIndex],
-              precio: parts[priceIndex] || '0',
-              stock: parts[stockIndex] || '0',
-              vencimiento: parts[expireIndex] || new Date().toISOString().split('T')[0],
-              laboratorio: laborIndex !== -1 ? parts[laborIndex] : '',
-            });
-          }
-        }
-      }
+      const productos = await extractProductos(file);
 
       if (productos.length === 0) {
         setError('No se encontraron productos válidos en el archivo');
         return;
       }
 
-      setPreview(productos.slice(0, 5));
+      setPreview(
+        productos.slice(0, 5).map((p) => ({
+          nombre: p.nombre,
+          precio: p.precio.toFixed(2),
+          stock: String(p.stock),
+          vencimiento: formatMesAnio(p.vencimiento),
+          laboratorio: p.laboratorio,
+        }))
+      );
     } catch (err) {
       console.error('Error parsing file:', err);
       setError('Error al leer el archivo. Asegúrate que sea un CSV o Excel válido.');
@@ -131,60 +179,7 @@ function ImportarProductosContent() {
     setLoading(true);
 
     try {
-      const isExcel = file.name.match(/\.(xlsx|xls)$/i);
-      const productos = [];
-
-      if (isExcel) {
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: 'array' });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const data = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-
-        for (const row of data) {
-          const rowData = row as any;
-          const nombre = rowData.nombre || rowData.Nombre || rowData.NOMBRE;
-          if (nombre) {
-            productos.push({
-              nombre,
-              precio: parseFloat(rowData.precio || rowData.Precio || rowData.PRECIO || '0'),
-              stock: parseInt(rowData.stock || rowData.Stock || rowData.STOCK || '0'),
-              vencimiento:
-                rowData.vencimiento ||
-                rowData.Vencimiento ||
-                rowData.VENCIMIENTO ||
-                rowData.fecha ||
-                rowData.Fecha ||
-                rowData.FECHA ||
-                new Date().toISOString().split('T')[0],
-              laboratorio: rowData.laboratorio || rowData.Laboratorio || rowData.LABORATORIO || '',
-              foto_url: 'https://via.placeholder.com/400?text=' + encodeURIComponent(nombre),
-            });
-          }
-        }
-      } else {
-        const text = await file.text();
-        const lines = text.trim().split('\n');
-        const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
-        const nameIndex = headers.findIndex((h) => h.includes('nombre'));
-        const priceIndex = headers.findIndex((h) => h.includes('precio'));
-        const stockIndex = headers.findIndex((h) => h.includes('stock'));
-        const expireIndex = headers.findIndex((h) => h.includes('vencimiento'));
-        const laborIndex = headers.findIndex((h) => h.includes('laboratorio'));
-
-        for (let i = 1; i < lines.length; i++) {
-          const parts = lines[i].split(',').map((p) => p.trim());
-          if (parts[nameIndex]) {
-            productos.push({
-              nombre: parts[nameIndex],
-              precio: parseFloat(parts[priceIndex] || '0'),
-              stock: parseInt(parts[stockIndex] || '0'),
-              vencimiento: parts[expireIndex] || new Date().toISOString().split('T')[0],
-              laboratorio: laborIndex !== -1 ? parts[laborIndex] : '',
-              foto_url: 'https://via.placeholder.com/400?text=' + encodeURIComponent(parts[nameIndex]),
-            });
-          }
-        }
-      }
+      const productos = await extractProductos(file);
 
       if (productos.length === 0) {
         setError('No se encontraron productos válidos en el archivo');
@@ -248,12 +243,15 @@ function ImportarProductosContent() {
                 <code className="text-xs sm:text-sm text-gray-800">
                   nombre,precio,stock,vencimiento,laboratorio
                   <br />
-                  Leche 1L,2.50,100,2025-12-31,Bayer
+                  Leche 1L,2.50,100,12/2026,Bayer
                   <br />
-                  Queso,5.00,50,2025-11-30,Zoetis
+                  Queso,5.00,50,11/2026,Zoetis
                 </code>
               </div>
-              <p className="text-xs text-gray-600 mb-4">Columnas requeridas: nombre, precio, stock, vencimiento (YYYY-MM-DD). Laboratorio es opcional.</p>
+              <p className="text-xs text-gray-600 mb-4">
+                Columnas: nombre, precio (o &quot;Precio Final&quot;), stock, vencimiento (MM/AAAA) y laboratorio.
+                Se aceptan archivos Excel directamente.
+              </p>
             </div>
 
             <div>

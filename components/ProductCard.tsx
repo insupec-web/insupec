@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
+import { formatMesAnio } from '@/lib/format';
 import { Package, Calendar, Plus, Minus } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
@@ -85,7 +86,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <span className="inline-flex items-center gap-1">
             <Calendar size={14} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
             <span className={isAboutToExpire ? 'text-red-600 font-semibold' : ''}>
-              {vencimiento.toLocaleDateString('es-AR')}
+              {formatMesAnio(producto.vencimiento)}
             </span>
           </span>
           <span className="text-gray-400">•</span>
