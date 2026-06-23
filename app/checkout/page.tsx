@@ -68,13 +68,6 @@ export default function CheckoutPage() {
     }));
   };
 
-  const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   const validateForm = (): boolean => {
     const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
@@ -406,20 +399,14 @@ export default function CheckoutPage() {
               {/* Transporte */}
               <div>
                 <label className="block text-gray-700 font-semibold mb-2 text-sm">Transporte de Preferencia</label>
-                <select
+                <input
+                  type="text"
                   name="transporte"
+                  placeholder="Ej: Moto, Auto, Camión, etc."
                   value={formData.transporte}
-                  onChange={handleSelectChange}
+                  onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
-                >
-                  <option value="">Sin preferencia</option>
-                  <option value="Moto">Moto</option>
-                  <option value="Auto">Auto</option>
-                  <option value="Camión">Camión</option>
-                  <option value="Utilitario">Utilitario</option>
-                  <option value="Bicicleta">Bicicleta</option>
-                  <option value="Otro">Otro</option>
-                </select>
+                />
               </div>
 
               {/* Aviso de Envío */}
