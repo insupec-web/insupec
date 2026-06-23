@@ -11,14 +11,14 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 py-2 sm:py-3 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
         {/* Carrito a la izquierda en mobile */}
         <button
           onClick={openCart}
-          className="flex sm:hidden items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+          className="flex sm:hidden items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors relative flex-shrink-0"
           aria-label="Abrir carrito"
         >
-          <ShoppingCart size={22} className="text-gray-800" />
+          <ShoppingCart size={20} className="text-gray-800" />
           {itemCount > 0 && (
             <span className="absolute top-0 right-0 bg-brand-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               {itemCount}
@@ -27,21 +27,21 @@ export default function Header() {
         </button>
 
         {/* Logo centrado */}
-        <Link href="/productos" className="flex-1 flex justify-center">
+        <Link href="/productos" className="flex-1 flex justify-center min-w-0">
           <Image
             src="/logo.png"
             alt="INSUPEC - Insumos Pecuarios"
-            width={616}
-            height={214}
+            width={338}
+            height={109}
             priority
-            className="h-11 sm:h-14 w-auto"
+            className="h-10 sm:h-16 w-auto"
           />
         </Link>
 
         {/* Carrito a la derecha en desktop */}
         <button
           onClick={openCart}
-          className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+          className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative flex-shrink-0"
           aria-label="Abrir carrito"
         >
           <ShoppingCart size={24} className="text-gray-800" />
