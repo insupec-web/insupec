@@ -33,13 +33,14 @@ export default function ProductCard({ producto }: { producto: Producto }) {
   return (
     <div className="group bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-500 hover:shadow-lg transition-all duration-200">
       {/* Foto del producto */}
-      <Link href={`/productos/${producto.id}`} className="relative block h-40 sm:h-48 bg-gray-100 overflow-hidden">
+      <Link href={`/productos/${producto.id}`} className="relative block h-40 sm:h-48 bg-white overflow-hidden">
         {producto.foto_url ? (
           <Image
             src={producto.foto_url}
             alt={producto.nombre}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+            className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">

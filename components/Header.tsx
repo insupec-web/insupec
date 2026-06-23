@@ -11,7 +11,7 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="relative max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 flex items-center justify-between">
         {/* Carrito a la izquierda en mobile */}
         <button
           onClick={openCart}
@@ -26,8 +26,11 @@ export default function Header() {
           )}
         </button>
 
-        {/* Logo centrado */}
-        <Link href="/productos" className="flex-1 flex justify-center min-w-0">
+        {/* Logo perfectamente centrado (posición absoluta) */}
+        <Link
+          href="/productos"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center"
+        >
           <Image
             src="/logo.png"
             alt="INSUPEC - Insumos Pecuarios"
@@ -38,10 +41,13 @@ export default function Header() {
           />
         </Link>
 
+        {/* Spacer izquierda en desktop para balancear el flex */}
+        <div className="hidden sm:block flex-shrink-0 w-[120px]" aria-hidden="true" />
+
         {/* Carrito a la derecha en desktop */}
         <button
           onClick={openCart}
-          className="hidden sm:flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative flex-shrink-0"
+          className="hidden sm:flex items-center justify-end gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative flex-shrink-0 w-[120px]"
           aria-label="Abrir carrito"
         >
           <ShoppingCart size={24} className="text-gray-800" />
@@ -52,6 +58,9 @@ export default function Header() {
             </span>
           )}
         </button>
+
+        {/* Spacer derecha en mobile para balancear el carrito izquierdo */}
+        <div className="block sm:hidden flex-shrink-0 w-9" aria-hidden="true" />
       </div>
     </header>
   );

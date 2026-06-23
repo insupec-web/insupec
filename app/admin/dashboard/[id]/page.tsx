@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
+import { useState, useEffect, use, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
@@ -11,7 +11,7 @@ import Link from 'next/link';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-function EditProductoContent({ params }: { params: { id: string } }) {
+function EditProductoContent({ id }: { id: string }) {
   const [formData, setFormData] = useState({
     nombre: '',
     precio: '',
@@ -33,7 +33,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
         const { data, error } = await supabase
           .from('productos')
           .select('*')
-          .eq('id', params.id)
+          .eq('id', id)
           .single();
 
         if (error) {
@@ -59,7 +59,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
     }
 
     fetchProducto();
-  }, [params.id]);
+  }, [id]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -134,7 +134,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
           laboratorio: formData.laboratorio,
           foto_url,
         })
-        .eq('id', params.id);
+        .eq('id', id);
 
       if (updateError) {
         throw updateError;
@@ -307,11 +307,12 @@ function EditProductoContent({ params }: { params: { id: string } }) {
   );
 }
 
-export default function EditProductoPage({ params }: { params: { id: string } }) {
+export default function EditProductoPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   return (
     <ProtectedAdminRoute>
       <div className="min-h-screen bg-white">
-        <EditProductoContent params={params} />
+        <EditProductoContent id={id} />
       </div>
     </ProtectedAdminRoute>
   );

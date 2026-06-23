@@ -2,14 +2,15 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { useCart } from '@/hooks/useCart';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
 
-export default function ProductoDetailPage({ params }: { params: { id: string } }) {
+export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [producto, setProducto] = useState<Producto | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -22,7 +23,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
         const { data, error } = await supabase
           .from('productos')
           .select('*')
-          .eq('id', params.id)
+          .eq('id', id)
           .single();
 
         if (error) {
@@ -39,7 +40,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
     }
 
     fetchProducto();
-  }, [params.id]);
+  }, [id]);
 
   const handleAddToCart = () => {
     if (producto) {
@@ -89,9 +90,9 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
-        <div className="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden border border-gray-200">
+        <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-200">
           {producto.foto_url ? (
-            <Image src={producto.foto_url} alt={producto.nombre} fill className="object-cover" />
+            <Image src={producto.foto_url} alt={producto.nombre} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-6" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package size={64} className="text-gray-300" />
