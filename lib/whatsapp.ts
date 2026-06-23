@@ -48,7 +48,8 @@ Pedido realizado desde la plataforma online.
   return message;
 }
 
-export function getWhatsAppLink(message: string, phoneNumber: string = '5493492615886'): string {
+export function getWhatsAppLink(message: string): string {
+  const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5493492615886';
   const encodedMessage = encodeURIComponent(message);
   return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 }
