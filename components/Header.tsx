@@ -30,8 +30,8 @@ export default function Header() {
           <Image
             src="/logo.svg"
             alt="INSUPEC"
-            width={280}
-            height={120}
+            width={140}
+            height={140}
             priority
             className="h-20 sm:h-28 w-auto"
           />
