@@ -15,7 +15,7 @@ export default function CarritoPage() {
       <div className="flex gap-4">
         <Link
           href="/productos"
-          className="flex-1 py-3 rounded-lg font-bold text-center border-2 border-[#4ca82b] text-[#4ca82b] hover:bg-green-50 transition-colors"
+          className="flex-1 py-3 rounded-lg font-bold text-center border-2 border-black text-black hover:bg-gray-100 transition-colors"
         >
           CONTINUAR COMPRANDO
         </Link>

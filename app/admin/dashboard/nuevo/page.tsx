@@ -98,7 +98,7 @@ export default function NuevoProductoPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <AdminNav />
 
       <div className="max-w-2xl mx-auto px-4 py-20">
@@ -118,7 +118,7 @@ export default function NuevoProductoPage() {
                 value={formData.nombre}
                 onChange={handleInputChange}
                 placeholder="Ej: Leche entera 1L"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                 required
               />
             </div>
@@ -133,7 +133,7 @@ export default function NuevoProductoPage() {
                   value={formData.precio}
                   onChange={handleInputChange}
                   placeholder="0.00"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -146,7 +146,7 @@ export default function NuevoProductoPage() {
                   value={formData.stock}
                   onChange={handleInputChange}
                   placeholder="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -159,7 +159,7 @@ export default function NuevoProductoPage() {
                 name="vencimiento"
                 value={formData.vencimiento}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                 required
               />
             </div>
@@ -196,7 +196,7 @@ export default function NuevoProductoPage() {
                 type="submit"
                 disabled={loading}
                 className={`flex-1 py-3 rounded-lg font-bold text-white transition-colors ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4ca82b] hover:bg-green-700'
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
                 }`}
               >
                 {loading ? 'Guardando...' : 'GUARDAR PRODUCTO'}

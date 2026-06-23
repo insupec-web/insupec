@@ -55,7 +55,7 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <AdminNav />
 
       <div className="max-w-7xl mx-auto px-4 py-20">
@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
           <h1 className="text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
           <Link
             href="/admin/dashboard/nuevo"
-            className="flex items-center gap-2 bg-[#4ca82b] text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors"
           >
             <Plus size={20} />
             Crear Producto
@@ -79,7 +79,7 @@ export default function AdminDashboardPage() {
         ) : productos.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-8 text-center">
             <p className="text-gray-600 mb-4">No hay productos disponibles</p>
-            <Link href="/admin/dashboard/nuevo" className="bg-[#4ca82b] text-white px-6 py-2 rounded-lg hover:bg-green-700">
+            <Link href="/admin/dashboard/nuevo" className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800">
               Crear el primer producto
             </Link>
           </div>

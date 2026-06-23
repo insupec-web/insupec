@@ -11,7 +11,7 @@ export default function CartSidebar() {
     return (
       <div className="bg-white rounded-lg shadow-md p-6 text-center">
         <p className="text-gray-500 mb-4">Tu carrito está vacío</p>
-        <a href="/productos" className="text-[#4ca82b] hover:underline font-semibold">
+        <a href="/productos" className="text-black hover:underline font-semibold">
           Continuar comprando
         </a>
       </div>
@@ -73,7 +73,7 @@ export default function CartSidebar() {
       <div className="border-t border-gray-300 pt-4 space-y-3">
         <div className="flex justify-between text-lg">
           <span className="font-semibold">Subtotal:</span>
-          <span className="font-bold text-[#4ca82b]">${total.toFixed(2)}</span>
+          <span className="font-bold text-black">${total.toFixed(2)}</span>
         </div>
         <div className="flex justify-between text-sm text-gray-600">
           <span>Cantidad de items:</span>
@@ -83,7 +83,7 @@ export default function CartSidebar() {
 
       <a
         href="/checkout"
-        className="w-full mt-6 bg-[#4ca82b] text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-colors block text-center"
+        className="w-full mt-6 bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors block text-center"
       >
         IR A CHECKOUT
       </a>

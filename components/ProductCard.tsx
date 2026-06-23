@@ -53,13 +53,13 @@ export default function ProductCard({ producto }: { producto: Producto }) {
 
       <div className="p-4">
         <Link href={`/productos/${producto.id}`}>
-          <h3 className="font-semibold text-lg text-gray-800 mb-2 hover:text-[#4ca82b] transition-colors">
+          <h3 className="font-semibold text-lg text-black mb-2 hover:text-gray-700 transition-colors">
             {producto.nombre}
           </h3>
         </Link>
 
         <div className="flex justify-between items-center mb-3">
-          <span className="text-xl font-bold text-[#4ca82b]">${producto.precio.toFixed(2)}</span>
+          <span className="text-xl font-bold text-black">${producto.precio.toFixed(2)}</span>
           <span className={`text-sm font-semibold ${isAboutToExpire ? 'text-red-600' : 'text-gray-600'}`}>
             Vence: {vencimiento.toLocaleDateString('es-AR')}
           </span>
@@ -91,7 +91,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
             className={`flex-1 py-2 rounded-lg font-semibold transition-colors ${
               isOutOfStock
                 ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                : 'bg-[#4ca82b] text-white hover:bg-green-700'
+                : 'bg-black text-white hover:bg-gray-800'
             }`}
           >
             {isOutOfStock ? 'SIN STOCK' : 'AGREGAR'}

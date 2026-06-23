@@ -46,7 +46,7 @@ export default function CheckoutPage() {
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-800 mb-4">Tu carrito está vacío</h1>
           <p className="text-gray-600 mb-6">No hay productos en tu carrito.</p>
-          <Link href="/productos" className="bg-[#4ca82b] text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">
+          <Link href="/productos" className="bg-black text-white px-6 py-3 rounded-lg font-bold hover:bg-gray-800">
             Ir al catálogo
           </Link>
         </div>
@@ -160,7 +160,7 @@ export default function CheckoutPage() {
       {showSuccess && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 text-center max-w-sm">
-            <h2 className="text-2xl font-bold text-[#4ca82b] mb-4">¡Éxito!</h2>
+            <h2 className="text-2xl font-bold text-black mb-4">¡Éxito!</h2>
             <p className="text-gray-700 mb-6">Tu pedido fue enviado a Insupec. Se abrirá WhatsApp automáticamente.</p>
           </div>
         </div>
@@ -181,7 +181,7 @@ export default function CheckoutPage() {
                   placeholder="Nombre *"
                   value={formData.nombre}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
                 <input
@@ -190,7 +190,7 @@ export default function CheckoutPage() {
                   placeholder="Apellido *"
                   value={formData.apellido}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -212,7 +212,7 @@ export default function CheckoutPage() {
                   placeholder="Email *"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
                 <input
@@ -221,7 +221,7 @@ export default function CheckoutPage() {
                   placeholder="Teléfono *"
                   value={formData.telefono}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -243,7 +243,7 @@ export default function CheckoutPage() {
                   placeholder="Ciudad *"
                   value={formData.ciudad}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
                 <input
@@ -252,7 +252,7 @@ export default function CheckoutPage() {
                   placeholder="Código Postal *"
                   value={formData.codigoPostal}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -272,7 +272,7 @@ export default function CheckoutPage() {
                 type="submit"
                 disabled={loading}
                 className={`w-full py-3 rounded-lg font-bold text-lg text-white transition-colors ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4ca82b] hover:bg-green-700'
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
                 }`}
               >
                 {loading ? 'Procesando...' : 'ENVIAR PEDIDO POR WHATSAPP'}
@@ -300,7 +300,7 @@ export default function CheckoutPage() {
             <div className="border-t border-gray-300 pt-4 space-y-3">
               <div className="flex justify-between text-lg">
                 <span className="font-semibold">Subtotal:</span>
-                <span className="font-bold text-[#4ca82b]">${total.toFixed(2)}</span>
+                <span className="font-bold text-black">${total.toFixed(2)}</span>
               </div>
             </div>
           </div>

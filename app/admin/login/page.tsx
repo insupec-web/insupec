@@ -31,9 +31,9 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#4ca82b] to-green-700 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-sm w-full">
-        <h1 className="text-3xl font-bold text-center text-[#4ca82b] mb-8">INSUPEC ADMIN</h1>
+        <h1 className="text-3xl font-bold text-center text-black mb-8">INSUPEC ADMIN</h1>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">{error}</div>}
 
@@ -45,7 +45,7 @@ export default function AdminLoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Ingresa tu usuario"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
               required
             />
           </div>
@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Ingresa tu contraseña"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
               required
             />
           </div>
@@ -66,7 +66,7 @@ export default function AdminLoginPage() {
             type="submit"
             disabled={loading}
             className={`w-full py-3 rounded-lg font-bold text-white transition-colors ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4ca82b] hover:bg-green-700'
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
             }`}
           >
             {loading ? 'Verificando...' : 'INGRESAR'}
@@ -74,7 +74,7 @@ export default function AdminLoginPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <Link href="/productos" className="text-gray-600 hover:text-[#4ca82b] text-sm">
+          <Link href="/productos" className="text-gray-600 hover:text-black text-sm">
             Volver al catálogo
           </Link>
         </div>

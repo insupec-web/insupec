@@ -133,7 +133,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <AdminNav />
         <div className="max-w-2xl mx-auto px-4 py-20">
           <p className="text-gray-600">Cargando...</p>
@@ -144,11 +144,11 @@ export default function EditProductoPage({ params }: { params: { id: string } })
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-white">
         <AdminNav />
         <div className="max-w-2xl mx-auto px-4 py-20">
           <p className="text-red-600 font-semibold mb-4">{error}</p>
-          <Link href="/admin/dashboard" className="text-[#4ca82b] hover:underline">
+          <Link href="/admin/dashboard" className="text-black hover:text-gray-700">
             Volver al dashboard
           </Link>
         </div>
@@ -157,7 +157,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <AdminNav />
 
       <div className="max-w-2xl mx-auto px-4 py-20">
@@ -176,7 +176,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
                 name="nombre"
                 value={formData.nombre}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                 required
               />
             </div>
@@ -190,7 +190,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
                   name="precio"
                   value={formData.precio}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -202,7 +202,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
                   name="stock"
                   value={formData.stock}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                   required
                 />
               </div>
@@ -215,7 +215,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
                 name="vencimiento"
                 value={formData.vencimiento}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#4ca82b]"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
                 required
               />
             </div>
@@ -251,7 +251,7 @@ export default function EditProductoPage({ params }: { params: { id: string } })
                 type="submit"
                 disabled={saving}
                 className={`flex-1 py-3 rounded-lg font-bold text-white transition-colors ${
-                  saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#4ca82b] hover:bg-green-700'
+                  saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
                 }`}
               >
                 {saving ? 'Guardando...' : 'GUARDAR CAMBIOS'}

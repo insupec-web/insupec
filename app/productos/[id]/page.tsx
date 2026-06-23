@@ -68,7 +68,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
     return (
       <div className="max-w-4xl mx-auto px-4 py-12">
         <p className="text-red-600 font-semibold mb-4">{error || 'Producto no encontrado'}</p>
-        <Link href="/productos" className="text-[#4ca82b] hover:underline flex items-center gap-2">
+        <Link href="/productos" className="text-black hover:text-gray-700 flex items-center gap-2">
           <ArrowLeft size={20} />
           Volver al catálogo
         </Link>
@@ -104,7 +104,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
             <h1 className="text-4xl font-bold text-gray-800 mb-4">{producto.nombre}</h1>
 
             <div className="mb-6">
-              <span className="text-4xl font-bold text-[#4ca82b]">${producto.precio.toFixed(2)}</span>
+              <span className="text-4xl font-bold text-black">${producto.precio.toFixed(2)}</span>
             </div>
 
             <div className="mb-6 space-y-2">
@@ -142,7 +142,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
               className={`w-full py-3 rounded-lg font-bold text-lg transition-colors ${
                 isOutOfStock
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-[#4ca82b] text-white hover:bg-green-700'
+                  : 'bg-black text-white hover:bg-gray-800'
               }`}
             >
               {isOutOfStock ? 'SIN STOCK' : 'AGREGAR AL CARRITO'}
@@ -150,7 +150,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
 
             <Link
               href="/carrito"
-              className="w-full py-3 rounded-lg font-bold text-lg text-center border-2 border-[#4ca82b] text-[#4ca82b] hover:bg-green-50 transition-colors"
+              className="w-full py-3 rounded-lg font-bold text-lg text-center border-2 border-black text-black hover:bg-gray-100 transition-colors"
             >
               IR AL CARRITO
             </Link>
