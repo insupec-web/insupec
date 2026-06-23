@@ -2,26 +2,26 @@
 
 import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { isAdminLoggedIn } from '@/lib/auth';
 
 export function ProtectedAdminRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useAuth();
   const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    setIsChecking(true);
-    const timer = setTimeout(() => {
-      if (!isAuthenticated) {
-        router.push('/admin/login');
-      }
+    // Verificar autenticación contra localStorage (fuente de verdad).
+    // No dependemos del estado del context para evitar problemas de timing
+    // tras el redirect desde el login en la misma pestaña.
+    if (isAdminLoggedIn()) {
+      setAuthorized(true);
       setIsChecking(false);
-    }, 100);
+    } else {
+      router.replace('/admin/login');
+    }
+  }, [router]);
 
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, router]);
-
-  if (isChecking || !isAuthenticated) {
+  if (isChecking || !authorized) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">

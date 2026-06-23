@@ -20,10 +20,8 @@ export default function AdminLoginPage() {
     const success = loginAdmin(username, password);
 
     if (success) {
-      // Pequeño delay para asegurar que el estado se actualice
-      setTimeout(() => {
-        router.push('/admin/dashboard');
-      }, 300);
+      // El token ya está en localStorage; ProtectedAdminRoute lo lee directo.
+      router.replace('/admin/dashboard');
     } else {
       setError('Usuario o contraseña incorrectos');
       setPassword('');
