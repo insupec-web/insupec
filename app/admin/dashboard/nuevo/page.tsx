@@ -105,7 +105,11 @@ function NuevoProductoContent() {
       router.push('/admin/dashboard');
     } catch (err) {
       console.error('Error creating producto:', err);
-      setError('Error al crear el producto. Verifica que todos los campos sean válidos.');
+      const msg =
+        (err as { message?: string; details?: string })?.message ||
+        (err as { details?: string })?.details ||
+        'Error desconocido';
+      setError(`Error al crear el producto: ${msg}`);
     } finally {
       setLoading(false);
     }

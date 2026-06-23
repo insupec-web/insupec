@@ -142,7 +142,11 @@ function EditProductoContent({ params }: { params: { id: string } }) {
       router.push('/admin/dashboard');
     } catch (err) {
       console.error('Error updating producto:', err);
-      setError('Error al actualizar el producto');
+      const msg =
+        (err as { message?: string; details?: string })?.message ||
+        (err as { details?: string })?.details ||
+        'Error desconocido';
+      setError(`Error al actualizar el producto: ${msg}`);
     } finally {
       setSaving(false);
     }
