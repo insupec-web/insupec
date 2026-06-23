@@ -12,6 +12,7 @@ export interface Producto {
   stock: number;
   vencimiento: string;
   foto_url: string;
+  laboratorio: string;
   created_at: string;
 }
 

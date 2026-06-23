@@ -74,7 +74,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
         </div>
 
         {/* Metadatos compactos */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500 mb-4 flex-1">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500 mb-4 flex-1">
           <span className="inline-flex items-center gap-1">
             <Package size={14} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
             <span className={isOutOfStock ? 'text-red-600 font-semibold' : ''}>
@@ -84,9 +84,11 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <span className="inline-flex items-center gap-1">
             <Calendar size={14} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
             <span className={isAboutToExpire ? 'text-red-600 font-semibold' : ''}>
-              Vence {vencimiento.toLocaleDateString('es-AR')}
+              {vencimiento.toLocaleDateString('es-AR')}
             </span>
           </span>
+          <span className="text-gray-400">•</span>
+          <span className="text-gray-600 font-medium">{producto.laboratorio}</span>
         </div>
 
         {/* Controles de cantidad y compra */}

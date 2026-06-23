@@ -17,6 +17,7 @@ function NuevoProductoContent() {
     precio: '',
     stock: '',
     vencimiento: '',
+    laboratorio: '',
   });
 
   const [file, setFile] = useState<File | null>(null);
@@ -73,20 +74,18 @@ function NuevoProductoContent() {
     e.preventDefault();
     setError(null);
 
-    if (!formData.nombre || !formData.precio || !formData.stock || !formData.vencimiento) {
-      setError('Todos los campos son requeridos');
-      return;
-    }
-
-    if (!file) {
-      setError('Debes seleccionar una imagen');
+    if (!formData.nombre || !formData.precio || !formData.stock || !formData.vencimiento || !formData.laboratorio) {
+      setError('Completa todos los campos requeridos');
       return;
     }
 
     setLoading(true);
 
     try {
-      const foto_url = await uploadImage(file);
+      let foto_url = '';
+      if (file) {
+        foto_url = await uploadImage(file);
+      }
 
       const { error: insertError } = await supabase.from('productos').insert([
         {
@@ -94,6 +93,7 @@ function NuevoProductoContent() {
           precio: parseFloat(formData.precio),
           stock: parseInt(formData.stock),
           vencimiento: formData.vencimiento,
+          laboratorio: formData.laboratorio,
           foto_url,
         },
       ]);
@@ -105,7 +105,7 @@ function NuevoProductoContent() {
       router.push('/admin/dashboard');
     } catch (err) {
       console.error('Error creating producto:', err);
-      setError('Error al crear el producto');
+      setError('Error al crear el producto. Verifica que todos los campos sean válidos.');
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ function NuevoProductoContent() {
                 value={formData.nombre}
                 onChange={handleInputChange}
                 placeholder="Ej: Leche entera 1L"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
                 required
               />
             </div>
@@ -147,7 +147,7 @@ function NuevoProductoContent() {
                   value={formData.precio}
                   onChange={handleInputChange}
                   placeholder="0.00"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
                   required
                 />
               </div>
@@ -160,26 +160,40 @@ function NuevoProductoContent() {
                   value={formData.stock}
                   onChange={handleInputChange}
                   placeholder="0"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Fecha de Vencimiento *</label>
+                <input
+                  type="date"
+                  name="vencimiento"
+                  value={formData.vencimiento}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
+                <input
+                  type="text"
+                  name="laboratorio"
+                  value={formData.laboratorio}
+                  onChange={handleInputChange}
+                  placeholder="Ej: Bayer, Zoetis, Eli Lilly"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
                   required
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Fecha de Vencimiento *</label>
-              <input
-                type="date"
-                name="vencimiento"
-                value={formData.vencimiento}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Foto del Producto *</label>
+              <label className="block text-gray-700 font-semibold mb-2">Foto del Producto (opcional)</label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <input
                   type="file"
@@ -210,7 +224,7 @@ function NuevoProductoContent() {
                 type="submit"
                 disabled={loading}
                 className={`flex-1 py-3 rounded-lg font-bold text-white transition-colors ${
-                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
+                  loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-600 hover:bg-brand-700'
                 }`}
               >
                 {loading ? 'Guardando...' : 'GUARDAR PRODUCTO'}

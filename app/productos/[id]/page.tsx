@@ -126,6 +126,10 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
                 {isOutOfStock ? 'Sin stock' : `${producto.stock} unidades disponibles`}
               </span>
             </div>
+            <div className="text-sm">
+              <span className="text-gray-500">Laboratorio:</span>
+              <span className="font-semibold text-gray-800 ml-2">{producto.laboratorio}</span>
+            </div>
           </div>
 
           <div className="mt-auto space-y-4">

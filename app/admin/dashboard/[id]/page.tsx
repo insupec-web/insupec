@@ -17,6 +17,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
     precio: '',
     stock: '',
     vencimiento: '',
+    laboratorio: '',
   });
 
   const [file, setFile] = useState<File | null>(null);
@@ -45,6 +46,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
             precio: data.precio.toString(),
             stock: data.stock.toString(),
             vencimiento: data.vencimiento,
+            laboratorio: data.laboratorio || '',
           });
           setPreview(data.foto_url);
         }
@@ -107,8 +109,8 @@ function EditProductoContent({ params }: { params: { id: string } }) {
     e.preventDefault();
     setError(null);
 
-    if (!formData.nombre || !formData.precio || !formData.stock || !formData.vencimiento) {
-      setError('Todos los campos son requeridos');
+    if (!formData.nombre || !formData.precio || !formData.stock || !formData.vencimiento || !formData.laboratorio) {
+      setError('Completa todos los campos requeridos');
       return;
     }
 
@@ -128,6 +130,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
           precio: parseFloat(formData.precio),
           stock: parseInt(formData.stock),
           vencimiento: formData.vencimiento,
+          laboratorio: formData.laboratorio,
           foto_url,
         })
         .eq('id', params.id);
@@ -190,7 +193,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
                 name="nombre"
                 value={formData.nombre}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
                 required
               />
             </div>
@@ -204,7 +207,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
                   name="precio"
                   value={formData.precio}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
                   required
                 />
               </div>
@@ -216,22 +219,36 @@ function EditProductoContent({ params }: { params: { id: string } }) {
                   name="stock"
                   value={formData.stock}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
                   required
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Fecha de Vencimiento *</label>
-              <input
-                type="date"
-                name="vencimiento"
-                value={formData.vencimiento}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Fecha de Vencimiento *</label>
+                <input
+                  type="date"
+                  name="vencimiento"
+                  value={formData.vencimiento}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
+                <input
+                  type="text"
+                  name="laboratorio"
+                  value={formData.laboratorio}
+                  onChange={handleInputChange}
+                  placeholder="Ej: Bayer, Zoetis, Eli Lilly"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
+                  required
+                />
+              </div>
             </div>
 
             <div>
@@ -265,7 +282,7 @@ function EditProductoContent({ params }: { params: { id: string } }) {
                 type="submit"
                 disabled={saving}
                 className={`flex-1 py-3 rounded-lg font-bold text-white transition-colors ${
-                  saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
+                  saving ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-600 hover:bg-brand-700'
                 }`}
               >
                 {saving ? 'Guardando...' : 'GUARDAR CAMBIOS'}
