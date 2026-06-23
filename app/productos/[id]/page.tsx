@@ -79,7 +79,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const vencimiento = new Date(producto.vencimiento);
   const hoy = new Date();
   const diasParaVencer = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-  const isOutOfStock = producto.stock === 0;
+  const cantidadDisponible = producto.cantidad ?? cantidadDisponible ?? 0;
+  const isOutOfStock = cantidadDisponible === 0;
 
   const isAboutToExpire = diasParaVencer <= 7 && diasParaVencer >= 0;
 
@@ -124,8 +125,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             <div className="flex items-center gap-3 text-sm">
               <Package size={18} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
               <span className="text-gray-500">Stock:</span>
-              <span className={`font-semibold ${isOutOfStock ? 'text-red-600' : producto.stock < 5 ? 'text-amber-600' : 'text-brand-600'}`}>
-                {isOutOfStock ? 'Sin stock' : `${producto.stock} unidades disponibles`}
+              <span className={`font-semibold ${isOutOfStock ? 'text-red-600' : cantidadDisponible < 5 ? 'text-amber-600' : 'text-brand-600'}`}>
+                {isOutOfStock ? 'Sin stock' : `${cantidadDisponible} unidades disponibles`}
               </span>
             </div>
             <div className="text-sm">
@@ -150,8 +151,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
                 <span className="w-12 text-center font-semibold">{quantity}</span>
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => Math.min(producto.stock, q + 1))}
-                  disabled={isOutOfStock || quantity >= producto.stock}
+                  onClick={() => setQuantity((q) => Math.min(cantidadDisponible, q + 1))}
+                  disabled={isOutOfStock || quantity >= cantidadDisponible}
                   className="px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                   aria-label="Aumentar cantidad"
                 >
