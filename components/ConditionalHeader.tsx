@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Header from './Header';
+import CartSidebar from './CartSidebar';
 
 export default function ConditionalHeader() {
   const pathname = usePathname();
@@ -11,5 +12,10 @@ export default function ConditionalHeader() {
     return null;
   }
 
-  return <Header />;
+  return (
+    <>
+      <Header />
+      <CartSidebar />
+    </>
+  );
 }

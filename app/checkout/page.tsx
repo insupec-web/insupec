@@ -8,6 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { generateWhatsAppMessage, getWhatsAppLink } from '@/lib/whatsapp';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { CheckCircle } from 'lucide-react';
 
 interface FormData {
   nombre: string;
@@ -46,7 +47,7 @@ export default function CheckoutPage() {
         <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 text-center">
           <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4">Tu carrito está vacío</h1>
           <p className="text-sm sm:text-base text-gray-600 mb-6">No hay productos en tu carrito.</p>
-          <Link href="/productos" className="bg-black text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-gray-800 inline-block text-sm sm:text-base">
+          <Link href="/productos" className="bg-emerald-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-emerald-700 inline-block text-sm sm:text-base">
             Ir al catálogo
           </Link>
         </div>
@@ -199,9 +200,12 @@ export default function CheckoutPage() {
     <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
       {showSuccess && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-lg p-6 sm:p-8 text-center max-w-sm w-full">
-            <h2 className="text-xl sm:text-2xl font-bold text-black mb-4">¡Éxito!</h2>
-            <p className="text-sm sm:text-base text-gray-700 mb-6">Tu pedido fue enviado a Insupec. Se abrirá WhatsApp automáticamente.</p>
+          <div className="bg-white rounded-2xl p-6 sm:p-8 text-center max-w-sm w-full">
+            <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
+              <CheckCircle size={32} className="text-emerald-600" />
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">¡Pedido enviado!</h2>
+            <p className="text-sm sm:text-base text-gray-600">Tu pedido fue enviado a INSUPEC. Se abrirá WhatsApp automáticamente.</p>
           </div>
         </div>
       )}
@@ -230,7 +234,7 @@ export default function CheckoutPage() {
                       placeholder="Nombre *"
                       value={formData.nombre}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                       required
                     />
                   </div>
@@ -241,7 +245,7 @@ export default function CheckoutPage() {
                       placeholder="Apellido *"
                       value={formData.apellido}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                       required
                     />
                   </div>
@@ -256,7 +260,7 @@ export default function CheckoutPage() {
                   placeholder="Razón Social / Empresa *"
                   value={formData.razonSocial}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                   required
                 />
               </div>
@@ -270,7 +274,7 @@ export default function CheckoutPage() {
                     placeholder="Email *"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                     required
                   />
                   <input
@@ -279,7 +283,7 @@ export default function CheckoutPage() {
                     placeholder="Teléfono *"
                     value={formData.telefono}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                     required
                   />
                 </div>
@@ -292,7 +296,7 @@ export default function CheckoutPage() {
                   placeholder="Calle, número, piso, apto, etc. *"
                   value={formData.direccion}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                   rows={3}
                   required
                 />
@@ -307,7 +311,7 @@ export default function CheckoutPage() {
                     placeholder="Ciudad *"
                     value={formData.ciudad}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                     required
                   />
                   <input
@@ -316,7 +320,7 @@ export default function CheckoutPage() {
                     placeholder="Código Postal *"
                     value={formData.codigoPostal}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-sm"
                     required
                   />
                 </div>
@@ -329,7 +333,7 @@ export default function CheckoutPage() {
                     name="factura"
                     checked={formData.factura}
                     onChange={handleInputChange}
-                    className="w-5 h-5 rounded border-gray-300 focus:ring-2 focus:ring-black"
+                    className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-2 focus:ring-emerald-500"
                   />
                   <span className="text-gray-700 text-sm font-medium">¿Necesitas factura?</span>
                 </label>
@@ -337,8 +341,8 @@ export default function CheckoutPage() {
 
               <div className="flex gap-3 pt-4">
                 <Link
-                  href="/carrito"
-                  className="flex-1 py-3 rounded-lg font-bold text-center text-sm sm:text-base border-2 border-gray-300 text-gray-800 hover:bg-gray-50 transition-colors"
+                  href="/productos"
+                  className="flex-1 py-3 rounded-lg font-bold text-center text-sm sm:text-base border border-gray-300 text-gray-800 hover:bg-gray-50 transition-colors"
                 >
                   VOLVER
                 </Link>
@@ -346,10 +350,10 @@ export default function CheckoutPage() {
                   type="submit"
                   disabled={loading}
                   className={`flex-1 py-3 rounded-lg font-bold text-sm sm:text-base text-white transition-colors ${
-                    loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
+                    loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700'
                   }`}
                 >
-                  {loading ? '⏳ Procesando...' : '💬 ENVIAR POR WHATSAPP'}
+                  {loading ? 'Procesando...' : 'ENVIAR POR WHATSAPP'}
                 </button>
               </div>
             </form>
@@ -375,7 +379,7 @@ export default function CheckoutPage() {
             <div className="border-t border-gray-300 pt-3 sm:pt-4 space-y-2 sm:space-y-3">
               <div className="flex justify-between text-base sm:text-lg">
                 <span className="font-semibold text-sm sm:text-base">Subtotal:</span>
-                <span className="font-bold text-black text-sm sm:text-base">${total.toFixed(2)}</span>
+                <span className="font-extrabold text-emerald-600 text-lg">${total.toFixed(2)}</span>
               </div>
             </div>
           </div>

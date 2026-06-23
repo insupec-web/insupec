@@ -5,18 +5,16 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { useCart } from '@/hooks/useCart';
-import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
 
 export default function ProductoDetailPage({ params }: { params: { id: string } }) {
   const [producto, setProducto] = useState<Producto | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState<string | null>(null);
-  const { addItem } = useCart();
-  const router = useRouter();
+  const { addItem, openCart } = useCart();
 
   useEffect(() => {
     async function fetchProducto() {
@@ -52,7 +50,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
         cantidad: quantity,
         foto_url: producto.foto_url,
       });
-      router.push('/carrito');
+      // addItem ya abre el drawer del carrito automáticamente.
     }
   };
 
@@ -81,79 +79,99 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
   const diasParaVencer = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
   const isOutOfStock = producto.stock === 0;
 
+  const isAboutToExpire = diasParaVencer <= 7 && diasParaVencer >= 0;
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-      <Link href="/productos" className="text-[#4ca82b] hover:underline flex items-center gap-2 mb-8">
-        <ArrowLeft size={20} />
+    <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+      <Link href="/productos" className="text-emerald-600 hover:underline flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium">
+        <ArrowLeft size={18} />
         Volver al catálogo
       </Link>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="relative h-96 bg-gray-200 rounded-lg overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
+        <div className="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden border border-gray-200">
           {producto.foto_url ? (
             <Image src={producto.foto_url} alt={producto.nombre} fill className="object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gray-300">
-              <span className="text-gray-500">Sin imagen</span>
+            <div className="w-full h-full flex items-center justify-center">
+              <Package size={64} className="text-gray-300" />
             </div>
+          )}
+          {isAboutToExpire && (
+            <span className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-md text-xs font-bold">
+              VENCE PRONTO
+            </span>
           )}
         </div>
 
-        <div className="flex flex-col justify-between">
-          <div>
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">{producto.nombre}</h1>
+        <div className="flex flex-col">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{producto.nombre}</h1>
 
-            <div className="mb-6">
-              <span className="text-4xl font-bold text-black">${producto.precio.toFixed(2)}</span>
+          <div className="mb-6">
+            <span className="text-4xl font-extrabold text-emerald-600">${producto.precio.toFixed(2)}</span>
+          </div>
+
+          <div className="space-y-3 mb-8 border-t border-b border-gray-100 py-5">
+            <div className="flex items-center gap-3 text-sm">
+              <Calendar size={18} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
+              <span className="text-gray-500">Vencimiento:</span>
+              <span className={`font-semibold ${isAboutToExpire ? 'text-red-600' : 'text-gray-800'}`}>
+                {vencimiento.toLocaleDateString('es-AR')}
+              </span>
             </div>
-
-            <div className="mb-6 space-y-2">
-              <p className="text-gray-700">
-                <span className="font-semibold">Vencimiento:</span> {vencimiento.toLocaleDateString('es-AR')}
-              </p>
-              {diasParaVencer <= 7 && diasParaVencer >= 0 && (
-                <p className="text-red-600 font-semibold">⚠️ Este producto vence pronto</p>
-              )}
-              <p className={`font-semibold ${isOutOfStock ? 'text-red-600' : producto.stock < 5 ? 'text-orange-600' : 'text-green-600'}`}>
-                {isOutOfStock ? 'SIN STOCK' : `Stock disponible: ${producto.stock} unidades`}
-              </p>
+            <div className="flex items-center gap-3 text-sm">
+              <Package size={18} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
+              <span className="text-gray-500">Stock:</span>
+              <span className={`font-semibold ${isOutOfStock ? 'text-red-600' : producto.stock < 5 ? 'text-amber-600' : 'text-emerald-600'}`}>
+                {isOutOfStock ? 'Sin stock' : `${producto.stock} unidades disponibles`}
+              </span>
             </div>
           </div>
 
-          <div className="space-y-4">
+          <div className="mt-auto space-y-4">
             <div className="flex items-center gap-4">
-              <label className="font-semibold text-gray-700">Cantidad:</label>
-              <input
-                type="number"
-                min="1"
-                max={producto.stock}
-                value={quantity}
-                onChange={(e) =>
-                  setQuantity(Math.min(producto.stock, Math.max(1, parseInt(e.target.value) || 1)))
-                }
-                className="w-20 px-4 py-2 border border-gray-300 rounded-lg text-center"
-                disabled={isOutOfStock}
-              />
+              <span className="font-semibold text-gray-700 text-sm">Cantidad</span>
+              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={isOutOfStock || quantity <= 1}
+                  className="px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Disminuir cantidad"
+                >
+                  <Minus size={16} />
+                </button>
+                <span className="w-12 text-center font-semibold">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.min(producto.stock, q + 1))}
+                  disabled={isOutOfStock || quantity >= producto.stock}
+                  className="px-3 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Aumentar cantidad"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
             </div>
 
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className={`w-full py-3 rounded-lg font-bold text-lg transition-colors ${
+              className={`w-full py-3.5 rounded-xl font-bold text-lg transition-colors ${
                 isOutOfStock
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-black text-white hover:bg-gray-800'
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
               }`}
             >
               {isOutOfStock ? 'SIN STOCK' : 'AGREGAR AL CARRITO'}
             </button>
 
-            <Link
-              href="/carrito"
-              className="w-full py-3 rounded-lg font-bold text-lg text-center border-2 border-black text-black hover:bg-gray-100 transition-colors"
+            <button
+              onClick={openCart}
+              className="w-full py-3 rounded-xl font-semibold text-gray-700 border border-gray-300 hover:bg-gray-50 transition-colors"
             >
-              IR AL CARRITO
-            </Link>
+              Ver carrito
+            </button>
           </div>
         </div>
       </div>
