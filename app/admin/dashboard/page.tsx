@@ -8,12 +8,13 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search } from 'lucide-react';
 
 function AdminDashboardContent() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [busqueda, setBusqueda] = useState('');
 
   useEffect(() => {
     fetchProductos();
@@ -55,6 +56,11 @@ function AdminDashboardContent() {
     }
   };
 
+  const productosFiltrados = productos.filter((p) =>
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.laboratorio.toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   return (
     <>
       <AdminNav />
@@ -73,16 +79,33 @@ function AdminDashboardContent() {
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
 
+        <div className="mb-6 sm:mb-8">
+          <div className="relative">
+            <Search size={18} className="absolute left-3 top-3 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Buscar por nombre o laboratorio..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-sm"
+            />
+          </div>
+        </div>
+
         {loading ? (
           <div className="text-center py-12">
             <p className="text-gray-600 text-sm sm:text-base">Cargando productos...</p>
           </div>
-        ) : productos.length === 0 ? (
+        ) : productosFiltrados.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 text-center">
-            <p className="text-gray-600 mb-4 text-sm sm:text-base">No hay productos disponibles</p>
-            <Link href="/admin/dashboard/nuevo" className="bg-black text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-gray-800 inline-block text-sm">
-              Crear el primer producto
-            </Link>
+            <p className="text-gray-600 mb-4 text-sm sm:text-base">
+              {busqueda ? 'No se encontraron productos que coincidan con tu búsqueda' : 'No hay productos disponibles'}
+            </p>
+            {!busqueda && (
+              <Link href="/admin/dashboard/nuevo" className="bg-black text-white px-4 sm:px-6 py-2 rounded-lg hover:bg-gray-800 inline-block text-sm">
+                Crear el primer producto
+              </Link>
+            )}
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md overflow-hidden overflow-x-auto">
@@ -98,7 +121,7 @@ function AdminDashboardContent() {
                 </tr>
               </thead>
               <tbody>
-                {productos.map((producto) => (
+                {productosFiltrados.map((producto) => (
                   <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {producto.foto_url ? (
