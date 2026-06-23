@@ -21,13 +21,15 @@ export default function AdminLoginPage() {
     const success = login(username, password);
 
     if (success) {
-      router.push('/admin/dashboard');
+      // Pequeño delay para asegurar que el estado se actualice
+      setTimeout(() => {
+        router.push('/admin/dashboard');
+      }, 300);
     } else {
       setError('Usuario o contraseña incorrectos');
       setPassword('');
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
