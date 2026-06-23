@@ -16,8 +16,9 @@ export default function ProductCard({ producto }: { producto: Producto }) {
   const hoy = new Date();
   const diasParaVencer = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
 
-  const isLowStock = producto.stock < 5 && producto.stock > 0;
-  const isOutOfStock = producto.stock === 0;
+  const stock = producto.cantidad ?? producto.stock ?? 0;
+  const isLowStock = stock < 5 && stock > 0;
+  const isOutOfStock = stock === 0;
   const isAboutToExpire = diasParaVencer <= 7 && diasParaVencer >= 0;
 
   const handleAddToCart = () => {
@@ -80,7 +81,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <span className="inline-flex items-center gap-1">
             <Package size={14} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
             <span className={isOutOfStock ? 'text-red-600 font-semibold' : ''}>
-              {isOutOfStock ? 'Sin stock' : `${producto.stock} u.`}
+              {isOutOfStock ? 'Sin stock' : `${stock} u.`}
             </span>
           </span>
           <span className="inline-flex items-center gap-1">
@@ -108,8 +109,8 @@ export default function ProductCard({ producto }: { producto: Producto }) {
             <span className="w-8 text-center text-sm font-semibold select-none">{quantity}</span>
             <button
               type="button"
-              onClick={() => setQuantity((q) => Math.min(producto.stock, q + 1))}
-              disabled={isOutOfStock || quantity >= producto.stock}
+              onClick={() => setQuantity((q) => Math.min(stock, q + 1))}
+              disabled={isOutOfStock || quantity >= stock}
               className="px-2 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               aria-label="Aumentar cantidad"
             >
