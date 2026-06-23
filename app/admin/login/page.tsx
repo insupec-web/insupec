@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginAdmin } from '@/lib/auth';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -32,7 +33,10 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center px-3 sm:px-4 py-8">
       <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center text-black mb-6 sm:mb-8">INSUPEC ADMIN</h1>
+        <div className="flex justify-center mb-2">
+          <Image src="/logo.png" alt="INSUPEC" width={616} height={214} priority className="h-14 w-auto" />
+        </div>
+        <p className="text-center text-gray-500 text-sm font-semibold tracking-wide mb-6 sm:mb-8">PANEL DE ADMINISTRACIÓN</p>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
 
@@ -65,7 +69,7 @@ export default function AdminLoginPage() {
             type="submit"
             disabled={loading}
             className={`w-full py-2 sm:py-3 rounded-lg font-bold text-white text-sm sm:text-base transition-colors ${
-              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-black hover:bg-gray-800'
+              loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-600 hover:bg-brand-700'
             }`}
           >
             {loading ? 'Verificando...' : 'INGRESAR'}

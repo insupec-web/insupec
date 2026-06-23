@@ -83,7 +83,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
-      <Link href="/productos" className="text-emerald-600 hover:underline flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium">
+      <Link href="/productos" className="text-brand-600 hover:underline flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium">
         <ArrowLeft size={18} />
         Volver al catálogo
       </Link>
@@ -108,7 +108,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{producto.nombre}</h1>
 
           <div className="mb-6">
-            <span className="text-4xl font-extrabold text-emerald-600">${producto.precio.toFixed(2)}</span>
+            <span className="text-4xl font-extrabold text-brand-600">${producto.precio.toFixed(2)}</span>
           </div>
 
           <div className="space-y-3 mb-8 border-t border-b border-gray-100 py-5">
@@ -122,7 +122,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
             <div className="flex items-center gap-3 text-sm">
               <Package size={18} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
               <span className="text-gray-500">Stock:</span>
-              <span className={`font-semibold ${isOutOfStock ? 'text-red-600' : producto.stock < 5 ? 'text-amber-600' : 'text-emerald-600'}`}>
+              <span className={`font-semibold ${isOutOfStock ? 'text-red-600' : producto.stock < 5 ? 'text-amber-600' : 'text-brand-600'}`}>
                 {isOutOfStock ? 'Sin stock' : `${producto.stock} unidades disponibles`}
               </span>
             </div>
@@ -160,7 +160,7 @@ export default function ProductoDetailPage({ params }: { params: { id: string } 
               className={`w-full py-3.5 rounded-xl font-bold text-lg transition-colors ${
                 isOutOfStock
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                  : 'bg-brand-600 text-white hover:bg-brand-700'
               }`}
             >
               {isOutOfStock ? 'SIN STOCK' : 'AGREGAR AL CARRITO'}

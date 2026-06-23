@@ -81,7 +81,7 @@ export default function ProductosPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar producto por nombre..."
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
         />
       </div>
 
@@ -92,7 +92,7 @@ export default function ProductosPage() {
       ) : productosFiltrados.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-gray-600 text-base">No se encontraron productos para “{query}”.</p>
-          <button onClick={() => setQuery('')} className="mt-3 text-emerald-600 font-semibold hover:underline">
+          <button onClick={() => setQuery('')} className="mt-3 text-brand-600 font-semibold hover:underline">
             Limpiar búsqueda
           </button>
         </div>

@@ -20,7 +20,7 @@ export default function Header() {
         >
           <ShoppingCart size={22} className="text-gray-800" />
           {itemCount > 0 && (
-            <span className="absolute top-0 right-0 bg-emerald-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="absolute top-0 right-0 bg-brand-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
               {itemCount}
             </span>
           )}
@@ -29,12 +29,12 @@ export default function Header() {
         {/* Logo centrado */}
         <Link href="/productos" className="flex-1 flex justify-center">
           <Image
-            src="/logo.svg"
+            src="/logo.png"
             alt="INSUPEC - Insumos Pecuarios"
-            width={340}
-            height={88}
+            width={616}
+            height={214}
             priority
-            className="h-12 sm:h-16 w-auto"
+            className="h-11 sm:h-14 w-auto"
           />
         </Link>
 
@@ -47,7 +47,7 @@ export default function Header() {
           <ShoppingCart size={24} className="text-gray-800" />
           <span className="text-sm font-semibold text-gray-800">Carrito</span>
           {itemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-emerald-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 bg-brand-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
               {itemCount}
             </span>
           )}

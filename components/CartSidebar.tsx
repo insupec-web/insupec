@@ -47,10 +47,10 @@ export default function CartSidebar() {
         {/* Header */}
         <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-2">
-            <ShoppingCart size={20} className="text-emerald-600" />
+            <ShoppingCart size={20} className="text-brand-600" />
             <h2 className="text-lg font-bold text-gray-900">Tu Carrito</h2>
             {itemCount > 0 && (
-              <span className="bg-emerald-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+              <span className="bg-brand-600 text-white px-2 py-0.5 rounded-full text-xs font-bold">
                 {itemCount}
               </span>
             )}
@@ -72,7 +72,7 @@ export default function CartSidebar() {
             <p className="text-gray-400 text-sm mb-6">Agregá productos para comenzar tu pedido</p>
             <button
               onClick={closeCart}
-              className="bg-emerald-600 text-white px-6 py-2.5 rounded-lg hover:bg-emerald-700 transition-colors font-semibold text-sm"
+              className="bg-brand-600 text-white px-6 py-2.5 rounded-lg hover:bg-brand-700 transition-colors font-semibold text-sm"
             >
               Ver catálogo
             </button>
@@ -94,7 +94,7 @@ export default function CartSidebar() {
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 text-sm line-clamp-2">{item.nombre}</h3>
-                    <p className="text-emerald-600 font-bold text-sm mt-0.5">${item.precio.toFixed(2)}</p>
+                    <p className="text-brand-600 font-bold text-sm mt-0.5">${item.precio.toFixed(2)}</p>
 
                     <div className="flex items-center gap-3 mt-2">
                       <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
@@ -142,12 +142,12 @@ export default function CartSidebar() {
             <div className="border-t border-gray-200 px-4 sm:px-6 py-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-gray-700">Subtotal</span>
-                <span className="font-extrabold text-emerald-600 text-2xl">${total.toFixed(2)}</span>
+                <span className="font-extrabold text-brand-600 text-2xl">${total.toFixed(2)}</span>
               </div>
               <Link
                 href="/checkout"
                 onClick={closeCart}
-                className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors block text-center"
+                className="w-full bg-brand-600 text-white py-3 rounded-xl font-bold hover:bg-brand-700 transition-colors block text-center"
               >
                 Finalizar pedido
               </Link>

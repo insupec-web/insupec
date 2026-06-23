@@ -31,7 +31,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
   };
 
   return (
-    <div className="group bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-emerald-500 hover:shadow-lg transition-all duration-200">
+    <div className="group bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-500 hover:shadow-lg transition-all duration-200">
       {/* Foto del producto */}
       <Link href={`/productos/${producto.id}`} className="relative block h-40 sm:h-48 bg-gray-100 overflow-hidden">
         {producto.foto_url ? (
@@ -63,14 +63,14 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       <div className="p-4 flex flex-col flex-1">
         {/* Nombre del producto */}
         <Link href={`/productos/${producto.id}`}>
-          <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 hover:text-emerald-700 transition-colors line-clamp-2 min-h-[2.75rem]">
+          <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 hover:text-brand-700 transition-colors line-clamp-2 min-h-[2.75rem]">
             {producto.nombre}
           </h3>
         </Link>
 
         {/* Precio destacado */}
         <div className="mb-3">
-          <span className="text-2xl sm:text-3xl font-extrabold text-emerald-600">${producto.precio.toFixed(2)}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-brand-600">${producto.precio.toFixed(2)}</span>
         </div>
 
         {/* Metadatos compactos */}
@@ -118,7 +118,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
             className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
               isOutOfStock
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                : 'bg-brand-600 text-white hover:bg-brand-700'
             }`}
           >
             {isOutOfStock ? 'SIN STOCK' : 'AGREGAR'}
