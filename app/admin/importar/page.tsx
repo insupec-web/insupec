@@ -141,21 +141,22 @@ function ImportarProductosContent() {
         const data = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 
         for (const row of data) {
-          const nombre = row.nombre || row.Nombre || row.NOMBRE;
+          const rowData = row as any;
+          const nombre = rowData.nombre || rowData.Nombre || rowData.NOMBRE;
           if (nombre) {
             productos.push({
               nombre,
-              precio: parseFloat(row.precio || row.Precio || row.PRECIO || '0'),
-              stock: parseInt(row.stock || row.Stock || row.STOCK || '0'),
+              precio: parseFloat(rowData.precio || rowData.Precio || rowData.PRECIO || '0'),
+              stock: parseInt(rowData.stock || rowData.Stock || rowData.STOCK || '0'),
               vencimiento:
-                row.vencimiento ||
-                row.Vencimiento ||
-                row.VENCIMIENTO ||
-                row.fecha ||
-                row.Fecha ||
-                row.FECHA ||
+                rowData.vencimiento ||
+                rowData.Vencimiento ||
+                rowData.VENCIMIENTO ||
+                rowData.fecha ||
+                rowData.Fecha ||
+                rowData.FECHA ||
                 new Date().toISOString().split('T')[0],
-              laboratorio: row.laboratorio || row.Laboratorio || row.LABORATORIO || '',
+              laboratorio: rowData.laboratorio || rowData.Laboratorio || rowData.LABORATORIO || '',
               foto_url: 'https://via.placeholder.com/400?text=' + encodeURIComponent(nombre),
             });
           }
