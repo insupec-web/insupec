@@ -122,6 +122,25 @@ function PedidosContent() {
     }
   };
 
+  const handleCancelar = async (id: string) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar este pedido?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('pedidos')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchPedidos();
+    } catch (err) {
+      console.error('Error canceling pedido:', err);
+      alert('Error al cancelar el pedido');
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-6 text-center">
@@ -238,8 +257,8 @@ function PedidosContent() {
                             <Check size={16} /> Confirmar
                           </button>
                           <button
-                            disabled
-                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
+                            onClick={() => handleCancelar(pedido.id)}
+                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
                           >
                             <X size={16} /> Cancelar
                           </button>
