@@ -9,6 +9,7 @@ import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Edit2, Trash2, Plus, Search } from 'lucide-react';
+import TrafficStats from '@/components/TrafficStats';
 
 function AdminDashboardContent() {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -66,6 +67,8 @@ function AdminDashboardContent() {
       <AdminNav />
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28 pb-8 sm:pb-12">
+        <TrafficStats />
+
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
           <Link
