@@ -69,7 +69,7 @@ CREATE POLICY "Productos: Admin puede modificar"
   USING (true)
   WITH CHECK (true);
 
--- HABILITAR RLS EN PEDIDOS (insert público, sin select/update)
+-- HABILITAR RLS EN PEDIDOS
 ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 
 -- Permitir insert público de pedidos
@@ -79,12 +79,27 @@ CREATE POLICY "Pedidos: Insert público"
   TO public
   WITH CHECK (true);
 
--- Denegar select y update de pedidos (solo lectura interna)
-CREATE POLICY "Pedidos: No select público"
+-- Permitir select para admin (anon key)
+CREATE POLICY "Pedidos: Select para admin"
   ON pedidos
   FOR SELECT
-  TO public
-  USING (false);
+  TO anon
+  USING (true);
+
+-- Permitir update para admin (confirmar pedidos)
+CREATE POLICY "Pedidos: Admin puede actualizar"
+  ON pedidos
+  FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Permitir delete para admin (cancelar pedidos)
+CREATE POLICY "Pedidos: Admin puede eliminar"
+  ON pedidos
+  FOR DELETE
+  TO anon
+  USING (true);
 
 -- 4. DATOS DE EJEMPLO (OPCIONAL - Descomenta si quieres)
 -- ═══════════════════════════════════════════════════════════════════════════

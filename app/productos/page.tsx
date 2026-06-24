@@ -13,6 +13,8 @@ export default function ProductosPage() {
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
   const [sortPrice, setSortPrice] = useState<'asc' | 'desc' | null>(null);
+  const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
+  const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -38,6 +40,11 @@ export default function ProductosPage() {
     fetchProductos();
   }, []);
 
+  const laboratorios = useMemo(() => {
+    const labs = new Set(productos.map((p) => p.laboratorio).filter(Boolean));
+    return Array.from(labs).sort();
+  }, [productos]);
+
   const productosFiltrados = useMemo(() => {
     let filtered = productos;
 
@@ -47,17 +54,28 @@ export default function ProductosPage() {
       filtered = filtered.filter((p) => p.nombre.toLowerCase().includes(q));
     }
 
-    // Ordenar por precio
+    // Filtrar por laboratorio
+    if (selectedLaboratorio) {
+      filtered = filtered.filter((p) => p.laboratorio === selectedLaboratorio);
+    }
+
+    // Ordenar
     if (sortPrice) {
       filtered = [...filtered].sort((a, b) => {
         const priceA = a.precio || 0;
         const priceB = b.precio || 0;
         return sortPrice === 'asc' ? priceA - priceB : priceB - priceA;
       });
+    } else if (sortName) {
+      filtered = [...filtered].sort((a, b) => {
+        const nameA = a.nombre.toLowerCase();
+        const nameB = b.nombre.toLowerCase();
+        return sortName === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      });
     }
 
     return filtered;
-  }, [productos, query, sortPrice]);
+  }, [productos, query, sortPrice, sortName, selectedLaboratorio]);
 
   if (loading) {
     return (
@@ -102,11 +120,44 @@ export default function ProductosPage() {
           />
         </div>
 
+        {/* Filtro por Laboratorio */}
+        {laboratorios.length > 0 && (
+          <div className="flex gap-2 flex-wrap items-center">
+            <span className="text-sm font-semibold text-gray-700">Laboratorio:</span>
+            <button
+              onClick={() => setSelectedLaboratorio(null)}
+              className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                !selectedLaboratorio
+                  ? 'bg-brand-600 text-white'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            >
+              Todos
+            </button>
+            {laboratorios.map((lab) => (
+              <button
+                key={lab}
+                onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  selectedLaboratorio === lab
+                    ? 'bg-brand-600 text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                }`}
+              >
+                {lab}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Filtro de Precios */}
-        <div className="flex gap-2 flex-wrap">
-          <span className="text-sm font-semibold text-gray-700 flex items-center">Ordenar por precio:</span>
+        <div className="flex gap-2 flex-wrap items-center">
+          <span className="text-sm font-semibold text-gray-700">Precio:</span>
           <button
-            onClick={() => setSortPrice(sortPrice === 'asc' ? null : 'asc')}
+            onClick={() => {
+              setSortPrice(sortPrice === 'asc' ? null : 'asc');
+              setSortName(null);
+            }}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
               sortPrice === 'asc'
                 ? 'bg-brand-600 text-white'
@@ -116,7 +167,10 @@ export default function ProductosPage() {
             ↑ Menor a Mayor
           </button>
           <button
-            onClick={() => setSortPrice(sortPrice === 'desc' ? null : 'desc')}
+            onClick={() => {
+              setSortPrice(sortPrice === 'desc' ? null : 'desc');
+              setSortName(null);
+            }}
             className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
               sortPrice === 'desc'
                 ? 'bg-brand-600 text-white'
@@ -125,15 +179,54 @@ export default function ProductosPage() {
           >
             ↓ Mayor a Menor
           </button>
-          {sortPrice && (
+        </div>
+
+        {/* Filtro de Nombre */}
+        <div className="flex gap-2 flex-wrap items-center">
+          <span className="text-sm font-semibold text-gray-700">Nombre:</span>
+          <button
+            onClick={() => {
+              setSortName(sortName === 'asc' ? null : 'asc');
+              setSortPrice(null);
+            }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              sortName === 'asc'
+                ? 'bg-brand-600 text-white'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }`}
+          >
+            A → Z
+          </button>
+          <button
+            onClick={() => {
+              setSortName(sortName === 'desc' ? null : 'desc');
+              setSortPrice(null);
+            }}
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              sortName === 'desc'
+                ? 'bg-brand-600 text-white'
+                : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+            }`}
+          >
+            Z → A
+          </button>
+        </div>
+
+        {/* Botón Limpiar */}
+        {(sortPrice || sortName || selectedLaboratorio) && (
+          <div>
             <button
-              onClick={() => setSortPrice(null)}
+              onClick={() => {
+                setSortPrice(null);
+                setSortName(null);
+                setSelectedLaboratorio(null);
+              }}
               className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
             >
-              Limpiar filtro
+              Limpiar todos los filtros
             </button>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {productos.length === 0 ? (
