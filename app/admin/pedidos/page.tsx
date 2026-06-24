@@ -223,24 +223,29 @@ function PedidosContent() {
 
                     <div className="text-right">
                       <p className="text-2xl font-bold text-brand-600">${pedido.total.toFixed(2)}</p>
-                      <button
-                        onClick={() => handleConfirmar(pedido.id, pedido.confirmado)}
-                        className={`mt-3 px-4 py-2 rounded-lg font-semibold text-white text-sm flex items-center gap-2 transition-colors ${
-                          pedido.confirmado
-                            ? 'bg-green-600 hover:bg-green-700'
-                            : 'bg-yellow-600 hover:bg-yellow-700'
-                        }`}
-                      >
-                        {pedido.confirmado ? (
-                          <>
-                            <Check size={16} /> Confirmado
-                          </>
-                        ) : (
-                          <>
-                            <X size={16} /> Pendiente
-                          </>
-                        )}
-                      </button>
+                      {pedido.confirmado ? (
+                        <button
+                          disabled
+                          className="mt-3 px-4 py-2 rounded-lg font-semibold text-white text-sm flex items-center gap-2 bg-green-600"
+                        >
+                          <Check size={16} /> Confirmado
+                        </button>
+                      ) : (
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() => handleConfirmar(pedido.id, pedido.confirmado)}
+                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-green-600 hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <Check size={16} /> Confirmar
+                          </button>
+                          <button
+                            onClick={() => handleConfirmar(pedido.id, pedido.confirmado)}
+                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                          >
+                            <X size={16} /> Cancelar
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
