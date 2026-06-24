@@ -239,8 +239,8 @@ function PedidosContent() {
                             <Check size={16} /> Confirmar
                           </button>
                           <button
-                            onClick={() => handleConfirmar(pedido.id, pedido.confirmado)}
-                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                            disabled
+                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-gray-400 cursor-not-allowed flex items-center justify-center gap-2"
                           >
                             <X size={16} /> Cancelar
                           </button>
