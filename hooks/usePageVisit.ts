@@ -6,6 +6,11 @@ export function usePageVisit() {
   const pathname = usePathname();
 
   useEffect(() => {
+    // No registrar visitas en rutas de admin
+    if (pathname.startsWith('/admin')) {
+      return;
+    }
+
     const recordVisit = async () => {
       try {
         await supabase.from('page_visits').insert([
