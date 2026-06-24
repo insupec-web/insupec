@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { isAdminLoggedIn } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 
 export function ProtectedAdminRoute({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -10,15 +10,35 @@ export function ProtectedAdminRoute({ children }: { children: ReactNode }) {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Verificar autenticación contra localStorage (fuente de verdad).
-    // No dependemos del estado del context para evitar problemas de timing
-    // tras el redirect desde el login en la misma pestaña.
-    if (isAdminLoggedIn()) {
-      setAuthorized(true);
-      setIsChecking(false);
-    } else {
-      router.replace('/admin/login');
-    }
+    const checkAdmin = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+
+        if (!data.session?.user?.id) {
+          router.replace('/admin/login');
+          return;
+        }
+
+        const { data: adminUser } = await supabase
+          .from('admin_users')
+          .select('id')
+          .eq('id', data.session.user.id)
+          .single();
+
+        if (adminUser) {
+          setAuthorized(true);
+        } else {
+          await supabase.auth.signOut();
+          router.replace('/admin/login');
+        }
+      } catch (err) {
+        router.replace('/admin/login');
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    checkAdmin();
   }, [router]);
 
   if (isChecking || !authorized) {
@@ -26,7 +46,7 @@ export function ProtectedAdminRoute({ children }: { children: ReactNode }) {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando...</p>
+          <p className="text-gray-600">Verificando acceso...</p>
         </div>
       </div>
     );

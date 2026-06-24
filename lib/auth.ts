@@ -1,29 +1,52 @@
-export const ADMIN_USERNAME = 'gero';
-export const ADMIN_PASSWORD = '1234';
+import { supabase } from './supabase';
 
-export function validateAdminCredentials(username: string, password: string): boolean {
-  return username === ADMIN_USERNAME && password === ADMIN_PASSWORD;
-}
+export async function loginAdmin(email: string, password: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-export function getAdminToken(): string {
-  return 'admin-token-' + Date.now();
-}
+    if (error || !data.user) {
+      return false;
+    }
 
-export function isAdminLoggedIn(): boolean {
-  if (typeof window === 'undefined') return false;
-  const token = localStorage.getItem('admin-token');
-  return !!token;
-}
+    // Verificar si el usuario es admin
+    const { data: adminUser } = await supabase
+      .from('admin_users')
+      .select('id')
+      .eq('id', data.user.id)
+      .single();
 
-export function loginAdmin(username: string, password: string): boolean {
-  if (validateAdminCredentials(username, password)) {
-    const token = getAdminToken();
-    localStorage.setItem('admin-token', token);
+    if (!adminUser) {
+      await supabase.auth.signOut();
+      return false;
+    }
+
     return true;
+  } catch (err) {
+    console.error('Error logging in:', err);
+    return false;
   }
-  return false;
 }
 
-export function logoutAdmin(): void {
-  localStorage.removeItem('admin-token');
+export async function isAdminLoggedIn(): Promise<boolean> {
+  try {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session?.user?.id) return false;
+
+    const { data: adminUser } = await supabase
+      .from('admin_users')
+      .select('id')
+      .eq('id', data.session.user.id)
+      .single();
+
+    return !!adminUser;
+  } catch (err) {
+    return false;
+  }
+}
+
+export async function logoutAdmin(): Promise<void> {
+  await supabase.auth.signOut();
 }

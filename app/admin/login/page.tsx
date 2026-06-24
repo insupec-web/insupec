@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function AdminLoginPage() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -18,13 +18,12 @@ export default function AdminLoginPage() {
     setError(null);
     setLoading(true);
 
-    const success = loginAdmin(username, password);
+    const success = await loginAdmin(email, password);
 
     if (success) {
-      // El token ya está en localStorage; ProtectedAdminRoute lo lee directo.
       router.replace('/admin/dashboard');
     } else {
-      setError('Usuario o contraseña incorrectos');
+      setError('Email o contraseña incorrectos');
       setPassword('');
       setLoading(false);
     }
@@ -42,12 +41,12 @@ export default function AdminLoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           <div>
-            <label className="block text-gray-700 font-semibold mb-2 text-sm">Usuario</label>
+            <label className="block text-gray-700 font-semibold mb-2 text-sm">Email</label>
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Ingresa tu usuario"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Ingresa tu email"
               className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-black text-sm"
               required
             />
