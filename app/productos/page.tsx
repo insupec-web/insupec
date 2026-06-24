@@ -15,6 +15,7 @@ export default function ProductosPage() {
   const [sortPrice, setSortPrice] = useState<'asc' | 'desc' | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
+  const [expandLaboratorios, setExpandLaboratorios] = useState(false);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -122,31 +123,44 @@ export default function ProductosPage() {
 
         {/* Filtro por Laboratorio */}
         {laboratorios.length > 0 && (
-          <div className="flex gap-2 flex-wrap items-center">
-            <span className="text-sm font-semibold text-gray-700">Laboratorio:</span>
+          <div>
             <button
-              onClick={() => setSelectedLaboratorio(null)}
-              className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                !selectedLaboratorio
-                  ? 'bg-brand-600 text-white'
-                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-              }`}
+              onClick={() => setExpandLaboratorios(!expandLaboratorios)}
+              className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
             >
-              Todos
+              <span>Laboratorio:</span>
+              <span className="text-xs text-gray-500">
+                {expandLaboratorios ? '▼' : '▶'} ({laboratorios.length})
+              </span>
             </button>
-            {laboratorios.map((lab) => (
-              <button
-                key={lab}
-                onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
-                className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  selectedLaboratorio === lab
-                    ? 'bg-brand-600 text-white'
-                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
-                }`}
-              >
-                {lab}
-              </button>
-            ))}
+
+            {expandLaboratorios && (
+              <div className="flex gap-2 flex-wrap items-center mt-3">
+                <button
+                  onClick={() => setSelectedLaboratorio(null)}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    !selectedLaboratorio
+                      ? 'bg-brand-600 text-white'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  Todos
+                </button>
+                {laboratorios.map((lab) => (
+                  <button
+                    key={lab}
+                    onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      selectedLaboratorio === lab
+                        ? 'bg-brand-600 text-white'
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    {lab}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
