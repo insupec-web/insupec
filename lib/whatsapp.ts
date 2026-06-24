@@ -23,8 +23,8 @@ export function generateWhatsAppMessage(
   const metodoPago = clientData.metodoPago === 'transferencia' ? 'Transferencia Bancaria (Alias: HORA.COCTEL.CETRO)' : 'Efectivo';
 
   const transporteText = clientData.transporte === 'retiro'
-    ? 'Retiro en Casa Central (Bv Lehmann 601, Rafaela, Santa Fe)'
-    : 'Envío por Transporte';
+    ? 'Retira en Casa Central'
+    : 'Mandar por transporte';
 
   const productosList = items
     .map((item) => `• ${item.nombre} - Cantidad: ${item.cantidad} - $${item.precio.toFixed(2)}`)
@@ -42,7 +42,7 @@ Dirección: ${clientData.direccion}
 Ciudad: ${clientData.ciudad}
 Código Postal: ${clientData.codigoPostal}
 
-*FORMA DE ENTREGA:*
+*ENVÍO:*
 ${transporteText}
 
 *PRODUCTOS:*
@@ -52,8 +52,6 @@ ${productosList}
 
 *MÉTODO DE PAGO:* ${metodoPago}
 *¿NECESITA FACTURA?:* ${factura}
-
-${clientData.transporte === 'envio' ? '⚠️ El envío corre por cuenta del comprador y se abona al transporte en destino.' : ''}
 
 ---
 Pedido realizado desde la plataforma online.
