@@ -378,21 +378,11 @@ export default function CheckoutPage() {
                     />
                     <div>
                       <span className="text-gray-800 font-semibold text-sm">Transferencia Bancaria</span>
-                      <p className="text-gray-600 text-xs">Completa los datos abajo</p>
+                      <p className="text-gray-600 text-xs">Se abona después de confirmar el pedido</p>
                     </div>
                   </label>
                 </div>
 
-                {formData.metodoPago === 'transferencia' && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm font-semibold text-gray-800 mb-2">Datos Bancarios:</p>
-                    <div className="space-y-1 text-sm text-gray-700">
-                      <p><strong>Alias:</strong> HORA.COCTEL.CETRO</p>
-                      <p><strong>Nombre de cuenta:</strong> Insupec SA</p>
-                      <p><strong>Banco:</strong> Comafi</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Transporte */}
