@@ -100,15 +100,15 @@ function PedidosContent() {
           for (const producto of pedido.productos) {
             const { data: prod } = await supabase
               .from('productos')
-              .select('cantidad')
+              .select('stock')
               .eq('id', producto.id)
               .single();
 
             if (prod) {
-              const nuevaCantidad = (prod.cantidad || 0) - producto.cantidad;
+              const nuevoStock = (prod.stock || 0) - producto.cantidad;
               await supabase
                 .from('productos')
-                .update({ cantidad: Math.max(0, nuevaCantidad) })
+                .update({ stock: Math.max(0, nuevoStock) })
                 .eq('id', producto.id);
             }
           }
