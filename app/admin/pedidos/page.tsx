@@ -48,7 +48,6 @@ function PedidosContent() {
         .select('*')
         .order('timestamp', { ascending: false });
 
-      console.log('Pedidos fetched:', data, 'Error:', error);
       if (error) throw error;
       setPedidos(data || []);
     } catch (err) {
