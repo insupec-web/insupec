@@ -21,7 +21,7 @@ interface FormData {
   codigoPostal: string;
   factura: boolean;
   metodoPago: 'efectivo' | 'transferencia';
-  transporte: string;
+  transporte: 'envio' | 'retiro';
 }
 
 export default function CheckoutPage() {
@@ -67,7 +67,6 @@ export default function CheckoutPage() {
       [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value,
     }));
   };
-
 
   const validateForm = (): boolean => {
     const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
@@ -379,26 +378,16 @@ export default function CheckoutPage() {
                     />
                     <div>
                       <span className="text-gray-800 font-semibold text-sm">Transferencia Bancaria</span>
-                      <p className="text-gray-600 text-xs">Completa los datos abajo</p>
+                      <p className="text-gray-600 text-xs">Se abona después de confirmar el pedido</p>
                     </div>
                   </label>
                 </div>
 
-                {formData.metodoPago === 'transferencia' && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm font-semibold text-gray-800 mb-2">Datos Bancarios:</p>
-                    <div className="space-y-1 text-sm text-gray-700">
-                      <p><strong>Alias:</strong> HORA.COCTEL.CETRO</p>
-                      <p><strong>Nombre de cuenta:</strong> Insupec SA</p>
-                      <p><strong>Banco:</strong> Comafi</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Transporte */}
               <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">Forma de Entrega</label>
+                <label className="block text-gray-700 font-semibold mb-3 text-sm">Forma de Entrega</label>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition-colors" style={{borderColor: formData.transporte === 'envio' ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)'}}>
                     <input
@@ -406,12 +395,12 @@ export default function CheckoutPage() {
                       name="transporte"
                       value="envio"
                       checked={formData.transporte === 'envio'}
-                      onChange={handleInputChange}
+                      onChange={(e) => setFormData(prev => ({...prev, transporte: e.target.value as 'envio' | 'retiro'}))}
                       className="w-5 h-5"
                     />
                     <div>
                       <span className="text-gray-800 font-semibold text-sm">Enviar por Transporte</span>
-                      <p className="text-gray-600 text-xs">A tu domicilio</p>
+                      <p className="text-gray-600 text-xs">El envío corre por cuenta del comprador y se abona al transporte en destino</p>
                     </div>
                   </label>
 
@@ -421,7 +410,7 @@ export default function CheckoutPage() {
                       name="transporte"
                       value="retiro"
                       checked={formData.transporte === 'retiro'}
-                      onChange={handleInputChange}
+                      onChange={(e) => setFormData(prev => ({...prev, transporte: e.target.value as 'envio' | 'retiro'}))}
                       className="w-5 h-5"
                     />
                     <div>
@@ -430,11 +419,6 @@ export default function CheckoutPage() {
                     </div>
                   </label>
                 </div>
-              </div>
-
-              {/* Aviso de Envío */}
-              <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                <p className="text-sm text-gray-700"><strong className="text-yellow-700">⚠️ Importante:</strong> El envío corre por cuenta del comprador y se abona al transporte en destino.</p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg">

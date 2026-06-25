@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect, ReactNode, useCallback } from 'react';
-import { isAdminLoggedIn, loginAdmin, logoutAdmin } from '@/lib/auth';
+import { loginAdmin, logoutAdmin } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
 import { AuthContext } from './useAuth';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -11,23 +12,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Verificar autenticación inicial y escuchar cambios
   useEffect(() => {
     setMounted(true);
-    const checkAuth = () => {
-      setIsAuthenticated(isAdminLoggedIn());
+
+    const checkAuth = async () => {
+      const { data } = await supabase.auth.getSession();
+      setIsAuthenticated(!!data.session?.user?.id);
     };
 
     checkAuth();
 
-    // Escuchar cambios en localStorage
-    const handleStorageChange = () => {
+    // Escuchar cambios de sesión
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
       checkAuth();
-    };
+    });
 
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
-  const login = useCallback((username: string, password: string): boolean => {
-    const success = loginAdmin(username, password);
+  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
+    const success = await loginAdmin(email, password);
     if (success) {
       setIsAuthenticated(true);
       return true;
@@ -35,8 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   }, []);
 
-  const logout = useCallback(() => {
-    logoutAdmin();
+  const logout = useCallback(async () => {
+    await logoutAdmin();
     setIsAuthenticated(false);
   }, []);
 

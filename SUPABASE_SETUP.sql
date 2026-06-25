@@ -51,8 +51,22 @@ CREATE INDEX IF NOT EXISTS idx_pedidos_email ON pedidos(email);
 CREATE INDEX IF NOT EXISTS idx_pedidos_timestamp ON pedidos(timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_pedidos_telefono ON pedidos(telefono);
 
--- 3. CONFIGURAR ROW LEVEL SECURITY (RLS)
+-- 3. CREAR TABLA DE PAGE VISITS (Analytics)
 -- ═══════════════════════════════════════════════════════════════════════════
+
+CREATE TABLE IF NOT EXISTS page_visits (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  page VARCHAR(255) NOT NULL,
+  user_agent TEXT,
+  referrer TEXT,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+-- Índices para mejor performance
+CREATE INDEX IF NOT EXISTS idx_page_visits_page ON page_visits(page);
+CREATE INDEX IF NOT EXISTS idx_page_visits_created_at ON page_visits(created_at DESC);
+
+-- 4. CONFIGURAR ROW LEVEL SECURITY (RLS)
 
 -- DESHABILITAR RLS EN PRODUCTOS (lectura pública)
 ALTER TABLE productos ENABLE ROW LEVEL SECURITY;
@@ -72,7 +86,7 @@ CREATE POLICY "Productos: Admin puede modificar"
   USING (true)
   WITH CHECK (true);
 
--- HABILITAR RLS EN PEDIDOS (insert público, sin select/update)
+-- HABILITAR RLS EN PEDIDOS
 ALTER TABLE pedidos ENABLE ROW LEVEL SECURITY;
 
 -- Permitir insert público de pedidos
@@ -82,14 +96,45 @@ CREATE POLICY "Pedidos: Insert público"
   TO public
   WITH CHECK (true);
 
--- Denegar select y update de pedidos (solo lectura interna)
-CREATE POLICY "Pedidos: No select público"
+-- Permitir select para admin (anon key)
+CREATE POLICY "Pedidos: Select para admin"
   ON pedidos
   FOR SELECT
-  TO public
-  USING (false);
+  TO anon
+  USING (true);
 
--- 4. DATOS DE EJEMPLO (OPCIONAL - Descomenta si quieres)
+-- Permitir update para admin (confirmar pedidos)
+CREATE POLICY "Pedidos: Admin puede actualizar"
+  ON pedidos
+  FOR UPDATE
+  TO anon
+  USING (true)
+  WITH CHECK (true);
+
+-- Permitir delete para admin (cancelar pedidos)
+CREATE POLICY "Pedidos: Admin puede eliminar"
+  ON pedidos
+  FOR DELETE
+  TO anon
+  USING (true);
+
+-- 5. CREAR POLÍTICAS RLS PARA PAGE_VISITS
+-- ═══════════════════════════════════════════════════════════════════════════
+
+-- Permitir insert público de page visits
+CREATE POLICY "allow_insert_visits"
+  ON page_visits
+  FOR INSERT
+  WITH CHECK (true);
+
+-- Permitir select para admin (anon key)
+CREATE POLICY "allow_select_visits"
+  ON page_visits
+  FOR SELECT
+  TO anon
+  USING (true);
+
+-- 6. DATOS DE EJEMPLO (OPCIONAL - Descomenta si quieres)
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- INSERT INTO productos (nombre, precio, stock, vencimiento, foto_url) VALUES

@@ -4,6 +4,7 @@ import './globals.css';
 import { CartProvider } from '@/hooks/CartProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
 import ConditionalHeader from '@/components/ConditionalHeader';
+import PageTracker from '@/components/PageTracker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html lang="es" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-white text-black">
+        <PageTracker />
         <CartProvider>
           <AuthProvider>
             <ConditionalHeader />

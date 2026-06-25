@@ -100,15 +100,15 @@ function PedidosContent() {
           for (const producto of pedido.productos) {
             const { data: prod } = await supabase
               .from('productos')
-              .select('cantidad')
+              .select('stock')
               .eq('id', producto.id)
               .single();
 
             if (prod) {
-              const nuevaCantidad = (prod.cantidad || 0) - producto.cantidad;
+              const nuevoStock = (prod.stock || 0) - producto.cantidad;
               await supabase
                 .from('productos')
-                .update({ cantidad: Math.max(0, nuevaCantidad) })
+                .update({ stock: Math.max(0, nuevoStock) })
                 .eq('id', producto.id);
             }
           }
@@ -119,6 +119,25 @@ function PedidosContent() {
     } catch (err) {
       console.error('Error updating pedido:', err);
       alert('Error al actualizar el pedido');
+    }
+  };
+
+  const handleCancelar = async (id: string) => {
+    if (!confirm('¿Estás seguro de que deseas cancelar este pedido?')) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('pedidos')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      fetchPedidos();
+    } catch (err) {
+      console.error('Error canceling pedido:', err);
+      alert('Error al cancelar el pedido');
     }
   };
 
@@ -221,25 +240,28 @@ function PedidosContent() {
                     </div>
 
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-brand-600 mb-4">${pedido.total.toFixed(2)}</p>
-                      {!pedido.confirmado ? (
-                        <div className="flex gap-2 justify-end">
+                      <p className="text-2xl font-bold text-brand-600">${pedido.total.toFixed(2)}</p>
+                      {pedido.confirmado ? (
+                        <button
+                          disabled
+                          className="mt-3 px-4 py-2 rounded-lg font-semibold text-white text-sm flex items-center gap-2 bg-green-600"
+                        >
+                          <Check size={16} /> Confirmado
+                        </button>
+                      ) : (
+                        <div className="mt-3 flex gap-2">
                           <button
-                            onClick={() => handleConfirmar(pedido.id, false)}
-                            className="px-4 py-2 rounded-lg font-semibold text-white text-sm bg-green-600 hover:bg-green-700 transition-colors flex items-center gap-2"
+                            onClick={() => handleConfirmar(pedido.id, pedido.confirmado)}
+                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-green-600 hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                           >
                             <Check size={16} /> Confirmar
                           </button>
                           <button
-                            onClick={() => handleConfirmar(pedido.id, true)}
-                            className="px-4 py-2 rounded-lg font-semibold text-white text-sm bg-red-600 hover:bg-red-700 transition-colors flex items-center gap-2"
+                            onClick={() => handleCancelar(pedido.id)}
+                            className="flex-1 px-3 py-2 rounded-lg font-semibold text-white text-sm bg-red-600 hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
                           >
                             <X size={16} /> Cancelar
                           </button>
-                        </div>
-                      ) : (
-                        <div className="px-4 py-2 rounded-lg font-semibold text-white text-sm bg-green-600 flex items-center gap-2 justify-center">
-                          <Check size={16} /> Confirmado
                         </div>
                       )}
                     </div>

@@ -12,8 +12,8 @@ export default function AdminNav() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/admin/login');
   };
 
@@ -32,7 +32,7 @@ export default function AdminNav() {
         {/* Desktop Menu */}
         <div className="hidden sm:flex items-center gap-8">
           <div className="flex items-center gap-4">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Productos</span>
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Productos</span>
             <Link href="/admin/dashboard" className="text-sm text-gray-700 hover:text-brand-600 transition-colors">
               Gestionar
             </Link>
@@ -47,8 +47,8 @@ export default function AdminNav() {
           <div className="h-6 border-l border-gray-300"></div>
 
           <div className="flex items-center gap-4">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Pedidos</span>
-            <Link href="/admin/pedidos" className="text-sm text-brand-600 hover:text-brand-700 transition-colors font-semibold">
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Pedidos</span>
+            <Link href="/admin/pedidos" className="text-sm text-gray-700 hover:text-brand-600 transition-colors">
               Gestionar
             </Link>
           </div>
@@ -77,7 +77,7 @@ export default function AdminNav() {
         <div className="sm:hidden bg-white border-t border-gray-200">
           <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-4">
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Productos</p>
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Productos</p>
               <div className="flex flex-col gap-2 ml-2">
                 <Link
                   href="/admin/dashboard"
@@ -104,10 +104,10 @@ export default function AdminNav() {
             </div>
 
             <div className="border-t border-gray-200 pt-4">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Pedidos</p>
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Pedidos</p>
               <Link
                 href="/admin/pedidos"
-                className="text-brand-600 hover:text-brand-700 transition-colors text-sm py-2 font-semibold block ml-2"
+                className="text-gray-700 hover:text-brand-600 transition-colors text-sm py-2 block ml-2"
                 onClick={handleNavClick}
               >
                 Gestionar

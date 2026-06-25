@@ -79,7 +79,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
   const vencimiento = new Date(producto.vencimiento);
   const hoy = new Date();
   const diasParaVencer = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-  const cantidadDisponible = producto.cantidad ?? cantidadDisponible ?? 0;
+  const cantidadDisponible = producto.cantidad ?? producto.stock ?? 0;
   const isOutOfStock = cantidadDisponible === 0;
 
   const isAboutToExpire = diasParaVencer <= 7 && diasParaVencer >= 0;

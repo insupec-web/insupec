@@ -15,7 +15,7 @@ export default function ProductosPage() {
   const [sortPrice, setSortPrice] = useState<'asc' | 'desc' | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
-  const [expandLaboratorio, setExpandLaboratorio] = useState(false);
+  const [expandLaboratorios, setExpandLaboratorios] = useState(false);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -44,6 +44,15 @@ export default function ProductosPage() {
   const laboratorios = useMemo(() => {
     const labs = new Set(productos.map((p) => p.laboratorio).filter(Boolean));
     return Array.from(labs).sort();
+  }, [productos]);
+
+  const productosEnOferta = useMemo(() => {
+    const fechaLimite = new Date('2026-08-01');
+    return productos.filter((p) => {
+      if (!p.vencimiento) return false; // Ignorar productos sin vencimiento
+      const vencimiento = new Date(p.vencimiento);
+      return vencimiento < fechaLimite;
+    }).sort((a, b) => new Date(a.vencimiento).getTime() - new Date(b.vencimiento).getTime());
   }, [productos]);
 
   const productosFiltrados = useMemo(() => {
@@ -101,6 +110,29 @@ export default function ProductosPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+      {/* Sección de Ofertas */}
+      {productosEnOferta.length > 0 && (
+        <div className="mb-10 sm:mb-12">
+          <div className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-lg border-2 border-brand-300 p-6 sm:p-8 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="bg-brand-600 text-white rounded-full px-4 py-2 font-bold text-sm">OFERTA</div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Productos con Corto Vencimiento</h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {productosEnOferta.map((producto) => (
+              <div key={producto.id} className="relative">
+                <ProductCard producto={producto} />
+                <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
+                  Vence: {new Date(producto.vencimiento).toLocaleDateString('es-AR')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Catálogo de Productos</h1>
         <p className="text-sm sm:text-base text-gray-500">
@@ -121,30 +153,27 @@ export default function ProductosPage() {
           />
         </div>
 
-        {/* Filtro por Laboratorio - Colapsable */}
+        {/* Filtro por Laboratorio */}
         {laboratorios.length > 0 && (
-          <div className="border border-gray-300 rounded-lg">
+          <div>
             <button
-              onClick={() => setExpandLaboratorio(!expandLaboratorio)}
-              className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              onClick={() => setExpandLaboratorios(!expandLaboratorios)}
+              className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
             >
-              <span className="text-sm font-semibold text-gray-900">
-                {selectedLaboratorio ? `Laboratorio: ${selectedLaboratorio}` : 'Filtrar por Laboratorio'}
+              <span>Laboratorio:</span>
+              <span className="text-xs text-gray-500">
+                {expandLaboratorios ? '▼' : '▶'} ({laboratorios.length})
               </span>
-              <span className="text-lg text-gray-600">{expandLaboratorio ? '▼' : '▶'}</span>
             </button>
 
-            {expandLaboratorio && (
-              <div className="border-t border-gray-300 p-3 space-y-2">
+            {expandLaboratorios && (
+              <div className="flex gap-2 flex-wrap items-center mt-3">
                 <button
-                  onClick={() => {
-                    setSelectedLaboratorio(null);
-                    setExpandLaboratorio(false);
-                  }}
-                  className={`w-full text-left px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  onClick={() => setSelectedLaboratorio(null)}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                     !selectedLaboratorio
                       ? 'bg-brand-600 text-white'
-                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                   }`}
                 >
                   Todos
@@ -152,14 +181,11 @@ export default function ProductosPage() {
                 {laboratorios.map((lab) => (
                   <button
                     key={lab}
-                    onClick={() => {
-                      setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab);
-                      setExpandLaboratorio(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                       selectedLaboratorio === lab
                         ? 'bg-brand-600 text-white'
-                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
                     }`}
                   >
                     {lab}
