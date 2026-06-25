@@ -113,12 +113,12 @@ export default function ProductosPage() {
       {/* Sección de Ofertas */}
       {productosEnOferta.length > 0 && (
         <div className="mb-10 sm:mb-12">
-          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-2 border-orange-200 p-6 sm:p-8 mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-orange-500 text-white rounded-full px-4 py-2 font-bold text-sm">OFERTA</div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Productos con Vencimiento Próximo</h2>
+          <div className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-lg border-2 border-brand-300 p-6 sm:p-8 mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-brand-600 text-white rounded-full px-4 py-2 font-bold text-sm">OFERTA</div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Ofertas Especiales</h2>
             </div>
-            <p className="text-gray-600">Descuentos especiales en productos que vencen antes de agosto 2026</p>
+            <p className="text-gray-600 text-sm">Productos con vencimiento próximo - ¡Descuentos increíbles!</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
