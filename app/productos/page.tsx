@@ -49,6 +49,7 @@ export default function ProductosPage() {
   const productosEnOferta = useMemo(() => {
     const fechaLimite = new Date('2026-08-01');
     return productos.filter((p) => {
+      if (!p.vencimiento) return false; // Ignorar productos sin vencimiento
       const vencimiento = new Date(p.vencimiento);
       return vencimiento < fechaLimite;
     }).sort((a, b) => new Date(a.vencimiento).getTime() - new Date(b.vencimiento).getTime());

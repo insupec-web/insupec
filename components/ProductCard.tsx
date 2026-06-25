@@ -12,14 +12,14 @@ export default function ProductCard({ producto }: { producto: Producto }) {
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
 
-  const vencimiento = new Date(producto.vencimiento);
+  const vencimiento = producto.vencimiento ? new Date(producto.vencimiento) : null;
   const hoy = new Date();
-  const diasParaVencer = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
+  const diasParaVencer = vencimiento ? Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)) : null;
 
   const stock = producto.cantidad ?? producto.stock ?? 0;
   const isLowStock = stock < 5 && stock > 0;
   const isOutOfStock = stock === 0;
-  const isAboutToExpire = diasParaVencer <= 7 && diasParaVencer >= 0;
+  const isAboutToExpire = diasParaVencer !== null && diasParaVencer <= 7 && diasParaVencer >= 0;
 
   const handleAddToCart = () => {
     addItem({
@@ -87,7 +87,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <span className="inline-flex items-center gap-1">
             <Calendar size={14} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
             <span className={isAboutToExpire ? 'text-red-600 font-semibold' : ''}>
-              {formatMesAnio(producto.vencimiento)}
+              {vencimiento ? formatMesAnio(producto.vencimiento) : 'Sin vencimiento'}
             </span>
           </span>
           <span className="text-gray-400">•</span>
