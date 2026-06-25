@@ -116,6 +116,7 @@ export default function ProductosPage() {
           <div className="bg-gradient-to-r from-brand-50 to-brand-100 rounded-lg border-2 border-brand-300 p-6 sm:p-8 mb-6">
             <div className="flex items-center gap-3">
               <div className="bg-brand-600 text-white rounded-full px-4 py-2 font-bold text-sm">OFERTA</div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Productos con Corto Vencimiento</h2>
             </div>
           </div>
 
