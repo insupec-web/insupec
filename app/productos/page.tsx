@@ -46,6 +46,14 @@ export default function ProductosPage() {
     return Array.from(labs).sort();
   }, [productos]);
 
+  const productosEnOferta = useMemo(() => {
+    const fechaLimite = new Date('2026-08-01');
+    return productos.filter((p) => {
+      const vencimiento = new Date(p.vencimiento);
+      return vencimiento < fechaLimite;
+    }).sort((a, b) => new Date(a.vencimiento).getTime() - new Date(b.vencimiento).getTime());
+  }, [productos]);
+
   const productosFiltrados = useMemo(() => {
     let filtered = productos;
 
@@ -101,6 +109,30 @@ export default function ProductosPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+      {/* Sección de Ofertas */}
+      {productosEnOferta.length > 0 && (
+        <div className="mb-10 sm:mb-12">
+          <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border-2 border-orange-200 p-6 sm:p-8 mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-orange-500 text-white rounded-full px-4 py-2 font-bold text-sm">OFERTA</div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Productos con Vencimiento Próximo</h2>
+            </div>
+            <p className="text-gray-600">Descuentos especiales en productos que vencen antes de agosto 2026</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+            {productosEnOferta.map((producto) => (
+              <div key={producto.id} className="relative">
+                <ProductCard producto={producto} />
+                <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
+                  Vence: {new Date(producto.vencimiento).toLocaleDateString('es-AR')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Catálogo de Productos</h1>
         <p className="text-sm sm:text-base text-gray-500">
