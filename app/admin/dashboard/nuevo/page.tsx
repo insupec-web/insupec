@@ -76,7 +76,7 @@ function NuevoProductoContent() {
     e.preventDefault();
     setError(null);
 
-    if (!formData.nombre || !formData.precio || !formData.stock || !formData.vencimiento || !formData.laboratorio) {
+    if (!formData.nombre || !formData.precio || !formData.stock || !formData.laboratorio) {
       setError('Completa todos los campos requeridos');
       return;
     }
@@ -94,7 +94,7 @@ function NuevoProductoContent() {
           nombre: formData.nombre,
           precio: parseFloat(formData.precio),
           stock: parseInt(formData.stock),
-          vencimiento: mesAnioADate(formData.vencimiento),
+          vencimiento: formData.vencimiento ? mesAnioADate(formData.vencimiento) : null,
           laboratorio: formData.laboratorio,
           foto_url,
         },
@@ -174,14 +174,13 @@ function NuevoProductoContent() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-gray-700 font-semibold mb-2">Vencimiento (Mes/Año) *</label>
+                <label className="block text-gray-700 font-semibold mb-2">Vencimiento (Mes/Año)</label>
                 <input
                   type="month"
                   name="vencimiento"
                   value={formData.vencimiento}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
-                  required
                 />
               </div>
               <div>
