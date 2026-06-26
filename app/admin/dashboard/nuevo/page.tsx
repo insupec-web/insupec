@@ -84,7 +84,7 @@ function NuevoProductoContent() {
     setLoading(true);
 
     try {
-      let foto_url = '';
+      let foto_url = null;
       if (file) {
         foto_url = await uploadImage(file);
       }
