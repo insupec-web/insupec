@@ -60,15 +60,20 @@ function NuevoProductoContent() {
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileName = `${Date.now()}-${file.name}`;
+    console.log('Uploading file:', fileName);
+
     const { error, data } = await supabase.storage.from('productos').upload(fileName, file);
 
     if (error) {
+      console.error('Upload error:', error);
       throw error;
     }
 
+    console.log('Upload successful:', data);
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     const publicUrl = `${supabaseUrl}/storage/v1/object/public/productos/${fileName}`;
 
+    console.log('Generated URL:', publicUrl);
     return publicUrl;
   };
 
