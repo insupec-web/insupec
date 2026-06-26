@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useCart } from '@/hooks/useCart';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Trash2, ShoppingCart, X, Plus, Minus } from 'lucide-react';
 
@@ -82,9 +81,9 @@ export default function CartSidebar() {
             <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-4 space-y-4">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
-                  <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                  <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     {item.foto_url ? (
-                      <Image src={item.foto_url} alt={item.nombre} fill className="object-cover" />
+                      <img src={item.foto_url} alt={item.nombre} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ShoppingCart size={20} className="text-gray-300" />

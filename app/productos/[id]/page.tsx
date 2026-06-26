@@ -5,7 +5,6 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState, use } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { useCart } from '@/hooks/useCart';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
 import { formatMesAnio } from '@/lib/format';
@@ -94,7 +93,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
         <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-200">
           {producto.foto_url ? (
-            <Image src={producto.foto_url} alt={producto.nombre} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-6" />
+            <img src={producto.foto_url} alt={producto.nombre} className="w-full h-full object-contain p-6" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package size={64} className="text-gray-300" />

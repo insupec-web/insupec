@@ -1,7 +1,6 @@
 'use client';
 
 import { Producto } from '@/lib/supabase';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
@@ -37,12 +36,10 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       {/* Foto del producto */}
       <Link href={`/productos/${producto.id}`} className="relative block h-40 sm:h-48 bg-white overflow-hidden">
         {producto.foto_url ? (
-          <Image
+          <img
             src={producto.foto_url}
             alt={producto.nombre}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">

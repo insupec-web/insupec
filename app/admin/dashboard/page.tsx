@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Edit2, Trash2, Plus, Search } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
@@ -128,14 +127,11 @@ function AdminDashboardContent() {
                   <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {producto.foto_url ? (
-                        <div className="relative w-10 h-10 sm:w-12 sm:h-12">
-                          <Image
-                            src={producto.foto_url}
-                            alt={producto.nombre}
-                            fill
-                            className="object-cover rounded"
-                          />
-                        </div>
+                        <img
+                          src={producto.foto_url}
+                          alt={producto.nombre}
+                          className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
+                        />
                       ) : (
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex items-center justify-center">
                           <span className="text-xs text-gray-500">Sin foto</span>
