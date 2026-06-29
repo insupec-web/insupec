@@ -27,19 +27,24 @@ export default function TrafficStats() {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-      const { data: allVisits } = await supabase
+      const { count: totalCount } = await supabase
         .from('page_visits')
-        .select('*');
+        .select('*', { count: 'exact', head: true });
 
-      const { data: todayVisits } = await supabase
+      const { count: todayCount } = await supabase
         .from('page_visits')
-        .select('*')
+        .select('*', { count: 'exact', head: true })
         .gte('created_at', today);
 
-      const { data: weekVisits } = await supabase
+      const { count: weekCount } = await supabase
         .from('page_visits')
-        .select('*')
+        .select('*', { count: 'exact', head: true })
         .gte('created_at', weekAgo);
+
+      const { data: allVisits } = await supabase
+        .from('page_visits')
+        .select('page')
+        .limit(10000);
 
       // Calcular páginas más visitadas
       const pageCount: Record<string, number> = {};
@@ -53,9 +58,9 @@ export default function TrafficStats() {
         .map(([page, count]) => ({ page, count }));
 
       setStats({
-        totalVisits: allVisits?.length || 0,
-        visitsToday: todayVisits?.length || 0,
-        visitsThisWeek: weekVisits?.length || 0,
+        totalVisits: totalCount || 0,
+        visitsToday: todayCount || 0,
+        visitsThisWeek: weekCount || 0,
         topPages,
       });
     } catch (err) {
