@@ -4,6 +4,7 @@ import { Pack, Producto } from '@/lib/supabase';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/formatPrice';
 import { Package, Plus } from 'lucide-react';
 
 export default function PackCard({ pack, productos }: { pack: Pack; productos: { producto: Producto; cantidad: number }[] }) {
@@ -54,7 +55,7 @@ export default function PackCard({ pack, productos }: { pack: Pack; productos: {
 
         {/* Precio destacado */}
         <div className="mb-3">
-          <span className="text-2xl sm:text-3xl font-extrabold text-brand-600">${pack.precio.toFixed(2)}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-brand-600">${formatPrice(pack.precio)}</span>
         </div>
 
         {/* Botón para expandir/contraer */}

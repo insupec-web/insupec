@@ -8,6 +8,7 @@ import { useCart } from '@/hooks/useCart';
 import Link from 'next/link';
 import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
 import { formatMesAnio } from '@/lib/format';
+import { formatPrice } from '@/lib/formatPrice';
 
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -110,7 +111,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{producto.nombre}</h1>
 
           <div className="mb-6">
-            <span className="text-4xl font-extrabold text-brand-600">${producto.precio.toFixed(2)}</span>
+            <span className="text-4xl font-extrabold text-brand-600">${formatPrice(producto.precio)}</span>
           </div>
 
           <div className="space-y-3 mb-8 border-t border-b border-gray-100 py-5">

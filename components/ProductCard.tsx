@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { formatMesAnio } from '@/lib/format';
+import { formatPrice } from '@/lib/formatPrice';
 import { Package, Calendar, Plus, Minus } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
@@ -70,7 +71,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
 
         {/* Precio destacado */}
         <div className="mb-3">
-          <span className="text-2xl sm:text-3xl font-extrabold text-brand-600">${producto.precio.toFixed(2)}</span>
+          <span className="text-2xl sm:text-3xl font-extrabold text-brand-600">${formatPrice(producto.precio)}</span>
         </div>
 
         {/* Metadatos compactos */}
