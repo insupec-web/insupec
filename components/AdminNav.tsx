@@ -55,6 +55,18 @@ export default function AdminNav() {
 
           <div className="h-6 border-l border-gray-300"></div>
 
+          <div className="flex items-center gap-4">
+            <span className="text-xs font-semibold text-gray-600 uppercase tracking-wider">Packs</span>
+            <Link href="/admin/packs" className="text-sm text-gray-700 hover:text-brand-600 transition-colors">
+              Gestionar
+            </Link>
+            <Link href="/admin/packs/nuevo" className="text-sm text-gray-700 hover:text-brand-600 transition-colors">
+              Crear
+            </Link>
+          </div>
+
+          <div className="h-6 border-l border-gray-300"></div>
+
           <button
             onClick={handleLogout}
             className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors font-semibold text-sm"
@@ -112,6 +124,26 @@ export default function AdminNav() {
               >
                 Gestionar
               </Link>
+            </div>
+
+            <div className="border-t border-gray-200 pt-4">
+              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-3">Packs</p>
+              <div className="flex flex-col gap-2 ml-2">
+                <Link
+                  href="/admin/packs"
+                  className="text-gray-700 hover:text-brand-600 transition-colors text-sm py-2"
+                  onClick={handleNavClick}
+                >
+                  Gestionar
+                </Link>
+                <Link
+                  href="/admin/packs/nuevo"
+                  className="text-gray-700 hover:text-brand-600 transition-colors text-sm py-2"
+                  onClick={handleNavClick}
+                >
+                  Crear
+                </Link>
+              </div>
             </div>
 
             <div className="border-t border-gray-200 pt-4">
