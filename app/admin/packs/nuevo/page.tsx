@@ -20,7 +20,7 @@ function NuevoPackContent() {
   });
 
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Map<string, number>>(new Map());
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [loading, setLoading] = useState(false);
@@ -56,9 +56,24 @@ function NuevoPackContent() {
   };
 
   const handleProductToggle = (productoId: string) => {
-    setSelectedProducts((prev) =>
-      prev.includes(productoId) ? prev.filter((id) => id !== productoId) : [...prev, productoId]
-    );
+    setSelectedProducts((prev) => {
+      const newMap = new Map(prev);
+      if (newMap.has(productoId)) {
+        newMap.delete(productoId);
+      } else {
+        newMap.set(productoId, 1);
+      }
+      return newMap;
+    });
+  };
+
+  const handleQuantityChange = (productoId: string, cantidad: number) => {
+    if (cantidad <= 0) return;
+    setSelectedProducts((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(productoId, cantidad);
+      return newMap;
+    });
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +117,7 @@ function NuevoPackContent() {
     e.preventDefault();
     setError(null);
 
-    if (!formData.nombre || !formData.precio || selectedProducts.length === 0) {
+    if (!formData.nombre || !formData.precio || selectedProducts.size === 0) {
       setError('Completa el nombre, precio y selecciona al menos un producto');
       return;
     }
@@ -133,10 +148,10 @@ function NuevoPackContent() {
       }
 
       // Agregar items al pack
-      const packItems = selectedProducts.map((productoId) => ({
+      const packItems = Array.from(selectedProducts.entries()).map(([productoId, cantidad]) => ({
         pack_id: packData.id,
         producto_id: productoId,
-        cantidad: 1,
+        cantidad,
       }));
 
       const { error: itemsError } = await supabase.from('pack_items').insert(packItems);
@@ -243,10 +258,10 @@ function NuevoPackContent() {
               ) : (
                 <div className="border border-gray-300 rounded-lg p-4 max-h-96 overflow-y-auto space-y-2">
                   {productos.map((producto) => (
-                    <label key={producto.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                    <div key={producto.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
                       <input
                         type="checkbox"
-                        checked={selectedProducts.includes(producto.id)}
+                        checked={selectedProducts.has(producto.id)}
                         onChange={() => handleProductToggle(producto.id)}
                         className="w-4 h-4 rounded"
                       />
@@ -254,17 +269,26 @@ function NuevoPackContent() {
                         <p className="text-sm font-semibold text-gray-800">{producto.nombre}</p>
                         <p className="text-xs text-gray-600">${producto.precio.toFixed(2)}</p>
                       </div>
-                    </label>
+                      {selectedProducts.has(producto.id) && (
+                        <input
+                          type="number"
+                          min="1"
+                          value={selectedProducts.get(producto.id) || 1}
+                          onChange={(e) => handleQuantityChange(producto.id, parseInt(e.target.value))}
+                          className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                        />
+                      )}
+                    </div>
                   ))}
                 </div>
               )}
-              {selectedProducts.length > 0 && (
+              {selectedProducts.size > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {selectedProducts.map((productId) => {
+                  {Array.from(selectedProducts.entries()).map(([productId, cantidad]) => {
                     const producto = productos.find((p) => p.id === productId);
                     return (
                       <div key={productId} className="flex items-center gap-2 bg-brand-100 text-brand-700 px-3 py-1 rounded-lg text-sm font-semibold">
-                        {producto?.nombre}
+                        {producto?.nombre} x{cantidad}
                         <button
                           type="button"
                           onClick={() => handleProductToggle(productId)}

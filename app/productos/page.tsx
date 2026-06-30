@@ -12,7 +12,7 @@ export default function ProductosPage() {
   const [tab, setTab] = useState<'productos' | 'ofertas' | 'packs'>('productos');
   const [productos, setProductos] = useState<Producto[]>([]);
   const [packs, setPacks] = useState<Pack[]>([]);
-  const [packItems, setPackItems] = useState<Map<string, Producto[]>>(new Map());
+  const [packItems, setPackItems] = useState<Map<string, { producto: Producto; cantidad: number }[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -36,17 +36,20 @@ export default function ProductosPage() {
         setPacks(packsData.data || []);
 
         if (packsData.data && packsData.data.length > 0) {
-          const packItemsMap = new Map<string, Producto[]>();
+          const packItemsMap = new Map<string, { producto: Producto; cantidad: number }[]>();
           for (const pack of packsData.data) {
             const { data: items } = await supabase
               .from('pack_items')
-              .select('producto_id')
+              .select('producto_id, cantidad')
               .eq('pack_id', pack.id);
 
             if (items) {
               const productosDelPack = items
-                .map((item) => productosData.data?.find((p) => p.id === item.producto_id))
-                .filter(Boolean) as Producto[];
+                .map((item) => {
+                  const producto = productosData.data?.find((p) => p.id === item.producto_id);
+                  return producto ? { producto: producto, cantidad: item.cantidad } : null;
+                })
+                .filter(Boolean) as { producto: Producto; cantidad: number }[];
               packItemsMap.set(pack.id, productosDelPack);
             }
           }

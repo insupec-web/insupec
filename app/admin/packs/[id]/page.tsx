@@ -20,7 +20,7 @@ function EditPackContent({ id }: { id: string }) {
   });
 
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<Map<string, number>>(new Map());
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -34,7 +34,7 @@ function EditPackContent({ id }: { id: string }) {
         const [packData, productosData, packItemsData] = await Promise.all([
           supabase.from('packs').select('*').eq('id', id).single(),
           supabase.from('productos').select('*').order('nombre'),
-          supabase.from('pack_items').select('producto_id').eq('pack_id', id),
+          supabase.from('pack_items').select('producto_id, cantidad').eq('pack_id', id),
         ]);
 
         if (packData.error) throw packData.error;
@@ -54,7 +54,11 @@ function EditPackContent({ id }: { id: string }) {
         setProductos(productosData.data || []);
 
         if (packItemsData.data) {
-          setSelectedProducts(packItemsData.data.map((item) => item.producto_id));
+          const selectedMap = new Map<string, number>();
+          packItemsData.data.forEach((item) => {
+            selectedMap.set(item.producto_id, item.cantidad);
+          });
+          setSelectedProducts(selectedMap);
         }
       } catch (err) {
         console.error('Error fetching pack:', err);
@@ -76,9 +80,24 @@ function EditPackContent({ id }: { id: string }) {
   };
 
   const handleProductToggle = (productoId: string) => {
-    setSelectedProducts((prev) =>
-      prev.includes(productoId) ? prev.filter((p) => p !== productoId) : [...prev, productoId]
-    );
+    setSelectedProducts((prev) => {
+      const newMap = new Map(prev);
+      if (newMap.has(productoId)) {
+        newMap.delete(productoId);
+      } else {
+        newMap.set(productoId, 1);
+      }
+      return newMap;
+    });
+  };
+
+  const handleQuantityChange = (productoId: string, cantidad: number) => {
+    if (cantidad <= 0) return;
+    setSelectedProducts((prev) => {
+      const newMap = new Map(prev);
+      newMap.set(productoId, cantidad);
+      return newMap;
+    });
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -122,7 +141,7 @@ function EditPackContent({ id }: { id: string }) {
     e.preventDefault();
     setError(null);
 
-    if (!formData.nombre || !formData.precio || selectedProducts.length === 0) {
+    if (!formData.nombre || !formData.precio || selectedProducts.size === 0) {
       setError('Completa el nombre, precio y selecciona al menos un producto');
       return;
     }
@@ -154,10 +173,10 @@ function EditPackContent({ id }: { id: string }) {
       await supabase.from('pack_items').delete().eq('pack_id', id);
 
       // Agregar nuevos items
-      const packItems = selectedProducts.map((productoId) => ({
+      const packItems = Array.from(selectedProducts.entries()).map(([productoId, cantidad]) => ({
         pack_id: id,
         producto_id: productoId,
-        cantidad: 1,
+        cantidad,
       }));
 
       const { error: itemsError } = await supabase.from('pack_items').insert(packItems);
@@ -283,10 +302,10 @@ function EditPackContent({ id }: { id: string }) {
               <label className="block text-gray-700 font-semibold mb-3">Productos en el Pack *</label>
               <div className="border border-gray-300 rounded-lg p-4 max-h-96 overflow-y-auto space-y-2">
                 {productos.map((producto) => (
-                  <label key={producto.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                  <div key={producto.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded">
                     <input
                       type="checkbox"
-                      checked={selectedProducts.includes(producto.id)}
+                      checked={selectedProducts.has(producto.id)}
                       onChange={() => handleProductToggle(producto.id)}
                       className="w-4 h-4 rounded"
                     />
@@ -294,16 +313,25 @@ function EditPackContent({ id }: { id: string }) {
                       <p className="text-sm font-semibold text-gray-800">{producto.nombre}</p>
                       <p className="text-xs text-gray-600">${producto.precio.toFixed(2)}</p>
                     </div>
-                  </label>
+                    {selectedProducts.has(producto.id) && (
+                      <input
+                        type="number"
+                        min="1"
+                        value={selectedProducts.get(producto.id) || 1}
+                        onChange={(e) => handleQuantityChange(producto.id, parseInt(e.target.value))}
+                        className="w-16 px-2 py-1 border border-gray-300 rounded text-sm"
+                      />
+                    )}
+                  </div>
                 ))}
               </div>
-              {selectedProducts.length > 0 && (
+              {selectedProducts.size > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {selectedProducts.map((productId) => {
+                  {Array.from(selectedProducts.entries()).map(([productId, cantidad]) => {
                     const producto = productos.find((p) => p.id === productId);
                     return (
                       <div key={productId} className="flex items-center gap-2 bg-brand-100 text-brand-700 px-3 py-1 rounded-lg text-sm font-semibold">
-                        {producto?.nombre}
+                        {producto?.nombre} x{cantidad}
                         <button
                           type="button"
                           onClick={() => handleProductToggle(productId)}

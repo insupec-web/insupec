@@ -6,17 +6,17 @@ import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { Package, Plus } from 'lucide-react';
 
-export default function PackCard({ pack, productos }: { pack: Pack; productos: Producto[] }) {
+export default function PackCard({ pack, productos }: { pack: Pack; productos: { producto: Producto; cantidad: number }[] }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const { addItem } = useCart();
 
   const handleAddPackToCart = () => {
-    productos.forEach((producto) => {
+    productos.forEach(({ producto, cantidad }) => {
       addItem({
         id: producto.id,
         nombre: producto.nombre,
         precio: producto.precio,
-        cantidad: 1,
+        cantidad: cantidad,
         foto_url: producto.foto_url,
       });
     });
@@ -70,10 +70,10 @@ export default function PackCard({ pack, productos }: { pack: Pack; productos: P
           <div className="mb-4 bg-gray-50 rounded-lg p-3 max-h-48 overflow-y-auto">
             <p className="text-xs font-semibold text-gray-700 mb-2">Productos incluidos:</p>
             <div className="space-y-1">
-              {productos.map((producto) => (
+              {productos.map(({ producto, cantidad }) => (
                 <div key={producto.id} className="flex items-start gap-2 text-xs text-gray-600">
                   <span className="text-brand-600 mt-0.5">•</span>
-                  <span className="flex-1">{producto.nombre}</span>
+                  <span className="flex-1">{producto.nombre} x{cantidad}</span>
                 </div>
               ))}
             </div>
