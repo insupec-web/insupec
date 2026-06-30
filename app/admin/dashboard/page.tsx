@@ -4,11 +4,11 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Search } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, X } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
 
 function AdminDashboardContent() {
@@ -16,6 +16,10 @@ function AdminDashboardContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busqueda, setBusqueda] = useState('');
+  const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
+  const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
+  const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
+  const [editFormData, setEditFormData] = useState({ nombre: '', precio: '', stock: '' });
 
   useEffect(() => {
     fetchProductos();
@@ -57,10 +61,71 @@ function AdminDashboardContent() {
     }
   };
 
-  const productosFiltrados = productos.filter((p) =>
-    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-    p.laboratorio.toLowerCase().includes(busqueda.toLowerCase())
-  );
+  const openEditModal = (producto: Producto) => {
+    setEditingProducto(producto);
+    setEditFormData({
+      nombre: producto.nombre,
+      precio: producto.precio.toString(),
+      stock: (producto.cantidad ?? producto.stock ?? 0).toString(),
+    });
+  };
+
+  const closeEditModal = () => {
+    setEditingProducto(null);
+    setEditFormData({ nombre: '', precio: '', stock: '' });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingProducto) return;
+
+    try {
+      const { error } = await supabase
+        .from('productos')
+        .update({
+          nombre: editFormData.nombre,
+          precio: parseFloat(editFormData.precio),
+          stock: parseInt(editFormData.stock),
+        })
+        .eq('id', editingProducto.id);
+
+      if (error) throw error;
+
+      setProductos((prev) =>
+        prev.map((p) =>
+          p.id === editingProducto.id
+            ? {
+                ...p,
+                nombre: editFormData.nombre,
+                precio: parseFloat(editFormData.precio),
+                stock: parseInt(editFormData.stock),
+              }
+            : p
+        )
+      );
+
+      closeEditModal();
+    } catch (err) {
+      console.error('Error updating producto:', err);
+      alert('Error al actualizar el producto');
+    }
+  };
+
+  const laboratorios = Array.from(new Set(productos.map((p) => p.laboratorio).filter(Boolean))).sort();
+
+  let productosFiltrados = productos.filter((p) => {
+    const matchBusqueda = p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+      p.laboratorio.toLowerCase().includes(busqueda.toLowerCase());
+    const matchLaboratorio = !selectedLaboratorio || p.laboratorio === selectedLaboratorio;
+    return matchBusqueda && matchLaboratorio;
+  });
+
+  if (sortName) {
+    productosFiltrados = [...productosFiltrados].sort((a, b) => {
+      const nameA = a.nombre.toLowerCase();
+      const nameB = b.nombre.toLowerCase();
+      return sortName === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+  }
 
   return (
     <>
@@ -82,7 +147,7 @@ function AdminDashboardContent() {
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
 
-        <div className="mb-6 sm:mb-8">
+        <div className="mb-6 sm:mb-8 space-y-4">
           <div className="relative">
             <Search size={18} className="absolute left-3 top-3 text-gray-400" />
             <input
@@ -93,6 +158,79 @@ function AdminDashboardContent() {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-sm"
             />
           </div>
+
+          {laboratorios.length > 0 && (
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-sm font-semibold text-gray-700">Laboratorio:</span>
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                <button
+                  onClick={() => setSelectedLaboratorio(null)}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    !selectedLaboratorio
+                      ? 'bg-brand-600 text-white'
+                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                  }`}
+                >
+                  Todos
+                </button>
+                {laboratorios.map((lab) => (
+                  <button
+                    key={lab}
+                    onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      selectedLaboratorio === lab
+                        ? 'bg-brand-600 text-white'
+                        : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                    }`}
+                  >
+                    {lab}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-semibold text-gray-700">Ordenar:</span>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={() => setSortName(sortName === 'asc' ? null : 'asc')}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  sortName === 'asc'
+                    ? 'bg-brand-600 text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                }`}
+              >
+                A → Z
+              </button>
+              <button
+                onClick={() => setSortName(sortName === 'desc' ? null : 'desc')}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                  sortName === 'desc'
+                    ? 'bg-brand-600 text-white'
+                    : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                }`}
+              >
+                Z → A
+              </button>
+            </div>
+          </div>
+
+          {(selectedLaboratorio || sortName) && (
+            <button
+              onClick={() => {
+                setSelectedLaboratorio(null);
+                setSortName(null);
+              }}
+              className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+            >
+              Limpiar filtros
+            </button>
+          )}
         </div>
 
         {loading ? (
@@ -128,14 +266,11 @@ function AdminDashboardContent() {
                   <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {producto.foto_url ? (
-                        <div className="relative w-10 h-10 sm:w-12 sm:h-12">
-                          <Image
-                            src={producto.foto_url}
-                            alt={producto.nombre}
-                            fill
-                            className="object-cover rounded"
-                          />
-                        </div>
+                        <img
+                          src={producto.foto_url}
+                          alt={producto.nombre}
+                          className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
+                        />
                       ) : (
                         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex items-center justify-center">
                           <span className="text-xs text-gray-500">Sin foto</span>
@@ -143,7 +278,7 @@ function AdminDashboardContent() {
                       )}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm truncate">{producto.nombre}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${producto.precio.toFixed(2)}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {(() => {
                         const stock = producto.cantidad ?? producto.stock ?? 0;
@@ -165,12 +300,12 @@ function AdminDashboardContent() {
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{new Date(producto.vencimiento).toLocaleDateString('es-AR')}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex gap-2 sm:gap-3">
-                        <Link
-                          href={`/admin/dashboard/${producto.id}`}
+                        <button
+                          onClick={() => openEditModal(producto)}
                           className="text-blue-600 hover:text-blue-800 transition-colors"
                         >
                           <Edit2 size={18} className="sm:w-5 sm:h-5" />
-                        </Link>
+                        </button>
                         <button
                           onClick={() => handleDelete(producto.id)}
                           className="text-red-600 hover:text-red-800 transition-colors"
@@ -183,6 +318,71 @@ function AdminDashboardContent() {
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Modal de Edición */}
+        {editingProducto && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full max-h-96 overflow-y-auto">
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <h2 className="text-lg font-bold text-gray-800">Editar Producto</h2>
+                <button
+                  onClick={closeEditModal}
+                  className="text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+
+              <div className="p-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
+                  <input
+                    type="text"
+                    value={editFormData.nombre}
+                    onChange={(e) => setEditFormData({ ...editFormData, nombre: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Precio</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={editFormData.precio}
+                    onChange={(e) => setEditFormData({ ...editFormData, precio: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Stock</label>
+                  <input
+                    type="number"
+                    value={editFormData.stock}
+                    onChange={(e) => setEditFormData({ ...editFormData, stock: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-sm"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={handleSaveEdit}
+                    className="flex-1 bg-brand-600 text-white py-2 rounded-lg font-bold hover:bg-brand-700 transition-colors text-sm"
+                  >
+                    Guardar
+                  </button>
+                  <button
+                    onClick={closeEditModal}
+                    className="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg font-bold hover:bg-gray-300 transition-colors text-sm"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>
