@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import Link from 'next/link';
@@ -226,7 +227,7 @@ function AdminDashboardContent() {
                       )}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm truncate">{producto.nombre}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${producto.precio.toFixed(2)}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {(() => {
                         const stock = producto.cantidad ?? producto.stock ?? 0;

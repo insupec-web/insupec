@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { Search, Check, X } from 'lucide-react';
@@ -240,7 +241,7 @@ function PedidosContent() {
                     </div>
 
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-brand-600">${pedido.total.toFixed(2)}</p>
+                      <p className="text-2xl font-bold text-brand-600">${formatPrice(pedido.total)}</p>
                       {pedido.confirmado ? (
                         <button
                           disabled
@@ -328,7 +329,7 @@ function PedidosContent() {
                                 <p className="font-semibold text-gray-900">{prod.nombre}</p>
                                 <p className="text-gray-600">x{prod.cantidad}</p>
                               </div>
-                              <p className="font-semibold text-gray-900">${(prod.precio * prod.cantidad).toFixed(2)}</p>
+                              <p className="font-semibold text-gray-900">${formatPrice((prod.precio * prod.cantidad))}</p>
                             </div>
                           ))}
                         </div>

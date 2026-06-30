@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';

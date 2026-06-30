@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { supabase, Pack } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import Link from 'next/link';
@@ -118,7 +119,7 @@ function AdminPacksContent() {
                 {packsFiltrados.map((pack) => (
                   <tr key={pack.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm font-semibold truncate">{pack.nombre}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${pack.precio.toFixed(2)}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(pack.precio)}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-600 hidden sm:table-cell text-sm line-clamp-2">{pack.descripcion || '-'}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex gap-2 sm:gap-3">
