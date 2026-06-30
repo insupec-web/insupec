@@ -29,17 +29,20 @@ export default function TrafficStats() {
 
       const { data: allVisits } = await supabase
         .from('page_visits')
-        .select('*');
+        .select('*')
+        .limit(10000);
 
       const { data: todayVisits } = await supabase
         .from('page_visits')
         .select('*')
-        .gte('created_at', today);
+        .gte('created_at', today)
+        .limit(10000);
 
       const { data: weekVisits } = await supabase
         .from('page_visits')
         .select('*')
-        .gte('created_at', weekAgo);
+        .gte('created_at', weekAgo)
+        .limit(10000);
 
       // Calcular páginas más visitadas
       const pageCount: Record<string, number> = {};
