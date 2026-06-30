@@ -19,7 +19,8 @@ function AdminDashboardContent() {
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
-  const [editFormData, setEditFormData] = useState({ nombre: '', precio: '', stock: '' });
+  const [editFormData, setEditFormData] = useState({ nombre: '', precio: '', stock: '', foto_url: '' });
+  const [editingImage, setEditingImage] = useState<File | null>(null);
 
   useEffect(() => {
     fetchProductos();
@@ -67,24 +68,42 @@ function AdminDashboardContent() {
       nombre: producto.nombre,
       precio: producto.precio.toString(),
       stock: (producto.cantidad ?? producto.stock ?? 0).toString(),
+      foto_url: producto.foto_url || '',
     });
+    setEditingImage(null);
   };
 
   const closeEditModal = () => {
     setEditingProducto(null);
-    setEditFormData({ nombre: '', precio: '', stock: '' });
+    setEditFormData({ nombre: '', precio: '', stock: '', foto_url: '' });
+    setEditingImage(null);
   };
 
   const handleSaveEdit = async () => {
     if (!editingProducto) return;
 
     try {
+      let fotoUrl = editFormData.foto_url;
+
+      if (editingImage) {
+        const fileName = `${editingProducto.id}-${Date.now()}`;
+        const { error: uploadError, data } = await supabase.storage
+          .from('productos')
+          .upload(fileName, editingImage, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicData } = supabase.storage.from('productos').getPublicUrl(fileName);
+        fotoUrl = publicData.publicUrl;
+      }
+
       const { error } = await supabase
         .from('productos')
         .update({
           nombre: editFormData.nombre,
           precio: parseFloat(editFormData.precio),
           stock: parseInt(editFormData.stock),
+          foto_url: fotoUrl,
         })
         .eq('id', editingProducto.id);
 
@@ -98,6 +117,7 @@ function AdminDashboardContent() {
                 nombre: editFormData.nombre,
                 precio: parseFloat(editFormData.precio),
                 stock: parseInt(editFormData.stock),
+                foto_url: fotoUrl,
               }
             : p
         )
@@ -336,6 +356,31 @@ function AdminDashboardContent() {
               </div>
 
               <div className="p-6 space-y-4">
+                {editFormData.foto_url && (
+                  <div className="mb-4">
+                    <img src={editFormData.foto_url} alt={editFormData.nombre} className="w-full h-40 object-cover rounded-lg" />
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Imagen</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        setEditingImage(e.target.files[0]);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setEditFormData({ ...editFormData, foto_url: event.target?.result as string });
+                        };
+                        reader.readAsDataURL(e.target.files[0]);
+                      }
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-600 text-sm"
+                  />
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre</label>
                   <input
