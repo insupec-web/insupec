@@ -5,10 +5,10 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState, use } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { useCart } from '@/hooks/useCart';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
 import { formatMesAnio } from '@/lib/format';
+import { formatPrice } from '@/lib/formatPrice';
 
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -94,7 +94,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
         <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-200">
           {producto.foto_url ? (
-            <Image src={producto.foto_url} alt={producto.nombre} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-contain p-6" />
+            <img src={producto.foto_url} alt={producto.nombre} className="w-full h-full object-contain p-6" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package size={64} className="text-gray-300" />
@@ -111,7 +111,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{producto.nombre}</h1>
 
           <div className="mb-6">
-            <span className="text-4xl font-extrabold text-brand-600">${producto.precio.toFixed(2)}</span>
+            <span className="text-4xl font-extrabold text-brand-600">${formatPrice(producto.precio)}</span>
           </div>
 
           <div className="space-y-3 mb-8 border-t border-b border-gray-100 py-5">

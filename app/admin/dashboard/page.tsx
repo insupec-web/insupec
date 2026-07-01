@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { formatPrice } from '@/lib/formatPrice';
+import { compressImage } from '@/lib/compressImage';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import Link from 'next/link';
@@ -86,10 +87,11 @@ function AdminDashboardContent() {
       let fotoUrl = editFormData.foto_url;
 
       if (editingImage) {
+        const compressed = await compressImage(editingImage);
         const fileName = `${editingProducto.id}-${Date.now()}`;
         const { error: uploadError, data } = await supabase.storage
           .from('productos')
-          .upload(fileName, editingImage, { upsert: true });
+          .upload(fileName, compressed, { upsert: true, cacheControl: '31536000', contentType: compressed.type });
 
         if (uploadError) throw uploadError;
 

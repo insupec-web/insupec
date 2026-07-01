@@ -17,7 +17,8 @@ export default function TrafficStats() {
 
   useEffect(() => {
     fetchStats();
-    const interval = setInterval(fetchStats, 30000);
+    // Refrescar cada 2 minutos: suficiente para el panel y ahorra ancho de banda
+    const interval = setInterval(fetchStats, 120000);
     return () => clearInterval(interval);
   }, []);
 
@@ -27,22 +28,27 @@ export default function TrafficStats() {
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
       const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-      const { data: allVisits, count: allCount } = await supabase
+      // head: true → solo trae el conteo (0 filas transferidas)
+      const { count: allCount } = await supabase
         .from('page_visits')
-        .select('page', { count: 'exact' })
-        .limit(50000);
+        .select('*', { count: 'exact', head: true });
 
-      const { data: todayVisits, count: todayCount } = await supabase
+      const { count: todayCount } = await supabase
         .from('page_visits')
-        .select('*', { count: 'exact' })
-        .gte('created_at', today)
-        .limit(10000);
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', today);
 
-      const { data: weekVisits, count: weekCount } = await supabase
+      const { count: weekCount } = await supabase
         .from('page_visits')
-        .select('*', { count: 'exact' })
-        .gte('created_at', weekAgo)
-        .limit(50000);
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', weekAgo);
+
+      // Para el top de páginas solo traemos la columna 'page' de las visitas recientes
+      const { data: allVisits } = await supabase
+        .from('page_visits')
+        .select('page')
+        .order('created_at', { ascending: false })
+        .limit(1000);
 
       // Calcular páginas más visitadas
       const pageCount: Record<string, number> = {};

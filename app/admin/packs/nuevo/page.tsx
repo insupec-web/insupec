@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent, useEffect } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { compressImage } from '@/lib/compressImage';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -100,8 +101,11 @@ function NuevoPackContent() {
   };
 
   const uploadImage = async (file: File): Promise<string> => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const { error, data } = await supabase.storage.from('productos').upload(fileName, file);
+    const compressed = await compressImage(file);
+    const fileName = `${Date.now()}-${compressed.name}`;
+    const { error, data } = await supabase.storage
+      .from('productos')
+      .upload(fileName, compressed, { cacheControl: '31536000', contentType: compressed.type });
 
     if (error) {
       throw error;

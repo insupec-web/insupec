@@ -467,7 +467,7 @@ export default function CheckoutPage() {
                     <p className="font-semibold text-gray-800 text-sm line-clamp-2">{item.nombre}</p>
                     <p className="text-xs text-gray-600">Cantidad: {item.cantidad}</p>
                   </div>
-                  <p className="font-semibold text-gray-800 text-sm">${(item.precio * item.cantidad).toFixed(2)}</p>
+                  <p className="font-semibold text-gray-800 text-sm">${formatPrice(item.precio * item.cantidad)}</p>
                 </div>
               ))}
             </div>

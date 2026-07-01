@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import { Menu, X } from 'lucide-react';
@@ -25,7 +24,7 @@ export default function AdminNav() {
     <nav className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <Image src="/logo.png" alt="INSUPEC" width={616} height={214} className="h-8 sm:h-9 w-auto" />
+          <img src="/logo.png" alt="INSUPEC" width={616} height={214} className="h-8 sm:h-9 w-auto" />
           <span className="text-xs font-semibold text-gray-400 hidden sm:inline">ADMIN</span>
         </Link>
 

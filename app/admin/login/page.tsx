@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { loginAdmin } from '@/lib/auth';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
@@ -33,7 +32,7 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-white flex items-center justify-center px-3 sm:px-4 py-8">
       <div className="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-sm w-full">
         <div className="flex justify-center mb-2">
-          <Image src="/logo.png" alt="INSUPEC" width={616} height={214} priority className="h-14 w-auto" />
+          <img src="/logo.png" alt="INSUPEC" width={616} height={214} className="h-14 w-auto" />
         </div>
         <p className="text-center text-gray-500 text-sm font-semibold tracking-wide mb-6 sm:mb-8">PANEL DE ADMINISTRACIÓN</p>
 

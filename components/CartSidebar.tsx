@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useCart } from '@/hooks/useCart';
-import Image from 'next/image';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/formatPrice';
 import { Trash2, ShoppingCart, X, Plus, Minus } from 'lucide-react';
 
 export default function CartSidebar() {
@@ -84,7 +84,7 @@ export default function CartSidebar() {
                 <div key={item.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
                   <div className="relative w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                     {item.foto_url ? (
-                      <Image src={item.foto_url} alt={item.nombre} fill className="object-cover" />
+                      <img src={item.foto_url} alt={item.nombre} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ShoppingCart size={20} className="text-gray-300" />
@@ -94,7 +94,7 @@ export default function CartSidebar() {
 
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900 text-sm line-clamp-2">{item.nombre}</h3>
-                    <p className="text-brand-600 font-bold text-sm mt-0.5">${item.precio.toFixed(2)}</p>
+                    <p className="text-brand-600 font-bold text-sm mt-0.5">${formatPrice(item.precio)}</p>
 
                     <div className="flex items-center gap-3 mt-2">
                       <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
@@ -125,7 +125,7 @@ export default function CartSidebar() {
                   </div>
 
                   <div className="text-right">
-                    <span className="font-bold text-gray-900 text-sm">${(item.precio * item.cantidad).toFixed(2)}</span>
+                    <span className="font-bold text-gray-900 text-sm">${formatPrice(item.precio * item.cantidad)}</span>
                   </div>
                 </div>
               ))}
@@ -142,7 +142,7 @@ export default function CartSidebar() {
             <div className="border-t border-gray-200 px-4 sm:px-6 py-4 space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-semibold text-gray-700">Subtotal</span>
-                <span className="font-extrabold text-brand-600 text-2xl">${total.toFixed(2)}</span>
+                <span className="font-extrabold text-brand-600 text-2xl">${formatPrice(total)}</span>
               </div>
               <Link
                 href="/checkout"

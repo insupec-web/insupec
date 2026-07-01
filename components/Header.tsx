@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
 import { ShoppingCart } from 'lucide-react';
-import Image from 'next/image';
 
 export default function Header() {
   const { items, openCart } = useCart();
@@ -31,12 +30,11 @@ export default function Header() {
           href="/productos"
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center"
         >
-          <Image
+          <img
             src="/logo.png"
             alt="INSUPEC - Insumos Pecuarios"
             width={338}
             height={109}
-            priority
             className="h-10 sm:h-16 w-auto"
           />
         </Link>

@@ -1,4 +1,5 @@
 import { CartItem } from './supabase';
+import { formatPrice } from './formatPrice';
 
 interface ClientData {
   nombre: string;
@@ -27,7 +28,7 @@ export function generateWhatsAppMessage(
     : 'Mandar por transporte';
 
   const productosList = items
-    .map((item) => `• ${item.nombre} - Cantidad: ${item.cantidad} - $${item.precio.toFixed(2)}`)
+    .map((item) => `• ${item.nombre} - Cantidad: ${item.cantidad} - $${formatPrice(item.precio)}`)
     .join('\n');
 
   const message = `
@@ -48,7 +49,7 @@ ${transporteText}
 *PRODUCTOS:*
 ${productosList}
 
-*SUBTOTAL:* $${total.toFixed(2)}
+*SUBTOTAL:* $${formatPrice(total)}
 
 *MÉTODO DE PAGO:* ${metodoPago}
 *¿NECESITA FACTURA?:* ${factura}
