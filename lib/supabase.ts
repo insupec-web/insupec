@@ -40,3 +40,21 @@ export interface CartItem {
   cantidad: number;
   foto_url: string;
 }
+
+export interface Pack {
+  id: string;
+  nombre: string;
+  descripcion?: string;
+  precio: number;
+  foto_url?: string;
+  created_at: string;
+}
+
+export interface PackItem {
+  id: string;
+  pack_id: string;
+  producto_id: string;
+  cantidad: number;
+  created_at: string;
+  producto?: Producto;
+}
