@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase, Producto, Pack } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import PackCard from '@/components/PackCard';
-import { Search } from 'lucide-react';
+import SearchAutocomplete from '@/components/SearchAutocomplete';
 
 export default function ProductosPage() {
   const [tab, setTab] = useState<'productos' | 'ofertas' | 'packs'>('productos');
@@ -87,7 +87,11 @@ export default function ProductosPage() {
 
     const q = query.trim().toLowerCase();
     if (q) {
-      filtered = filtered.filter((p) => p.nombre.toLowerCase().includes(q));
+      filtered = filtered.filter(
+        (p) =>
+          p.nombre.toLowerCase().includes(q) ||
+          (p.laboratorio && p.laboratorio.toLowerCase().includes(q))
+      );
     }
 
     if (selectedLaboratorio) {
@@ -179,16 +183,7 @@ export default function ProductosPage() {
           </div>
 
           <div className="mb-6 sm:mb-8 space-y-4">
-            <div className="relative max-w-xl">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar producto por nombre..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-              />
-            </div>
+            <SearchAutocomplete productos={productos} query={query} onQueryChange={setQuery} />
 
             {laboratorios.length > 0 && (
               <div>

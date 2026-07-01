@@ -5,6 +5,8 @@ import { CartProvider } from '@/hooks/CartProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
 import ConditionalHeader from '@/components/ConditionalHeader';
 import PageTracker from '@/components/PageTracker';
+import Footer from '@/components/Footer';
+import WhatsAppButton from '@/components/WhatsAppButton';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -34,6 +36,8 @@ export default function RootLayout({
           <AuthProvider>
             <ConditionalHeader />
             <main className="pt-20 sm:pt-24 flex-1">{children}</main>
+            <Footer />
+            <WhatsAppButton />
           </AuthProvider>
         </CartProvider>
       </body>
