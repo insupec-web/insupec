@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent, useEffect, use } from 'react';
 import { supabase, Producto, Pack } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import { compressImage } from '@/lib/compressImage';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
@@ -315,7 +316,7 @@ function EditPackContent({ id }: { id: string }) {
                     />
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-gray-800">{producto.nombre}</p>
-                      <p className="text-xs text-gray-600">${producto.precio.toFixed(2)}</p>
+                      <p className="text-xs text-gray-600">${formatPrice(producto.precio)}</p>
                     </div>
                     {selectedProducts.has(producto.id) && (
                       <input

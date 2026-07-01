@@ -359,8 +359,8 @@ function AdminDashboardContent() {
 
               <div className="p-6 space-y-4">
                 {editFormData.foto_url && (
-                  <div className="mb-4">
-                    <img src={editFormData.foto_url} alt={editFormData.nombre} className="w-full h-40 object-cover rounded-lg" />
+                  <div className="mb-4 bg-gray-50 rounded-lg">
+                    <img src={editFormData.foto_url} alt={editFormData.nombre} className="w-full h-40 object-contain rounded-lg" />
                   </div>
                 )}
 

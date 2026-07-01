@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
+import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -155,7 +156,7 @@ function ImportarProductosContent() {
       setPreview(
         productos.slice(0, 5).map((p) => ({
           nombre: p.nombre,
-          precio: p.precio.toFixed(2),
+          precio: formatPrice(p.precio),
           stock: String(p.stock),
           vencimiento: formatMesAnio(p.vencimiento),
           laboratorio: p.laboratorio,

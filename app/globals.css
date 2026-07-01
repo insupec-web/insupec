@@ -12,10 +12,13 @@
   --font-mono: var(--font-geist-mono);
 
   /* Paleta de marca INSUPEC (verde del logo) */
+  --color-brand-50: #f3faeb;
   --color-brand-100: #e7f3dc;
+  --color-brand-300: #a8d982;
   --color-brand-500: #5fb52e;
   --color-brand-600: #48a828;
   --color-brand-700: #3c8c20;
+  --color-brand-800: #2f6d19;
 }
 
 body {
