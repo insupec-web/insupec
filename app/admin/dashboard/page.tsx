@@ -291,6 +291,8 @@ function AdminDashboardContent() {
                         <img
                           src={producto.foto_url}
                           alt={producto.nombre}
+                          loading="lazy"
+                          decoding="async"
                           className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
                         />
                       ) : (

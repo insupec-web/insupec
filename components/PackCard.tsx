@@ -31,6 +31,8 @@ export default function PackCard({ pack, productos }: { pack: Pack; productos: {
           <img
             src={pack.foto_url}
             alt={pack.nombre}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
