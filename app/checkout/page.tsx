@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/lib/supabase';
 import { generateWhatsAppMessage, getWhatsAppLink } from '@/lib/whatsapp';
+import { formatPrice } from '@/lib/formatPrice';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle } from 'lucide-react';
@@ -474,8 +475,9 @@ export default function CheckoutPage() {
             <div className="border-t border-gray-300 pt-3 sm:pt-4 space-y-2 sm:space-y-3">
               <div className="flex justify-between text-base sm:text-lg">
                 <span className="font-semibold text-sm sm:text-base">Subtotal:</span>
-                <span className="font-extrabold text-brand-600 text-lg">${total.toFixed(2)}</span>
+                <span className="font-extrabold text-brand-600 text-lg">${formatPrice(total)}</span>
               </div>
+              <p className="text-xs text-gray-500">PRECIO SIN IVA</p>
             </div>
           </div>
         </div>
