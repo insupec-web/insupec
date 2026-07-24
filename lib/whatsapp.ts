@@ -18,7 +18,10 @@ interface ClientData {
 export function generateWhatsAppMessage(
   clientData: ClientData,
   items: CartItem[],
-  total: number
+  total: number,
+  descuentoMonto?: number,
+  descuentoPorcentaje?: number,
+  ivaMonto?: number
 ): string {
   const factura = clientData.factura ? 'Sí' : 'No';
   const metodoPago = clientData.metodoPago === 'transferencia' ? 'Transferencia Bancaria (Alias: HORA.COCTEL.CETRO)' : 'Efectivo';
@@ -30,6 +33,16 @@ export function generateWhatsAppMessage(
   const productosList = items
     .map((item) => `• ${item.nombre} - Cantidad: ${item.cantidad} - $${formatPrice(item.precio)}`)
     .join('\n');
+
+  const descuentoText = descuentoMonto || descuentoPorcentaje
+    ? `\n*DESCUENTO:* ${descuentoPorcentaje ? `${descuentoPorcentaje}%` : ''} (-$${formatPrice(descuentoMonto || 0)})`
+    : '';
+
+  const ivaText = ivaMonto && ivaMonto > 0
+    ? `\n*IVA (21%):* +$${formatPrice(ivaMonto)}`
+    : '';
+
+  const totalFinal = total - (descuentoMonto || 0) + (ivaMonto || 0);
 
   const message = `
 *PEDIDO INSUPEC*
@@ -49,7 +62,9 @@ ${transporteText}
 *PRODUCTOS:*
 ${productosList}
 
-*SUBTOTAL:* $${formatPrice(total)}
+*SUBTOTAL:* $${formatPrice(total)}${descuentoText}${ivaText}
+
+*TOTAL A PAGAR:* $${formatPrice(totalFinal)}
 
 *MÉTODO DE PAGO:* ${metodoPago}
 *¿NECESITA FACTURA?:* ${factura}
@@ -66,3 +81,4 @@ export function getWhatsAppLink(message: string): string {
   const encodedMessage = encodeURIComponent(message);
   return `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 }
+

@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { supabase } from '@/lib/supabase';
 import { generateWhatsAppMessage, getWhatsAppLink } from '@/lib/whatsapp';
@@ -46,6 +46,31 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [descuentoAplicado, setDescuentoAplicado] = useState<{ porcentaje?: number; monto?: number } | null>(null);
+
+  const calcularDescuento = () => {
+    if (!descuentoAplicado) return 0;
+    if (descuentoAplicado.porcentaje) {
+      return total * (descuentoAplicado.porcentaje / 100);
+    }
+    return descuentoAplicado.monto || 0;
+  };
+
+  const descuentoMonto = calcularDescuento();
+  const totalConDescuento = total - descuentoMonto;
+  const ivaAmount = formData.factura ? totalConDescuento * 0.21 : 0;
+  const totalFinal = totalConDescuento + ivaAmount;
+
+  useEffect(() => {
+    const descuentoGuardado = localStorage.getItem('descuentoAplicado');
+    if (descuentoGuardado) {
+      try {
+        setDescuentoAplicado(JSON.parse(descuentoGuardado));
+      } catch {
+        setDescuentoAplicado(null);
+      }
+    }
+  }, []);
 
   if (items.length === 0) {
     return (
@@ -160,7 +185,11 @@ export default function CheckoutPage() {
           metodo_pago: formData.metodoPago,
           transporte: formData.transporte,
           productos: productosData,
-          total,
+          total: totalFinal,
+          subtotal: total,
+          descuento_monto: descuentoMonto || null,
+          descuento_porcentaje: descuentoAplicado?.porcentaje || null,
+          iva_monto: ivaAmount || null,
           confirmado: false,
           timestamp: new Date().toISOString(),
         },
@@ -185,7 +214,10 @@ export default function CheckoutPage() {
           transporte: formData.transporte,
         },
         items,
-        total
+        total,
+        descuentoMonto || undefined,
+        descuentoAplicado?.porcentaje || undefined,
+        ivaAmount || undefined
       );
 
       const whatsappLink = getWhatsAppLink(whatsappMessage);
@@ -193,6 +225,7 @@ export default function CheckoutPage() {
       setWhatsappUrl(whatsappLink);
       setShowSuccess(true);
       clearCart();
+      localStorage.removeItem('descuentoAplicado');
 
       // Abrir WhatsApp inmediatamente, aprovechando el gesto del usuario (evita
       // que Safari/Chrome bloqueen el popup). El modal ofrece un botón de respaldo.
@@ -476,6 +509,26 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-base sm:text-lg">
                 <span className="font-semibold text-sm sm:text-base">Subtotal:</span>
                 <span className="font-extrabold text-brand-600 text-lg">${formatPrice(total)}</span>
+              </div>
+              <p className="text-xs text-gray-500">PRECIO SIN IVA</p>
+
+              {descuentoAplicado && (
+                <div className="flex justify-between items-center pt-2 pb-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">Descuento {descuentoAplicado.porcentaje ? `(${descuentoAplicado.porcentaje}%)` : ''}</span>
+                  <span className="font-bold text-green-600">-${formatPrice(descuentoMonto)}</span>
+                </div>
+              )}
+
+              {ivaAmount > 0 && (
+                <div className="flex justify-between items-center pt-2 pb-2 border-b border-gray-100">
+                  <span className="text-sm text-gray-600">IVA (21%)</span>
+                  <span className="font-bold text-gray-900">+${formatPrice(ivaAmount)}</span>
+                </div>
+              )}
+
+              <div className="flex justify-between text-base sm:text-lg pt-2">
+                <span className="font-semibold text-sm sm:text-base">{descuentoAplicado || ivaAmount > 0 ? 'Total a pagar:' : 'Total:'}</span>
+                <span className="font-extrabold text-brand-600 text-lg">${formatPrice(totalFinal)}</span>
               </div>
             </div>
           </div>
