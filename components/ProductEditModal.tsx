@@ -123,16 +123,13 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         throw updateError;
       }
 
+      setSaving(false);
       onSave();
       onClose();
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error updating producto:', err);
-      const msg =
-        (err as { message?: string; details?: string })?.message ||
-        (err as { details?: string })?.details ||
-        'Error desconocido';
+      const msg = err?.message || err?.details || JSON.stringify(err) || 'Error desconocido';
       setError(`Error al actualizar: ${msg}`);
-    } finally {
       setSaving(false);
     }
   };
@@ -140,8 +137,18 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl my-8">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && !saving) {
+          onClose();
+        }
+      }}
+    >
+      <div
+        className="bg-white rounded-lg shadow-xl w-full max-w-2xl my-8"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-2xl font-bold text-gray-900">Editar Producto</h2>
