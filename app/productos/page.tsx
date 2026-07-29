@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
-import PromoBar from '@/components/PromoBar';
 import { Search } from 'lucide-react';
 
 export default function ProductosPage() {
@@ -121,9 +120,7 @@ export default function ProductosPage() {
   }
 
   return (
-    <>
-      <PromoBar />
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
         {/* Tabs */}
       <div className="flex gap-2 mb-8 border-b border-gray-200">
         <button
@@ -152,11 +149,8 @@ export default function ProductosPage() {
       {tab === 'productos' && (
         <div>
           <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-brand-100">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">💊</span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Productos</h1>
-            </div>
-            <p className="text-sm sm:text-base text-gray-500 ml-10">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Productos</h1>
+            <p className="text-sm sm:text-base text-gray-500">
               {productos.length} {productos.length === 1 ? 'producto disponible' : 'productos disponibles'}
             </p>
           </div>
@@ -325,11 +319,8 @@ export default function ProductosPage() {
       {tab === 'ofertas' && (
         <div>
           <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-amber-200">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">🏷️</span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Ofertas</h1>
-            </div>
-            <p className="text-sm sm:text-base text-gray-500 ml-10">Productos con vencimiento próximo a precios especiales</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Ofertas</h1>
+            <p className="text-sm sm:text-base text-gray-500">Productos con vencimiento próximo a precios especiales</p>
           </div>
 
           {productosEnOferta.length === 0 ? (
@@ -355,7 +346,6 @@ export default function ProductosPage() {
           )}
         </div>
       )}
-      </div>
-    </>
+    </div>
   );
 }

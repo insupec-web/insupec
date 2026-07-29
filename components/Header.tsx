@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCart } from '@/hooks/useCart';
-import { ShoppingCart, Lock, Truck, CheckCircle } from 'lucide-react';
+import { ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 
 export default function Header() {
@@ -11,29 +11,6 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white z-50 shadow-sm">
-      {/* Trust Bar */}
-      <div className="bg-gradient-to-r from-brand-50 to-white border-b border-brand-200 px-3 sm:px-6 py-3">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap justify-center sm:justify-between gap-3 sm:gap-6 text-xs sm:text-sm">
-            <div className="flex items-center gap-2 text-gray-700">
-              <Lock size={16} className="text-brand-600 flex-shrink-0" />
-              <span className="hidden sm:inline">🔒 HTTPS Seguro</span>
-              <span className="sm:hidden">Seguro</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <Truck size={16} className="text-brand-600 flex-shrink-0" />
-              <span className="hidden sm:inline">📦 Envío 24-72h</span>
-              <span className="sm:hidden">Envío Rápido</span>
-            </div>
-            <div className="flex items-center gap-2 text-gray-700">
-              <CheckCircle size={16} className="text-brand-600 flex-shrink-0" />
-              <span className="hidden sm:inline">✓ 100% Auténticos</span>
-              <span className="sm:hidden">Auténticos</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Header */}
       <div className="border-b border-gray-200 px-3 sm:px-6 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">

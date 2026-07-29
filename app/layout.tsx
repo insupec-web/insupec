@@ -4,7 +4,6 @@ import './globals.css';
 import { CartProvider } from '@/hooks/CartProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
 import ConditionalHeader from '@/components/ConditionalHeader';
-import Footer from '@/components/Footer';
 import WhatsAppButton from '@/components/WhatsAppButton';
 import BackToTop from '@/components/BackToTop';
 import PageTracker from '@/components/PageTracker';
@@ -43,8 +42,7 @@ export default function RootLayout({
         <CartProvider>
           <AuthProvider>
             <ConditionalHeader />
-            <main className="pt-28 sm:pt-32 flex-1">{children}</main>
-            <Footer />
+            <main className="pt-20 sm:pt-24 flex-1">{children}</main>
             <WhatsAppButton />
             <BackToTop />
           </AuthProvider>
