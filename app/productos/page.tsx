@@ -7,6 +7,7 @@ import { supabase, Producto, Pack } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
 import PackCard from '@/components/PackCard';
+import PromoBar from '@/components/PromoBar';
 import { Search } from 'lucide-react';
 
 export default function ProductosPage() {
@@ -146,8 +147,10 @@ export default function ProductosPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
-      {/* Tabs */}
+    <>
+      <PromoBar />
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+        {/* Tabs */}
       <div className="flex gap-2 mb-8 border-b border-gray-200">
         <button
           onClick={() => setTab('productos')}
@@ -378,6 +381,7 @@ export default function ProductosPage() {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
