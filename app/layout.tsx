@@ -43,7 +43,7 @@ export default function RootLayout({
         <CartProvider>
           <AuthProvider>
             <ConditionalHeader />
-            <main className="pt-20 sm:pt-24 flex-1">{children}</main>
+            <main className="pt-28 sm:pt-32 flex-1">{children}</main>
             <Footer />
             <WhatsAppButton />
             <BackToTop />
