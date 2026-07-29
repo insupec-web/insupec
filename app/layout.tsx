@@ -5,6 +5,8 @@ import { CartProvider } from '@/hooks/CartProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
 import ConditionalHeader from '@/components/ConditionalHeader';
 import Footer from '@/components/Footer';
+import WhatsAppButton from '@/components/WhatsAppButton';
+import BackToTop from '@/components/BackToTop';
 import PageTracker from '@/components/PageTracker';
 
 const geistSans = Geist({
@@ -18,8 +20,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'INSUPEC - Plataforma de Pedidos Online',
-  description: 'Plataforma de pedidos online de INSUPEC. Compra productos frescos en línea.',
+  title: 'INSUPEC - Farmacia Online de Confianza | Medicamentos Auténticos',
+  description: 'Compra medicamentos y productos de salud auténticos en línea. Envío rápido 24-72h a todo el país. Farmacia verificada y segura. Atención 24/7 en WhatsApp.',
+  keywords: 'farmacia online, medicamentos, productos de salud, envío a domicilio, farmacia argentina',
+  openGraph: {
+    title: 'INSUPEC - Tu Farmacia de Confianza',
+    description: 'Medicamentos y productos de salud 100% auténticos. Envío rápido y seguro.',
+    type: 'website',
+    url: 'https://insupec.com',
+  },
 };
 
 export default function RootLayout({
@@ -36,6 +45,8 @@ export default function RootLayout({
             <ConditionalHeader />
             <main className="pt-20 sm:pt-24 flex-1">{children}</main>
             <Footer />
+            <WhatsAppButton />
+            <BackToTop />
           </AuthProvider>
         </CartProvider>
       </body>

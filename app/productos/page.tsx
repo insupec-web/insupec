@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase, Producto, Pack } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
+import ProductSkeleton from '@/components/ProductSkeleton';
 import PackCard from '@/components/PackCard';
 import { Search } from 'lucide-react';
 
@@ -113,9 +114,21 @@ export default function ProductosPage() {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="text-center">
-          <p className="text-gray-600">Cargando...</p>
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+        <div className="mb-8">
+          <div className="h-10 bg-gray-200 rounded-lg w-1/4 animate-pulse mb-2" />
+          <div className="h-5 bg-gray-200 rounded-lg w-1/3 animate-pulse" />
+        </div>
+
+        <div className="mb-8 space-y-4">
+          <div className="h-10 bg-gray-200 rounded-xl w-full max-w-md animate-pulse" />
+          <div className="h-8 bg-gray-200 rounded-lg w-1/2 animate-pulse" />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <ProductSkeleton key={i} />
+          ))}
         </div>
       </div>
     );

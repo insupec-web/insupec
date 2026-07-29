@@ -9,7 +9,7 @@ import { generateWhatsAppMessage, getWhatsAppLink } from '@/lib/whatsapp';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/formatPrice';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Lock, Shield, Truck } from 'lucide-react';
 
 interface FormData {
   nombre: string;
@@ -239,6 +239,72 @@ export default function CheckoutPage() {
   };
 
   return (
+    <div className="bg-gray-50 min-h-screen">
+      {/* Security Banner */}
+      <div className="bg-gradient-to-r from-brand-50 to-white border-b border-brand-200 px-4 py-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center gap-3">
+              <Lock className="text-brand-600 flex-shrink-0" size={24} />
+              <div className="text-sm">
+                <p className="font-semibold text-gray-900">🔒 Conexión Segura</p>
+                <p className="text-gray-600">HTTPS SSL Encriptado</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Shield className="text-brand-600 flex-shrink-0" size={24} />
+              <div className="text-sm">
+                <p className="font-semibold text-gray-900">✓ Datos Protegidos</p>
+                <p className="text-gray-600">Tu información es segura</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Truck className="text-brand-600 flex-shrink-0" size={24} />
+              <div className="text-sm">
+                <p className="font-semibold text-gray-900">📦 Entrega Rápida</p>
+                <p className="text-gray-600">24-72 horas a todo el país</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Checkout Steps */}
+      <div className="bg-white border-b px-4 py-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 flex items-center">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-600 text-white font-bold text-lg">
+                1
+              </div>
+              <div className="flex-1 h-1 bg-brand-600 mx-2"></div>
+            </div>
+            <div className="flex-1 flex items-center">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-brand-600 text-white font-bold text-lg">
+                2
+              </div>
+              <div className="flex-1 h-1 bg-gray-300 mx-2"></div>
+            </div>
+            <div className="flex items-center">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 font-bold text-lg">
+                3
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-3 gap-4 mt-4 text-center text-xs sm:text-sm">
+            <div>
+              <p className="font-semibold text-gray-900">Tu Carrito</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-900">Datos de Envío</p>
+            </div>
+            <div>
+              <p className="font-semibold text-gray-500">Confirmación</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
     <div className="max-w-6xl mx-auto px-3 sm:px-4 py-8 sm:py-12">
       {showSuccess && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
@@ -534,6 +600,7 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }
