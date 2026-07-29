@@ -7,6 +7,7 @@ import { supabase, Producto, Pack } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
 import PackCard from '@/components/PackCard';
+import PromoBar from '@/components/PromoBar';
 import { Search } from 'lucide-react';
 
 export default function ProductosPage() {
@@ -146,61 +147,75 @@ export default function ProductosPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
-      {/* Tabs */}
+    <>
+      <PromoBar />
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
+        {/* Tabs */}
       <div className="flex gap-2 mb-8 border-b border-gray-200">
         <button
           onClick={() => setTab('productos')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
             tab === 'productos'
-              ? 'border-brand-600 text-brand-600'
+              ? 'border-brand-600 text-brand-600 scale-105'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Productos
+          Productos <span className="text-xs text-gray-500">({productos.length})</span>
         </button>
         <button
           onClick={() => setTab('ofertas')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
             tab === 'ofertas'
-              ? 'border-brand-600 text-brand-600'
+              ? 'border-brand-600 text-brand-600 scale-105'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Ofertas
+          Ofertas <span className="text-xs text-gray-500">({productosEnOferta.length})</span>
         </button>
         <button
           onClick={() => setTab('packs')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
             tab === 'packs'
-              ? 'border-brand-600 text-brand-600'
+              ? 'border-brand-600 text-brand-600 scale-105'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Packs
+          Packs <span className="text-xs text-gray-500">({packs.length})</span>
         </button>
       </div>
 
       {/* TAB: Productos */}
       {tab === 'productos' && (
         <div>
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Productos</h1>
-            <p className="text-sm sm:text-base text-gray-500">
+          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-brand-100">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">💊</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Productos</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-500 ml-10">
               {productos.length} {productos.length === 1 ? 'producto disponible' : 'productos disponibles'}
             </p>
           </div>
 
           <div className="mb-6 sm:mb-8 space-y-4">
-            <div className="relative max-w-xl">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <div className="relative max-w-xl group">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-brand-600 transition-colors" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar producto por nombre..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm focus:shadow-md bg-gray-50 focus:bg-white"
               />
+              {query && (
+                <button
+                  onClick={() => setQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="Limpiar búsqueda"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
             {laboratorios.length > 0 && (
@@ -217,10 +232,10 @@ export default function ProductosPage() {
                   <div className="flex gap-2 flex-wrap items-center mt-3">
                     <button
                       onClick={() => setSelectedLaboratorio(null)}
-                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
                         !selectedLaboratorio
-                          ? 'bg-brand-600 text-white'
-                          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                          ? 'bg-brand-600 text-white shadow-md scale-105'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                       }`}
                     >
                       Todos
@@ -229,10 +244,10 @@ export default function ProductosPage() {
                       <button
                         key={lab}
                         onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
-                        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                        className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
                           selectedLaboratorio === lab
-                            ? 'bg-brand-600 text-white'
-                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                            ? 'bg-brand-600 text-white shadow-md scale-105'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                         }`}
                       >
                         {lab}
@@ -250,22 +265,26 @@ export default function ProductosPage() {
                   setSortPrice(sortPrice === 'asc' ? null : 'asc');
                   setSortName(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortPrice === 'asc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortPrice === 'asc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
-                ↑ Menor a Mayor
+                ↑ Menor
               </button>
               <button
                 onClick={() => {
                   setSortPrice(sortPrice === 'desc' ? null : 'desc');
                   setSortName(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortPrice === 'desc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortPrice === 'desc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
-                ↓ Mayor a Menor
+                ↓ Mayor
               </button>
             </div>
 
@@ -276,8 +295,10 @@ export default function ProductosPage() {
                   setSortName(sortName === 'asc' ? null : 'asc');
                   setSortPrice(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortName === 'asc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortName === 'asc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
                 A → Z
@@ -287,8 +308,10 @@ export default function ProductosPage() {
                   setSortName(sortName === 'desc' ? null : 'desc');
                   setSortPrice(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortName === 'desc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortName === 'desc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
                 Z → A
@@ -302,22 +325,26 @@ export default function ProductosPage() {
                   setSortName(null);
                   setSelectedLaboratorio(null);
                 }}
-                className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all transform hover:scale-102 border border-red-200"
               >
-                Limpiar todos los filtros
+                ✕ Limpiar filtros
               </button>
             )}
           </div>
 
           {productos.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base sm:text-lg">No hay productos disponibles en este momento.</p>
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+              <div className="text-5xl mb-4">📦</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin productos disponibles</h3>
+              <p className="text-gray-600 text-base mb-6">Estamos cargando nuestro catálogo. Vuelve pronto!</p>
             </div>
           ) : productosFiltrados.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base">No se encontraron productos para "{query}".</p>
-              <button onClick={() => setQuery('')} className="mt-3 text-brand-600 font-semibold hover:underline">
-                Limpiar búsqueda
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No encontramos coincidencias</h3>
+              <p className="text-gray-600 text-base mb-6">No hay productos que coincidan con "{query}"</p>
+              <button onClick={() => setQuery('')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+                Ver todos los productos
               </button>
             </div>
           ) : (
@@ -333,14 +360,22 @@ export default function ProductosPage() {
       {/* TAB: Ofertas */}
       {tab === 'ofertas' && (
         <div>
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Ofertas</h1>
-            <p className="text-sm sm:text-base text-gray-500">Productos con vencimiento próximo</p>
+          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-amber-200">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🏷️</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Ofertas</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-500 ml-10">Productos con vencimiento próximo a precios especiales</p>
           </div>
 
           {productosEnOferta.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base sm:text-lg">No hay ofertas disponibles en este momento.</p>
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl">
+              <div className="text-5xl mb-4">🏷️</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin ofertas en este momento</h3>
+              <p className="text-gray-600 text-base mb-6">Todas nuestras ofertas están agotadas. Vuelve pronto para nuevas promociones!</p>
+              <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+                Ver productos regulares
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
@@ -360,14 +395,22 @@ export default function ProductosPage() {
       {/* TAB: Packs */}
       {tab === 'packs' && (
         <div>
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Packs</h1>
-            <p className="text-sm sm:text-base text-gray-500">Combos de productos con descuento especial</p>
+          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-blue-200">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🎁</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Packs</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-500 ml-10">Combos de productos con descuento especial</p>
           </div>
 
           {packs.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base sm:text-lg">No hay packs disponibles en este momento.</p>
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
+              <div className="text-5xl mb-4">🎁</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin packs disponibles</h3>
+              <p className="text-gray-600 text-base mb-6">Nuestros combos especiales están en construcción. Sigue comprando productos individuales!</p>
+              <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+                Explorar productos
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
@@ -378,6 +421,7 @@ export default function ProductosPage() {
           )}
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 }
