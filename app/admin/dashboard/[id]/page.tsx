@@ -125,16 +125,22 @@ function EditProductoContent({ id }: { id: string }) {
         foto_url = await uploadImage(file);
       }
 
+      const updateData: Record<string, unknown> = {
+        nombre: formData.nombre,
+        precio: parseFloat(formData.precio),
+        cantidad: parseInt(formData.stock),
+        laboratorio: formData.laboratorio,
+        foto_url,
+      };
+
+      // vencimiento es NOT NULL en la DB: solo actualizarlo si hay valor.
+      if (formData.vencimiento) {
+        updateData.vencimiento = mesAnioADate(formData.vencimiento);
+      }
+
       const { error: updateError } = await supabase
         .from('productos')
-        .update({
-          nombre: formData.nombre,
-          precio: parseFloat(formData.precio),
-          cantidad: parseInt(formData.stock),
-          vencimiento: formData.vencimiento ? mesAnioADate(formData.vencimiento) : null,
-          laboratorio: formData.laboratorio,
-          foto_url,
-        })
+        .update(updateData)
         .eq('id', id);
 
       if (updateError) {

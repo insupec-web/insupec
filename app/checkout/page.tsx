@@ -62,14 +62,9 @@ export default function CheckoutPage() {
   const totalFinal = totalConDescuento + ivaAmount;
 
   useEffect(() => {
-    const descuentoGuardado = localStorage.getItem('descuentoAplicado');
-    if (descuentoGuardado) {
-      try {
-        setDescuentoAplicado(JSON.parse(descuentoGuardado));
-      } catch {
-        setDescuentoAplicado(null);
-      }
-    }
+    // Ya no existe UI para ingresar códigos de descuento: limpiar cualquier
+    // descuento viejo guardado para que no se aplique de forma invisible.
+    localStorage.removeItem('descuentoAplicado');
   }, []);
 
   if (items.length === 0) {
@@ -171,29 +166,42 @@ export default function CheckoutPage() {
         precio: item.precio,
       }));
 
-      const { error: insertError } = await supabase.from('pedidos').insert([
-        {
-          nombre: formData.nombre,
-          apellido: formData.apellido,
-          razon_social: formData.razonSocial,
-          email: formData.email,
-          telefono: formData.telefono,
-          direccion: formData.direccion,
-          ciudad: formData.ciudad,
-          codigo_postal: formData.codigoPostal,
-          factura: formData.factura,
-          metodo_pago: formData.metodoPago,
-          transporte: formData.transporte,
-          productos: productosData,
-          total: totalFinal,
-          subtotal: total,
-          descuento_monto: descuentoMonto || null,
-          descuento_porcentaje: descuentoAplicado?.porcentaje || null,
-          iva_monto: ivaAmount || null,
-          confirmado: false,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
+      // Columnas garantizadas por SUPABASE_SETUP.sql / SUPABASE_ALTER_PEDIDOS.sql.
+      const pedidoBase = {
+        nombre: formData.nombre,
+        apellido: formData.apellido,
+        razon_social: formData.razonSocial,
+        email: formData.email,
+        telefono: formData.telefono,
+        direccion: formData.direccion,
+        ciudad: formData.ciudad,
+        codigo_postal: formData.codigoPostal,
+        factura: formData.factura,
+        metodo_pago: formData.metodoPago,
+        transporte: formData.transporte,
+        productos: productosData,
+        total: totalFinal,
+        confirmado: false,
+        timestamp: new Date().toISOString(),
+      };
+
+      // Columnas de SUPABASE_ALTER_PEDIDOS_DESCUENTOS.sql (pueden no existir aún).
+      const pedidoCompleto = {
+        ...pedidoBase,
+        subtotal: total,
+        descuento_monto: descuentoMonto || null,
+        descuento_porcentaje: descuentoAplicado?.porcentaje || null,
+        iva_monto: ivaAmount || null,
+      };
+
+      let { error: insertError } = await supabase.from('pedidos').insert([pedidoCompleto]);
+
+      // Si la DB no tiene las columnas de descuento (código PGRST204 / 42703),
+      // reintentar con las columnas base para no perder el pedido.
+      if (insertError && (insertError.code === 'PGRST204' || insertError.code === '42703')) {
+        console.warn('Columnas de descuento faltantes en pedidos; guardando pedido base. Ejecuta SUPABASE_ALTER_PEDIDOS_DESCUENTOS.sql');
+        ({ error: insertError } = await supabase.from('pedidos').insert([pedidoBase]));
+      }
 
       if (insertError) {
         throw insertError;

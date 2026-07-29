@@ -47,7 +47,10 @@ export default function ProductosPage() {
   }, [productos]);
 
   const productosEnOferta = useMemo(() => {
-    const fechaLimite = new Date('2026-08-01');
+    // Ofertas: productos que vencen dentro de los próximos 3 meses (ventana
+    // móvil, antes era una fecha fija que quedaba desactualizada).
+    const fechaLimite = new Date();
+    fechaLimite.setMonth(fechaLimite.getMonth() + 3);
     return productos
       .filter((p) => {
         if (!p.vencimiento) return false;

@@ -86,6 +86,12 @@ function NuevoProductoContent() {
       return;
     }
 
+    // La columna vencimiento es NOT NULL en la DB: sin fecha el insert falla.
+    if (!formData.vencimiento) {
+      setError('Selecciona la fecha de vencimiento');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -99,7 +105,7 @@ function NuevoProductoContent() {
           nombre: formData.nombre,
           precio: parseFloat(formData.precio),
           cantidad: parseInt(formData.stock),
-          vencimiento: formData.vencimiento ? mesAnioADate(formData.vencimiento) : null,
+          vencimiento: mesAnioADate(formData.vencimiento),
           laboratorio: formData.laboratorio,
           foto_url,
         },

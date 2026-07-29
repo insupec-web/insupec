@@ -20,10 +20,11 @@ interface ProductoCSV {
   laboratorio?: string;
 }
 
+// Debe coincidir con las columnas reales de la tabla productos.
 interface ProductoImport {
   nombre: string;
   precio: number;
-  stock: number;
+  cantidad: number;
   vencimiento: string;
   laboratorio: string;
   foto_url: string;
@@ -113,7 +114,7 @@ async function extractProductos(file: File): Promise<ProductoImport[]> {
     productos.push({
       nombre,
       precio: Math.round(parseNumero(precioRaw) * 100) / 100,
-      stock: Math.round(parseNumero(pick(row, 'stock', 'cantidad'))),
+      cantidad: Math.round(parseNumero(pick(row, 'stock', 'cantidad'))),
       vencimiento: parseVencimiento(pick(row, 'vencimiento', 'fecha', 'vto')),
       laboratorio: String(pick(row, 'laboratorio', 'lab', 'marca')).trim(),
       foto_url: '',
@@ -157,7 +158,7 @@ function ImportarProductosContent() {
         productos.slice(0, 5).map((p) => ({
           nombre: p.nombre,
           precio: p.precio.toFixed(2),
-          stock: String(p.stock),
+          stock: String(p.cantidad),
           vencimiento: formatMesAnio(p.vencimiento),
           laboratorio: p.laboratorio,
         }))

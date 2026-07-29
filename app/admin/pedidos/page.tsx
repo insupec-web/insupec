@@ -99,18 +99,23 @@ function PedidosContent() {
         const pedido = pedidos.find((p) => p.id === id);
         if (pedido) {
           for (const producto of pedido.productos) {
-            const { data: prod } = await supabase
+            const { data: prod, error: readError } = await supabase
               .from('productos')
-              .select('stock')
+              .select('*')
               .eq('id', producto.id)
               .single();
 
+            if (readError) throw readError;
+
             if (prod) {
-              const nuevoStock = (prod.stock || 0) - producto.cantidad;
-              await supabase
+              const stockActual = (prod.cantidad ?? prod.stock) ?? 0;
+              const nuevoStock = Math.max(0, stockActual - producto.cantidad);
+              const { error: stockError } = await supabase
                 .from('productos')
-                .update({ stock: Math.max(0, nuevoStock) })
+                .update({ ['cantidad' in prod ? 'cantidad' : 'stock']: nuevoStock })
                 .eq('id', producto.id);
+
+              if (stockError) throw stockError;
             }
           }
         }
