@@ -3,18 +3,15 @@
 export const dynamic = 'force-dynamic';
 
 import { useEffect, useMemo, useState } from 'react';
-import { supabase, Producto, Pack } from '@/lib/supabase';
+import { supabase, Producto } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
-import PackCard from '@/components/PackCard';
 import PromoBar from '@/components/PromoBar';
 import { Search } from 'lucide-react';
 
 export default function ProductosPage() {
-  const [tab, setTab] = useState<'productos' | 'ofertas' | 'packs'>('productos');
+  const [tab, setTab] = useState<'productos' | 'ofertas'>('productos');
   const [productos, setProductos] = useState<Producto[]>([]);
-  const [packs, setPacks] = useState<Pack[]>([]);
-  const [packItems, setPackItems] = useState<Map<string, { producto: Producto; cantidad: number }[]>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
@@ -26,37 +23,14 @@ export default function ProductosPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [productosData, packsData] = await Promise.all([
-          supabase.from('productos').select('*').order('created_at', { ascending: false }),
-          supabase.from('packs').select('*').order('created_at', { ascending: false }),
-        ]);
+        const { data: productosData, error: productosError } = await supabase
+          .from('productos')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-        if (productosData.error) throw productosData.error;
-        if (packsData.error) throw packsData.error;
+        if (productosError) throw productosError;
 
-        setProductos(productosData.data || []);
-        setPacks(packsData.data || []);
-
-        if (packsData.data && packsData.data.length > 0) {
-          const packItemsMap = new Map<string, { producto: Producto; cantidad: number }[]>();
-          for (const pack of packsData.data) {
-            const { data: items } = await supabase
-              .from('pack_items')
-              .select('producto_id, cantidad')
-              .eq('pack_id', pack.id);
-
-            if (items) {
-              const productosDelPack = items
-                .map((item) => {
-                  const producto = productosData.data?.find((p) => p.id === item.producto_id);
-                  return producto ? { producto: producto, cantidad: item.cantidad } : null;
-                })
-                .filter(Boolean) as { producto: Producto; cantidad: number }[];
-              packItemsMap.set(pack.id, productosDelPack);
-            }
-          }
-          setPackItems(packItemsMap);
-        }
+        setProductos(productosData || []);
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos');
@@ -171,16 +145,6 @@ export default function ProductosPage() {
           }`}
         >
           Ofertas <span className="text-xs text-gray-500">({productosEnOferta.length})</span>
-        </button>
-        <button
-          onClick={() => setTab('packs')}
-          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
-            tab === 'packs'
-              ? 'border-brand-600 text-brand-600 scale-105'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Packs <span className="text-xs text-gray-500">({packs.length})</span>
         </button>
       </div>
 
@@ -386,36 +350,6 @@ export default function ProductosPage() {
                     Vence: {new Date(producto.vencimiento).toLocaleDateString('es-AR')}
                   </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB: Packs */}
-      {tab === 'packs' && (
-        <div>
-          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-blue-200">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-3xl">🎁</span>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Packs</h1>
-            </div>
-            <p className="text-sm sm:text-base text-gray-500 ml-10">Combos de productos con descuento especial</p>
-          </div>
-
-          {packs.length === 0 ? (
-            <div className="text-center py-20 px-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
-              <div className="text-5xl mb-4">🎁</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin packs disponibles</h3>
-              <p className="text-gray-600 text-base mb-6">Nuestros combos especiales están en construcción. Sigue comprando productos individuales!</p>
-              <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
-                Explorar productos
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-              {packs.map((pack) => (
-                <PackCard key={pack.id} pack={pack} productos={packItems.get(pack.id) || []} />
               ))}
             </div>
           )}
