@@ -29,19 +29,19 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (producto) {
+    if (producto && isOpen) {
       setFormData({
-        nombre: producto.nombre,
-        precio: producto.precio.toString(),
-        stock: (producto.cantidad ?? producto.stock ?? 0).toString(),
-        vencimiento: dateAMesAnio(producto.vencimiento),
+        nombre: producto.nombre || '',
+        precio: producto.precio?.toString() || '',
+        stock: ((producto.cantidad ?? producto.stock) ?? 0).toString(),
+        vencimiento: producto.vencimiento ? dateAMesAnio(producto.vencimiento) : '',
         laboratorio: producto.laboratorio || '',
       });
-      setPreview(producto.foto_url);
+      setPreview(producto.foto_url || '');
       setError(null);
       setFile(null);
     }
-  }, [producto, isOpen]);
+  }, [producto?.id, isOpen]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
