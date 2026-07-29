@@ -195,15 +195,24 @@ export default function ProductosPage() {
           </div>
 
           <div className="mb-6 sm:mb-8 space-y-4">
-            <div className="relative max-w-xl">
-              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <div className="relative max-w-xl group">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-brand-600 transition-colors" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar producto por nombre..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm focus:shadow-md bg-gray-50 focus:bg-white"
               />
+              {query && (
+                <button
+                  onClick={() => setQuery('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="Limpiar búsqueda"
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
             {laboratorios.length > 0 && (
