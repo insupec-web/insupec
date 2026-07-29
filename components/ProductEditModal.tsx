@@ -15,14 +15,11 @@ interface ProductEditModalProps {
 }
 
 export default function ProductEditModal({ producto, isOpen, onClose, onSave }: ProductEditModalProps) {
-  const [formData, setFormData] = useState({
-    nombre: '',
-    precio: '',
-    stock: '',
-    vencimiento: '',
-    laboratorio: '',
-  });
-
+  const [nombre, setNombre] = useState('');
+  const [precio, setPrecio] = useState('');
+  const [stock, setStock] = useState('');
+  const [laboratorio, setLaboratorio] = useState('');
+  const [vencimiento, setVencimiento] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [saving, setSaving] = useState(false);
@@ -30,26 +27,16 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
 
   useEffect(() => {
     if (producto && isOpen) {
-      setFormData({
-        nombre: producto.nombre || '',
-        precio: producto.precio?.toString() || '',
-        stock: ((producto.cantidad ?? producto.stock) ?? 0).toString(),
-        vencimiento: producto.vencimiento ? dateAMesAnio(producto.vencimiento) : '',
-        laboratorio: producto.laboratorio || '',
-      });
+      setNombre(producto.nombre || '');
+      setPrecio(producto.precio?.toString() || '');
+      setStock(((producto.cantidad ?? producto.stock) ?? 0).toString());
+      setLaboratorio(producto.laboratorio || '');
+      setVencimiento(producto.vencimiento ? dateAMesAnio(producto.vencimiento) : '');
       setPreview(producto.foto_url || '');
       setError(null);
       setFile(null);
     }
   }, [producto?.id, isOpen]);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -76,10 +63,10 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileName = `${Date.now()}-${file.name}`;
-    const { error, data } = await supabase.storage.from('productos').upload(fileName, file);
+    const { error: uploadError, data } = await supabase.storage.from('productos').upload(fileName, file);
 
-    if (error) {
-      throw error;
+    if (uploadError) {
+      throw uploadError;
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -90,14 +77,19 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setError(null);
 
-    if (!producto || !formData.nombre || !formData.precio || !formData.stock || !formData.laboratorio) {
+    if (!producto) {
+      setError('No hay producto cargado');
+      return;
+    }
+
+    if (!nombre.trim() || !precio || !stock || !laboratorio.trim()) {
       setError('Completa todos los campos requeridos');
       return;
     }
 
     setSaving(true);
+    setError(null);
 
     try {
       let foto_url = preview;
@@ -106,17 +98,22 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         foto_url = await uploadImage(file);
       }
 
+      const updateData: any = {
+        nombre: nombre.trim(),
+        precio: parseFloat(precio),
+        stock: parseInt(stock),
+        cantidad: parseInt(stock),
+        laboratorio: laboratorio.trim(),
+        foto_url: foto_url || null,
+      };
+
+      if (vencimiento) {
+        updateData.vencimiento = mesAnioADate(vencimiento);
+      }
+
       const { error: updateError } = await supabase
         .from('productos')
-        .update({
-          nombre: formData.nombre,
-          precio: parseFloat(formData.precio),
-          stock: parseInt(formData.stock),
-          cantidad: parseInt(formData.stock),
-          vencimiento: formData.vencimiento ? mesAnioADate(formData.vencimiento) : null,
-          laboratorio: formData.laboratorio,
-          foto_url,
-        })
+        .update(updateData)
         .eq('id', producto.id);
 
       if (updateError) {
@@ -127,14 +124,13 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       onSave();
       onClose();
     } catch (err: any) {
-      console.error('Error updating producto:', err);
-      const msg = err?.message || err?.details || JSON.stringify(err) || 'Error desconocido';
-      setError(`Error al actualizar: ${msg}`);
+      console.error('Error:', err);
+      setError(err?.message || err?.details || 'Error al guardar');
       setSaving(false);
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !producto) return null;
 
   return (
     <div
@@ -151,11 +147,11 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-bold text-gray-900">Editar Producto</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Editar: {nombre}</h2>
           <button
             onClick={onClose}
             disabled={saving}
-            className="text-gray-500 hover:text-gray-700 transition-colors"
+            className="text-gray-500 hover:text-gray-700 transition-colors disabled:opacity-50"
           >
             <X size={24} />
           </button>
@@ -163,13 +159,17 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
 
         {/* Content */}
         <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
-          {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm">{error}</div>}
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6 text-sm">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Preview Imagen */}
             {preview && (
               <div className="flex justify-center">
-                <img src={preview} alt={formData.nombre} className="h-40 w-40 object-cover rounded-lg" />
+                <img src={preview} alt="preview" className="h-40 w-40 object-cover rounded-lg" />
               </div>
             )}
 
@@ -181,20 +181,21 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
                 accept="image/*"
                 onChange={handleFileChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
               />
               <p className="text-xs text-gray-500 mt-1">PNG, JPG o GIF. Máximo 5MB.</p>
             </div>
 
             {/* Nombre */}
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Nombre del Producto *</label>
+              <label className="block text-gray-700 font-semibold mb-2">Nombre *</label>
               <input
                 type="text"
-                name="nombre"
-                value={formData.nombre}
-                onChange={handleInputChange}
-                placeholder="Ej: Paracetamol 500mg"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                placeholder="Nombre del producto"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
               />
             </div>
 
@@ -203,12 +204,12 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
               <label className="block text-gray-700 font-semibold mb-2">Precio *</label>
               <input
                 type="number"
-                name="precio"
-                value={formData.precio}
-                onChange={handleInputChange}
-                placeholder="0"
                 step="0.01"
+                value={precio}
+                onChange={(e) => setPrecio(e.target.value)}
+                placeholder="0.00"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
               />
             </div>
 
@@ -217,11 +218,11 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
               <label className="block text-gray-700 font-semibold mb-2">Stock *</label>
               <input
                 type="number"
-                name="stock"
-                value={formData.stock}
-                onChange={handleInputChange}
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
                 placeholder="0"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
               />
             </div>
 
@@ -230,11 +231,11 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
               <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
               <input
                 type="text"
-                name="laboratorio"
-                value={formData.laboratorio}
-                onChange={handleInputChange}
-                placeholder="Ej: Bayer"
+                value={laboratorio}
+                onChange={(e) => setLaboratorio(e.target.value)}
+                placeholder="Nombre del laboratorio"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
               />
             </div>
 
@@ -243,11 +244,11 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
               <label className="block text-gray-700 font-semibold mb-2">Vencimiento</label>
               <input
                 type="text"
-                name="vencimiento"
-                value={formData.vencimiento}
-                onChange={handleInputChange}
+                value={vencimiento}
+                onChange={(e) => setVencimiento(e.target.value)}
                 placeholder="MM/YYYY"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
               />
             </div>
 
