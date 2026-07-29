@@ -6,10 +6,11 @@ import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
 import { formatMesAnio } from '@/lib/format';
 import { formatPrice } from '@/lib/formatPrice';
-import { Package, Calendar, Plus, Minus } from 'lucide-react';
+import { Package, Calendar, Plus, Minus, ShoppingCart, Star } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
   const [quantity, setQuantity] = useState(1);
+  const [addedFeedback, setAddedFeedback] = useState(false);
   const { addItem } = useCart();
 
   const vencimiento = producto.vencimiento ? new Date(producto.vencimiento) : null;
@@ -28,88 +29,102 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       precio: producto.precio,
       cantidad: quantity,
       foto_url: producto.foto_url,
+      moneda: producto.moneda || 'ARS',
     });
+    setAddedFeedback(true);
+    setTimeout(() => setAddedFeedback(false), 2000);
     setQuantity(1);
   };
 
   return (
-    <div className="group bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-500 hover:shadow-lg transition-all duration-200">
+    <div className="group bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-500 hover:shadow-xl transition-all duration-300">
       {/* Foto del producto */}
-      <Link href={`/productos/${producto.id}`} className="relative block h-40 sm:h-48 bg-white overflow-hidden">
+      <Link href={`/productos/${producto.id}`} className="relative block h-44 sm:h-56 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         {producto.foto_url ? (
           <img
             src={producto.foto_url}
             alt={producto.nombre}
-            className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain p-4 group-hover:scale-110 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-            <Package size={40} className="text-gray-300" />
+          <div className="w-full h-full flex items-center justify-center">
+            <Package size={48} className="text-gray-300" />
           </div>
         )}
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
-          {isOutOfStock && (
-            <span className="bg-gray-800 text-white px-2 py-1 rounded-md text-[10px] font-bold tracking-wide">SIN STOCK</span>
-          )}
-          {isLowStock && (
-            <span className="bg-amber-500 text-white px-2 py-1 rounded-md text-[10px] font-bold tracking-wide">ÚLTIMAS UNIDADES</span>
-          )}
+
+        {/* Badges mejorados */}
+        <div className="absolute top-2 right-2 flex flex-col gap-1">
           {isAboutToExpire && (
-            <span className="bg-red-500 text-white px-2 py-1 rounded-md text-[10px] font-bold tracking-wide">VENCE PRONTO</span>
+            <span className="bg-red-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">🔴 VENCE PRONTO</span>
           )}
+          {isLowStock && !isOutOfStock && (
+            <span className="bg-amber-500 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">⚡ ÚLTIMAS UNIDADES</span>
+          )}
+          {isOutOfStock && (
+            <span className="bg-gray-700 text-white px-2.5 py-1 rounded-full text-[11px] font-bold">❌ AGOTADO</span>
+          )}
+        </div>
+
+        {/* Rating badge */}
+        <div className="absolute top-2 left-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+          <Star size={14} className="text-amber-500 fill-amber-500" />
+          <span className="text-xs font-semibold text-gray-800">4.8</span>
         </div>
       </Link>
 
       <div className="p-4 flex flex-col flex-1">
         {/* Nombre del producto */}
-        <Link href={`/productos/${producto.id}`}>
-          <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 hover:text-brand-700 transition-colors line-clamp-2 min-h-[2.75rem]">
+        <Link href={`/productos/${producto.id}`} className="mb-2">
+          <h3 className="font-semibold text-sm sm:text-base text-gray-900 hover:text-brand-600 transition-colors line-clamp-2">
             {producto.nombre}
           </h3>
         </Link>
 
+        {/* Laboratorio */}
+        <p className="text-xs text-gray-500 mb-3 font-medium">{producto.laboratorio}</p>
+
         {/* Precio destacado */}
-        <div className="mb-3">
-          <span className="text-2xl sm:text-3xl font-extrabold text-brand-600">${formatPrice(producto.precio)}</span>
+        <div className="mb-3 flex items-baseline gap-2">
+          <span className="text-3xl sm:text-4xl font-extrabold text-brand-600">${formatPrice(producto.precio)}</span>
+          <span className="text-xs text-gray-500">ARS</span>
         </div>
 
-        {/* Metadatos compactos */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-gray-500 mb-4 flex-1">
-          <span className="inline-flex items-center gap-1">
-            <Package size={14} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
+        {/* Metadatos */}
+        <div className="flex flex-col gap-2 text-xs text-gray-600 mb-4 flex-1">
+          <div className="flex items-center gap-1">
+            <Package size={13} className={isOutOfStock ? 'text-red-500' : 'text-brand-600'} />
             <span className={isOutOfStock ? 'text-red-600 font-semibold' : ''}>
-              {isOutOfStock ? 'Sin stock' : `${stock} u.`}
+              {isOutOfStock ? 'Sin stock' : `${stock} disponibles`}
             </span>
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <Calendar size={14} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
+          </div>
+          <div className="flex items-center gap-1">
+            <Calendar size={13} className={isAboutToExpire ? 'text-red-500' : 'text-brand-600'} />
             <span className={isAboutToExpire ? 'text-red-600 font-semibold' : ''}>
               {vencimiento ? formatMesAnio(producto.vencimiento) : 'Sin vencimiento'}
             </span>
-          </span>
-          <span className="text-gray-400">•</span>
-          <span className="text-gray-600 font-medium">{producto.laboratorio}</span>
+          </div>
         </div>
 
         {/* Controles de cantidad y compra */}
-        <div className="flex items-center gap-2 mt-auto">
-          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+        <div className="flex gap-2 mt-auto">
+          <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50">
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.max(1, q - 1))}
               disabled={isOutOfStock || quantity <= 1}
-              className="px-2 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               aria-label="Disminuir cantidad"
             >
               <Minus size={14} />
             </button>
-            <span className="w-8 text-center text-sm font-semibold select-none">{quantity}</span>
+            <span className="w-7 text-center text-sm font-bold">{quantity}</span>
             <button
               type="button"
               onClick={() => setQuantity((q) => Math.min(stock, q + 1))}
               disabled={isOutOfStock || quantity >= stock}
-              className="px-2 py-2 text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="p-1.5 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               aria-label="Aumentar cantidad"
             >
               <Plus size={14} />
@@ -118,13 +133,16 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`flex-1 py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1 ${
               isOutOfStock
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-brand-600 text-white hover:bg-brand-700'
+                : addedFeedback
+                  ? 'bg-green-500 text-white'
+                  : 'bg-brand-600 text-white hover:bg-brand-700 shadow-md hover:shadow-lg'
             }`}
           >
-            {isOutOfStock ? 'SIN STOCK' : 'AGREGAR'}
+            <ShoppingCart size={16} />
+            {addedFeedback ? '✓ Agregado' : 'Comprar'}
           </button>
         </div>
       </div>

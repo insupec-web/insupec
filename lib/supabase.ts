@@ -15,6 +15,7 @@ export interface Producto {
   foto_url: string;
   laboratorio: string;
   created_at: string;
+  moneda?: string;
 }
 
 export interface Pedido {
@@ -39,6 +40,7 @@ export interface CartItem {
   precio: number;
   cantidad: number;
   foto_url: string;
+  moneda?: string;
 }
 
 export interface Pack {
