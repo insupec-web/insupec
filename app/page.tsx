@@ -367,17 +367,60 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* NEWSLETTER SECTION */}
+      <section className="bg-gray-50 py-16 sm:py-24 px-4 border-t border-brand-100">
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Ofertas Exclusivas</h2>
+          <p className="text-gray-600 text-lg mb-8">
+            Recibe descuentos especiales y promociones solo para suscriptores
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input
+              type="email"
+              placeholder="Tu correo electrónico"
+              className="flex-1 px-6 py-4 border-2 border-gray-300 rounded-xl focus:outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-200 text-base"
+            />
+            <button className="bg-brand-600 hover:bg-brand-700 text-white px-8 py-4 rounded-xl font-bold text-base transition-all shadow-md hover:shadow-lg">
+              Suscribir →
+            </button>
+          </div>
+          <p className="text-gray-500 text-sm mt-4">✓ Sin spam. Solo ofertas genuinas.</p>
+        </div>
+      </section>
+
       {/* CTA FINAL */}
-      <section className="bg-gradient-to-r from-brand-600 to-brand-700 py-16 sm:py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">¿Necesitas medicamentos?</h2>
-          <p className="text-brand-100 text-lg mb-8">Explora nuestro catálogo de más de 500 productos auténticos</p>
-          <Link
-            href="/productos"
-            className="inline-block bg-white text-brand-600 px-10 py-4 rounded-xl font-bold text-lg hover:bg-brand-50 transition-all shadow-lg"
-          >
-            🛍️ Compra Ahora
-          </Link>
+      <section className="bg-gradient-to-r from-brand-600 via-brand-700 to-brand-800 py-20 sm:py-28 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -mr-48 -mt-48"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-white rounded-full -ml-40 -mb-40"></div>
+        </div>
+
+        <div className="max-w-4xl mx-auto text-center relative z-10">
+          <div className="inline-block mb-6 px-4 py-2 bg-white/20 rounded-full border border-white/30 backdrop-blur-sm">
+            <span className="text-white font-semibold text-sm">🚀 Únete a miles de clientes satisfechos</span>
+          </div>
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+            ¿Necesitas Medicamentos?
+          </h2>
+          <p className="text-brand-100 text-lg sm:text-xl mb-10 max-w-2xl mx-auto">
+            Explora nuestro catálogo de más de 500 productos auténticos. Envío rápido, seguro y a precio justo.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/productos"
+              className="inline-block bg-white text-brand-600 px-10 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+            >
+              🛍️ Compra Ahora
+            </Link>
+            <a
+              href="https://wa.me/5493492615886"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block border-2 border-white text-white px-10 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm hover:-translate-y-1"
+            >
+              💬 Contactar
+            </a>
+          </div>
         </div>
       </section>
     </div>
