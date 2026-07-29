@@ -292,13 +292,11 @@ export default function ProductosPage() {
 
           {productos.length === 0 ? (
             <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-              <div className="text-5xl mb-4">📦</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin productos disponibles</h3>
               <p className="text-gray-600 text-base mb-6">Estamos cargando nuestro catálogo. Vuelve pronto!</p>
             </div>
           ) : productosFiltrados.length === 0 ? (
             <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
-              <div className="text-5xl mb-4">🔍</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No encontramos coincidencias</h3>
               <p className="text-gray-600 text-base mb-6">No hay productos que coincidan con "{query}"</p>
               <button onClick={() => setQuery('')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
@@ -325,7 +323,6 @@ export default function ProductosPage() {
 
           {productosEnOferta.length === 0 ? (
             <div className="text-center py-20 px-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl">
-              <div className="text-5xl mb-4">🏷️</div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin ofertas en este momento</h3>
               <p className="text-gray-600 text-base mb-6">Todas nuestras ofertas están agotadas. Vuelve pronto para nuevas promociones!</p>
               <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">

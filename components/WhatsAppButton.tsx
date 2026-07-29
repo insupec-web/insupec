@@ -30,7 +30,7 @@ export default function WhatsAppButton() {
           <MessageCircle size={28} />
         </button>
         <span className="absolute bottom-full right-0 mb-3 px-4 py-2 bg-gray-900 text-white text-sm font-semibold rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          💬 WhatsApp 24/7
+          WhatsApp 24/7
         </span>
       </div>
     </a>

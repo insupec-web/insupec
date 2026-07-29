@@ -247,21 +247,21 @@ export default function CheckoutPage() {
             <div className="flex items-center gap-3">
               <Lock className="text-brand-600 flex-shrink-0" size={24} />
               <div className="text-sm">
-                <p className="font-semibold text-gray-900">🔒 Conexión Segura</p>
+                <p className="font-semibold text-gray-900">Conexión Segura</p>
                 <p className="text-gray-600">HTTPS SSL Encriptado</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Shield className="text-brand-600 flex-shrink-0" size={24} />
               <div className="text-sm">
-                <p className="font-semibold text-gray-900">✓ Datos Protegidos</p>
+                <p className="font-semibold text-gray-900">Datos Protegidos</p>
                 <p className="text-gray-600">Tu información es segura</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <Truck className="text-brand-600 flex-shrink-0" size={24} />
               <div className="text-sm">
-                <p className="font-semibold text-gray-900">📦 Entrega Rápida</p>
+                <p className="font-semibold text-gray-900">Entrega Rápida</p>
                 <p className="text-gray-600">24-72 horas a todo el país</p>
               </div>
             </div>
