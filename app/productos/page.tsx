@@ -321,14 +321,18 @@ export default function ProductosPage() {
           </div>
 
           {productos.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base sm:text-lg">No hay productos disponibles en este momento.</p>
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+              <div className="text-5xl mb-4">📦</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin productos disponibles</h3>
+              <p className="text-gray-600 text-base mb-6">Estamos cargando nuestro catálogo. Vuelve pronto!</p>
             </div>
           ) : productosFiltrados.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base">No se encontraron productos para "{query}".</p>
-              <button onClick={() => setQuery('')} className="mt-3 text-brand-600 font-semibold hover:underline">
-                Limpiar búsqueda
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
+              <div className="text-5xl mb-4">🔍</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">No encontramos coincidencias</h3>
+              <p className="text-gray-600 text-base mb-6">No hay productos que coincidan con "{query}"</p>
+              <button onClick={() => setQuery('')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+                Ver todos los productos
               </button>
             </div>
           ) : (
@@ -350,8 +354,13 @@ export default function ProductosPage() {
           </div>
 
           {productosEnOferta.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base sm:text-lg">No hay ofertas disponibles en este momento.</p>
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl">
+              <div className="text-5xl mb-4">🏷️</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin ofertas en este momento</h3>
+              <p className="text-gray-600 text-base mb-6">Todas nuestras ofertas están agotadas. Vuelve pronto para nuevas promociones!</p>
+              <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+                Ver productos regulares
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
@@ -377,8 +386,13 @@ export default function ProductosPage() {
           </div>
 
           {packs.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-gray-600 text-base sm:text-lg">No hay packs disponibles en este momento.</p>
+            <div className="text-center py-20 px-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl">
+              <div className="text-5xl mb-4">🎁</div>
+              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin packs disponibles</h3>
+              <p className="text-gray-600 text-base mb-6">Nuestros combos especiales están en construcción. Sigue comprando productos individuales!</p>
+              <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+                Explorar productos
+              </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
