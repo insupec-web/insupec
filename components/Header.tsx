@@ -30,12 +30,6 @@ export default function Header() {
             <Link href="/productos" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition">
               Productos
             </Link>
-            <Link href="/nosotros" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition">
-              Nosotros
-            </Link>
-            <Link href="/faq" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition">
-              Preguntas Frecuentes
-            </Link>
           </nav>
 
           {/* Carrito */}

@@ -32,7 +32,6 @@ export default function Footer() {
               <li><Link href="/productos" className="hover:text-brand-600 transition">Productos</Link></li>
               <li><Link href="/productos" className="hover:text-brand-600 transition">Ofertas</Link></li>
               <li><Link href="/productos" className="hover:text-brand-600 transition">Packs</Link></li>
-              <li><Link href="/nosotros" className="hover:text-brand-600 transition">Nosotros</Link></li>
             </ul>
           </div>
 
@@ -42,7 +41,6 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><a href="https://wa.me/5493492615886" className="hover:text-brand-600 transition flex items-center gap-2"><Phone size={16} /> WhatsApp 24/7</a></li>
               <li><a href="mailto:info@insupec.com" className="hover:text-brand-600 transition flex items-center gap-2"><Mail size={16} /> info@insupec.com</a></li>
-              <li><Link href="/faq" className="hover:text-brand-600 transition">Preguntas Frecuentes</Link></li>
               <li><Link href="/privacidad" className="hover:text-brand-600 transition">Garantía</Link></li>
             </ul>
           </div>
