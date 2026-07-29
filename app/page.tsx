@@ -1,10 +1,51 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Shield, Truck, Phone, Check } from 'lucide-react';
+import { Shield, Truck, Phone, Check, Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export default function HomePage() {
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+
+  const testimonials = [
+    {
+      name: 'María González',
+      location: 'Rosario, Santa Fe',
+      rating: 5,
+      text: 'Excelente farmacia online. Los medicamentos llegaron en 48hs y todo completamente seguro. Ya compré 3 veces y siempre perfectamente.',
+      avatar: '👩',
+    },
+    {
+      name: 'Carlos Rodríguez',
+      location: 'La Plata, Buenos Aires',
+      rating: 5,
+      text: 'Me sorprendió la rapidez. Pedí el viernes y ya tenía los medicamentos el lunes. El atender por WhatsApp es muy cómodo.',
+      avatar: '👨',
+    },
+    {
+      name: 'Beatriz López',
+      location: 'Córdoba, Córdoba',
+      rating: 5,
+      text: 'Farmacia de confianza. Todos los productos son auténticos y tienen sus vencimientos claramente indicados. Excelente servicio.',
+      avatar: '👩‍🦱',
+    },
+    {
+      name: 'Roberto Martínez',
+      location: 'Mendoza, Mendoza',
+      rating: 5,
+      text: 'No tengo palabras. Servicio impecable, precios justos y muy profesionales. Los recomiendo a toda mi familia.',
+      avatar: '👨‍💼',
+    },
+  ];
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
   useEffect(() => {
     // Analytics para la página de inicio
   }, []);
@@ -161,6 +202,69 @@ export default function HomePage() {
                   Códigos de descuento disponibles
                 </li>
               </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIALS SECTION */}
+      <section className="bg-white py-16 sm:py-24 px-4 border-t-2 border-brand-100">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 text-center mb-12">Lo que dicen nuestros clientes</h2>
+
+          <div className="relative">
+            {/* Testimonial Card */}
+            <div className="bg-gradient-to-br from-brand-50 to-white rounded-2xl p-8 sm:p-10 shadow-lg border border-brand-100 min-h-64 flex flex-col justify-between">
+              {/* Stars */}
+              <div className="flex justify-center gap-1 mb-6">
+                {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                  <Star key={i} size={20} className="text-amber-500 fill-amber-500" />
+                ))}
+              </div>
+
+              {/* Quote */}
+              <p className="text-gray-700 text-center text-lg font-medium mb-8 flex-1 flex items-center justify-center">
+                "{testimonials[currentTestimonial].text}"
+              </p>
+
+              {/* Author */}
+              <div className="flex items-center justify-center gap-4">
+                <div className="text-4xl">{testimonials[currentTestimonial].avatar}</div>
+                <div className="text-left">
+                  <p className="font-bold text-gray-900">{testimonials[currentTestimonial].name}</p>
+                  <p className="text-sm text-gray-600">{testimonials[currentTestimonial].location}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-center gap-4 mt-8">
+              <button
+                onClick={prevTestimonial}
+                className="p-3 bg-white border-2 border-brand-600 text-brand-600 rounded-full hover:bg-brand-50 transition-colors shadow-md"
+                aria-label="Testimonio anterior"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <div className="flex gap-2 items-center">
+                {testimonials.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentTestimonial(idx)}
+                    className={`w-3 h-3 rounded-full transition-colors ${
+                      idx === currentTestimonial ? 'bg-brand-600' : 'bg-gray-300'
+                    }`}
+                    aria-label={`Ir al testimonio ${idx + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={nextTestimonial}
+                className="p-3 bg-white border-2 border-brand-600 text-brand-600 rounded-full hover:bg-brand-50 transition-colors shadow-md"
+                aria-label="Próximo testimonio"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
           </div>
         </div>
