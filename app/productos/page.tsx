@@ -187,9 +187,12 @@ export default function ProductosPage() {
       {/* TAB: Productos */}
       {tab === 'productos' && (
         <div>
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Productos</h1>
-            <p className="text-sm sm:text-base text-gray-500">
+          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-brand-100">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">💊</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Productos</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-500 ml-10">
               {productos.length} {productos.length === 1 ? 'producto disponible' : 'productos disponibles'}
             </p>
           </div>
@@ -357,9 +360,12 @@ export default function ProductosPage() {
       {/* TAB: Ofertas */}
       {tab === 'ofertas' && (
         <div>
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Ofertas</h1>
-            <p className="text-sm sm:text-base text-gray-500">Productos con vencimiento próximo</p>
+          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-amber-200">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🏷️</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Ofertas</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-500 ml-10">Productos con vencimiento próximo a precios especiales</p>
           </div>
 
           {productosEnOferta.length === 0 ? (
@@ -389,9 +395,12 @@ export default function ProductosPage() {
       {/* TAB: Packs */}
       {tab === 'packs' && (
         <div>
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Packs</h1>
-            <p className="text-sm sm:text-base text-gray-500">Combos de productos con descuento especial</p>
+          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-blue-200">
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-3xl">🎁</span>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Packs</h1>
+            </div>
+            <p className="text-sm sm:text-base text-gray-500 ml-10">Combos de productos con descuento especial</p>
           </div>
 
           {packs.length === 0 ? (
