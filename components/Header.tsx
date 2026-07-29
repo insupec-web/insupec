@@ -11,56 +11,50 @@ export default function Header() {
 
   return (
     <header className="fixed top-0 left-0 right-0 bg-white border-b border-gray-200 shadow-sm z-50">
-      <div className="relative max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4 flex items-center justify-between">
-        {/* Carrito a la izquierda en mobile */}
-        <button
-          onClick={openCart}
-          className="flex sm:hidden items-center gap-2 px-2 py-2 rounded-lg hover:bg-gray-100 transition-colors relative flex-shrink-0"
-          aria-label="Abrir carrito"
-        >
-          <ShoppingCart size={20} className="text-gray-800" />
-          {itemCount > 0 && (
-            <span className="absolute top-0 right-0 bg-brand-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-              {itemCount}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
+        <div className="flex items-center justify-between gap-4">
+          {/* Logo */}
+          <Link href="/" className="flex-shrink-0">
+            <Image
+              src="/logo.png"
+              alt="INSUPEC"
+              width={338}
+              height={109}
+              priority
+              className="h-10 sm:h-14 w-auto"
+            />
+          </Link>
+
+          {/* Navigation Desktop */}
+          <nav className="hidden sm:flex items-center gap-6 flex-1 mx-4">
+            <Link href="/productos" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition">
+              Productos
+            </Link>
+            <Link href="/nosotros" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition">
+              Nosotros
+            </Link>
+            <Link href="/faq" className="text-sm font-medium text-gray-700 hover:text-brand-600 transition">
+              Preguntas Frecuentes
+            </Link>
+          </nav>
+
+          {/* Carrito */}
+          <button
+            onClick={openCart}
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative"
+            aria-label="Abrir carrito"
+          >
+            <ShoppingCart size={22} className="text-gray-800" />
+            <span className="hidden sm:inline text-sm font-semibold text-gray-800">
+              {itemCount > 0 ? `Carrito (${itemCount})` : 'Carrito'}
             </span>
-          )}
-        </button>
-
-        {/* Logo perfectamente centrado (posición absoluta) */}
-        <Link
-          href="/productos"
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center"
-        >
-          <Image
-            src="/logo.png"
-            alt="INSUPEC - Insumos Pecuarios"
-            width={338}
-            height={109}
-            priority
-            className="h-10 sm:h-16 w-auto"
-          />
-        </Link>
-
-        {/* Spacer izquierda en desktop para balancear el flex */}
-        <div className="hidden sm:block flex-shrink-0 w-[120px]" aria-hidden="true" />
-
-        {/* Carrito a la derecha en desktop */}
-        <button
-          onClick={openCart}
-          className="hidden sm:flex items-center justify-end gap-2 px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors relative flex-shrink-0 w-[120px]"
-          aria-label="Abrir carrito"
-        >
-          <ShoppingCart size={24} className="text-gray-800" />
-          <span className="text-sm font-semibold text-gray-800">Carrito</span>
-          {itemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-brand-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-              {itemCount}
-            </span>
-          )}
-        </button>
-
-        {/* Spacer derecha en mobile para balancear el carrito izquierdo */}
-        <div className="block sm:hidden flex-shrink-0 w-9" aria-hidden="true" />
+            {itemCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-brand-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {itemCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );

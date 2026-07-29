@@ -4,6 +4,7 @@ import './globals.css';
 import { CartProvider } from '@/hooks/CartProvider';
 import { AuthProvider } from '@/hooks/AuthProvider';
 import ConditionalHeader from '@/components/ConditionalHeader';
+import Footer from '@/components/Footer';
 import PageTracker from '@/components/PageTracker';
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({
           <AuthProvider>
             <ConditionalHeader />
             <main className="pt-20 sm:pt-24 flex-1">{children}</main>
+            <Footer />
           </AuthProvider>
         </CartProvider>
       </body>
