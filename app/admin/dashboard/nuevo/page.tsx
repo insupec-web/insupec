@@ -98,7 +98,7 @@ function NuevoProductoContent() {
         {
           nombre: formData.nombre,
           precio: parseFloat(formData.precio),
-          stock: parseInt(formData.stock),
+          cantidad: parseInt(formData.stock),
           vencimiento: formData.vencimiento ? mesAnioADate(formData.vencimiento) : null,
           laboratorio: formData.laboratorio,
           foto_url,

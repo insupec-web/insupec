@@ -98,26 +98,33 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         foto_url = await uploadImage(file);
       }
 
-      const updateData: any = {
+      const updateData: Record<string, unknown> = {
         nombre: nombre.trim(),
         precio: parseFloat(precio),
-        stock: parseInt(stock),
-        cantidad: parseInt(stock),
         laboratorio: laboratorio.trim(),
         foto_url: foto_url || null,
       };
+
+      // La columna de stock se llama "cantidad" en el esquema actual, pero
+      // instalaciones viejas todavía usan "stock". Escribimos en la que exista.
+      updateData['cantidad' in producto ? 'cantidad' : 'stock'] = parseInt(stock);
 
       if (vencimiento) {
         updateData.vencimiento = mesAnioADate(vencimiento);
       }
 
-      const { error: updateError } = await supabase
+      const { data, error: updateError } = await supabase
         .from('productos')
         .update(updateData)
-        .eq('id', producto.id);
+        .eq('id', producto.id)
+        .select();
 
       if (updateError) {
         throw updateError;
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('No se actualizó ninguna fila. Verifica los permisos (RLS) de la tabla productos.');
       }
 
       setSaving(false);
@@ -243,10 +250,9 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
             <div>
               <label className="block text-gray-700 font-semibold mb-2">Vencimiento</label>
               <input
-                type="text"
+                type="month"
                 value={vencimiento}
                 onChange={(e) => setVencimiento(e.target.value)}
-                placeholder="MM/YYYY"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                 disabled={saving}
               />

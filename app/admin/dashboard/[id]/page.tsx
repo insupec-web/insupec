@@ -45,7 +45,7 @@ function EditProductoContent({ id }: { id: string }) {
           setFormData({
             nombre: data.nombre,
             precio: data.precio.toString(),
-            stock: data.stock.toString(),
+            stock: ((data.cantidad ?? data.stock) ?? 0).toString(),
             vencimiento: dateAMesAnio(data.vencimiento),
             laboratorio: data.laboratorio || '',
           });
@@ -130,7 +130,7 @@ function EditProductoContent({ id }: { id: string }) {
         .update({
           nombre: formData.nombre,
           precio: parseFloat(formData.precio),
-          stock: parseInt(formData.stock),
+          cantidad: parseInt(formData.stock),
           vencimiento: formData.vencimiento ? mesAnioADate(formData.vencimiento) : null,
           laboratorio: formData.laboratorio,
           foto_url,
