@@ -47,7 +47,52 @@ export default function HomePage() {
   };
 
   useEffect(() => {
-    // Analytics para la página de inicio
+    const schemaData = {
+      '@context': 'https://schema.org',
+      '@type': 'LocalBusiness',
+      '@id': 'https://insupec.com/#organization',
+      name: 'INSUPEC',
+      description: 'Farmacia online de confianza con medicamentos auténticos entregados rápido a todo el país',
+      url: 'https://insupec.com',
+      image: 'https://insupec.com/logo.png',
+      telephone: '+5493492615886',
+      email: 'info@insupec.com',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Bv. Lehmann 601',
+        addressLocality: 'Rafaela',
+        addressRegion: 'Santa Fe',
+        postalCode: '2300',
+        addressCountry: 'AR',
+      },
+      contactPoint: {
+        '@type': 'ContactPoint',
+        availableLanguage: ['es'],
+        contactType: 'Customer Support',
+        telephone: '+5493492615886',
+        email: 'info@insupec.com',
+      },
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: '4.8',
+        ratingCount: '1000+',
+        bestRating: '5',
+        worstRating: '1',
+      },
+      areaServed: 'AR',
+      priceRange: '$',
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(schemaData);
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
   }, []);
 
   return (
