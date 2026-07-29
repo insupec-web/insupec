@@ -18,6 +18,7 @@ function AdminDashboardContent() {
   const [busqueda, setBusqueda] = useState('');
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
+  const [showOnlyZeroStock, setShowOnlyZeroStock] = useState(false);
 
   useEffect(() => {
     fetchProductos();
@@ -65,7 +66,9 @@ function AdminDashboardContent() {
     const matchBusqueda = p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
       p.laboratorio.toLowerCase().includes(busqueda.toLowerCase());
     const matchLaboratorio = !selectedLaboratorio || p.laboratorio === selectedLaboratorio;
-    return matchBusqueda && matchLaboratorio;
+    const stock = p.cantidad ?? p.stock ?? 0;
+    const matchStock = !showOnlyZeroStock || stock === 0;
+    return matchBusqueda && matchLaboratorio && matchStock;
   });
 
   if (sortName) {
@@ -169,11 +172,28 @@ function AdminDashboardContent() {
             </div>
           </div>
 
-          {(selectedLaboratorio || sortName) && (
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-semibold text-gray-700">Stock:</span>
+            </div>
+            <button
+              onClick={() => setShowOnlyZeroStock(!showOnlyZeroStock)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                showOnlyZeroStock
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            >
+              ⚠️ Solo Stock = 0
+            </button>
+          </div>
+
+          {(selectedLaboratorio || sortName || showOnlyZeroStock) && (
             <button
               onClick={() => {
                 setSelectedLaboratorio(null);
                 setSortName(null);
+                setShowOnlyZeroStock(false);
               }}
               className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
             >
