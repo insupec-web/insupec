@@ -7,6 +7,7 @@ import { supabase, Producto } from '@/lib/supabase';
 import { formatPrice } from '@/lib/formatPrice';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
+import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
 import { Edit2, Trash2, Plus, Search } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
@@ -19,6 +20,8 @@ function AdminDashboardContent() {
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [showOnlyZeroStock, setShowOnlyZeroStock] = useState(false);
+  const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProductos();
@@ -184,7 +187,7 @@ function AdminDashboardContent() {
                   : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
               }`}
             >
-              ⚠️ Solo Stock = 0
+              Solo Stock = 0
             </button>
           </div>
 
@@ -269,12 +272,15 @@ function AdminDashboardContent() {
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{new Date(producto.vencimiento).toLocaleDateString('es-AR')}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex gap-2 sm:gap-3">
-                        <Link
-                          href={`/admin/dashboard/${producto.id}`}
+                        <button
+                          onClick={() => {
+                            setEditingProducto(producto);
+                            setIsModalOpen(true);
+                          }}
                           className="text-blue-600 hover:text-blue-800 transition-colors"
                         >
                           <Edit2 size={18} className="sm:w-5 sm:h-5" />
-                        </Link>
+                        </button>
                         <button
                           onClick={() => handleDelete(producto.id)}
                           className="text-red-600 hover:text-red-800 transition-colors"
@@ -289,6 +295,18 @@ function AdminDashboardContent() {
             </table>
           </div>
         )}
+
+        <ProductEditModal
+          producto={editingProducto}
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setEditingProducto(null);
+          }}
+          onSave={() => {
+            fetchProductos();
+          }}
+        />
       </div>
     </>
   );
