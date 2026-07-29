@@ -154,33 +154,33 @@ export default function ProductosPage() {
       <div className="flex gap-2 mb-8 border-b border-gray-200">
         <button
           onClick={() => setTab('productos')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
             tab === 'productos'
-              ? 'border-brand-600 text-brand-600'
+              ? 'border-brand-600 text-brand-600 scale-105'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Productos
+          Productos <span className="text-xs text-gray-500">({productos.length})</span>
         </button>
         <button
           onClick={() => setTab('ofertas')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
             tab === 'ofertas'
-              ? 'border-brand-600 text-brand-600'
+              ? 'border-brand-600 text-brand-600 scale-105'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Ofertas
+          Ofertas <span className="text-xs text-gray-500">({productosEnOferta.length})</span>
         </button>
         <button
           onClick={() => setTab('packs')}
-          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
             tab === 'packs'
-              ? 'border-brand-600 text-brand-600'
+              ? 'border-brand-600 text-brand-600 scale-105'
               : 'border-transparent text-gray-600 hover:text-gray-900'
           }`}
         >
-          Packs
+          Packs <span className="text-xs text-gray-500">({packs.length})</span>
         </button>
       </div>
 
@@ -220,10 +220,10 @@ export default function ProductosPage() {
                   <div className="flex gap-2 flex-wrap items-center mt-3">
                     <button
                       onClick={() => setSelectedLaboratorio(null)}
-                      className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
                         !selectedLaboratorio
-                          ? 'bg-brand-600 text-white'
-                          : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                          ? 'bg-brand-600 text-white shadow-md scale-105'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                       }`}
                     >
                       Todos
@@ -232,10 +232,10 @@ export default function ProductosPage() {
                       <button
                         key={lab}
                         onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
-                        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                        className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
                           selectedLaboratorio === lab
-                            ? 'bg-brand-600 text-white'
-                            : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                            ? 'bg-brand-600 text-white shadow-md scale-105'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                         }`}
                       >
                         {lab}
@@ -253,22 +253,26 @@ export default function ProductosPage() {
                   setSortPrice(sortPrice === 'asc' ? null : 'asc');
                   setSortName(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortPrice === 'asc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortPrice === 'asc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
-                ↑ Menor a Mayor
+                ↑ Menor
               </button>
               <button
                 onClick={() => {
                   setSortPrice(sortPrice === 'desc' ? null : 'desc');
                   setSortName(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortPrice === 'desc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortPrice === 'desc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
-                ↓ Mayor a Menor
+                ↓ Mayor
               </button>
             </div>
 
@@ -279,8 +283,10 @@ export default function ProductosPage() {
                   setSortName(sortName === 'asc' ? null : 'asc');
                   setSortPrice(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortName === 'asc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortName === 'asc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
                 A → Z
@@ -290,8 +296,10 @@ export default function ProductosPage() {
                   setSortName(sortName === 'desc' ? null : 'desc');
                   setSortPrice(null);
                 }}
-                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                  sortName === 'desc' ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                  sortName === 'desc'
+                    ? 'bg-brand-600 text-white shadow-lg scale-105'
+                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
                 }`}
               >
                 Z → A
@@ -305,9 +313,9 @@ export default function ProductosPage() {
                   setSortName(null);
                   setSelectedLaboratorio(null);
                 }}
-                className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all transform hover:scale-102 border border-red-200"
               >
-                Limpiar todos los filtros
+                ✕ Limpiar filtros
               </button>
             )}
           </div>
