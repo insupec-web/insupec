@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { Shield, Truck, Phone, Check, Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Shield, Truck, Phone, Check, Star, ChevronLeft, ChevronRight, Zap } from 'lucide-react';
+import { supabase, Producto } from '@/lib/supabase';
+import ProductCard from '@/components/ProductCard';
 
 export default function HomePage() {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [featuredProducts, setFeaturedProducts] = useState<Producto[]>([]);
 
   const testimonials = [
     {
@@ -47,6 +50,24 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    async function fetchFeaturedProducts() {
+      try {
+        const { data } = await supabase
+          .from('productos')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(6);
+
+        if (data) {
+          setFeaturedProducts(data);
+        }
+      } catch (err) {
+        console.error('Error loading featured products:', err);
+      }
+    }
+
+    fetchFeaturedProducts();
+
     const schemaData = {
       '@context': 'https://schema.org',
       '@type': 'LocalBusiness',
@@ -314,6 +335,37 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* FEATURED PRODUCTS SECTION */}
+      {featuredProducts.length > 0 && (
+        <section className="py-16 sm:py-24 px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <Zap size={28} className="text-amber-500" />
+                <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">Productos Destacados</h2>
+                <Zap size={28} className="text-amber-500" />
+              </div>
+              <p className="text-gray-600">Descubre nuestros medicamentos más populares y nuevas llegadas</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProducts.map((producto) => (
+                <ProductCard key={producto.id} producto={producto} />
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <Link
+                href="/productos"
+                className="inline-block bg-brand-600 text-white px-12 py-4 rounded-xl font-bold text-lg hover:bg-brand-700 transition-all shadow-lg hover:shadow-xl"
+              >
+                Ver Catálogo Completo →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA FINAL */}
       <section className="bg-gradient-to-r from-brand-600 to-brand-700 py-16 sm:py-20 px-4">
