@@ -19,12 +19,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'INSUPEC - Farmacia Online de Confianza | Medicamentos Auténticos',
-  description: 'Compra medicamentos y productos de salud auténticos en línea. Envío rápido 24-72h a todo el país. Farmacia verificada y segura. Atención 24/7 en WhatsApp.',
-  keywords: 'farmacia online, medicamentos, productos de salud, envío a domicilio, farmacia argentina',
+  title: 'INSUPEC - Distribuidora de Confianza | Productos Auténticos',
+  description: 'Compra productos auténticos en línea. Envío rápido 24-72h a todo el país. Distribuidora verificada y segura. Atención 24/7 en WhatsApp.',
+  keywords: 'distribuidora online, productos, mayorista, envío a domicilio, distribuidora argentina',
   openGraph: {
-    title: 'INSUPEC - Tu Farmacia de Confianza',
-    description: 'Medicamentos y productos de salud 100% auténticos. Envío rápido y seguro.',
+    title: 'INSUPEC - Tu Distribuidora de Confianza',
+    description: 'Productos 100% auténticos. Envío rápido y seguro.',
     type: 'website',
     url: 'https://insupec.com',
   },

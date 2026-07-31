@@ -14,7 +14,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="col-span-1">
             <h3 className="text-xl font-bold text-white mb-3">INSUPEC</h3>
-            <p className="text-sm text-gray-400 mb-4">Tu farmacia de confianza en línea. Medicamentos y productos de salud auténticos.</p>
+            <p className="text-sm text-gray-400 mb-4">Tu distribuidora de confianza en línea. Productos auténticos y de calidad.</p>
             <div className="flex gap-3">
               <a href="https://wa.me/5493492615886" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:text-brand-500 transition">
                 <Phone size={20} />
@@ -65,7 +65,7 @@ export default function Footer() {
           <div>© {currentYear} INSUPEC - Todos los derechos reservados</div>
           <div className="flex gap-4 flex-wrap">
             <span className="flex items-center gap-1">🔒 HTTPS SSL Seguro</span>
-            <span className="flex items-center gap-1">✓ Farmacia Registrada</span>
+            <span className="flex items-center gap-1">✓ Distribuidora Verificada</span>
             <span className="flex items-center gap-1">✓ 100% Auténticos</span>
           </div>
         </div>
