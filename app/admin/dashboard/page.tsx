@@ -11,6 +11,7 @@ import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
 import { Edit2, Trash2, Plus, Search } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
+import InventoryStats from '@/components/InventoryStats';
 
 function AdminDashboardContent() {
   const [productos, setProductos] = useState<Producto[]>([]);
@@ -87,6 +88,7 @@ function AdminDashboardContent() {
       <AdminNav />
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28 pb-8 sm:pb-12">
+        <InventoryStats productos={productos} />
         <TrafficStats />
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
