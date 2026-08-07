@@ -52,7 +52,7 @@ function ExportarProductosContent() {
 
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-4xl font-bold text-gray-800">Exportar Productos</h1>
-          <p className="text-gray-600 text-sm sm:text-base mt-2">Descarga un Excel con todos tus productos, precios, stock y vencimiento</p>
+          <p className="text-gray-600 text-sm sm:text-base mt-2">Descarga un Excel con todos tus productos, precios y stock</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-md p-6 sm:p-8">
@@ -64,7 +64,7 @@ function ExportarProductosContent() {
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold">✓</span>
                 <span>
-                  <strong>Laboratorio, Nombre, Precio, Stock y Vencimiento</strong>
+                  <strong>Laboratorio, Nombre, Precio y Stock</strong>
                 </span>
               </li>
               <li className="flex items-start gap-2">
@@ -83,12 +83,6 @@ function ExportarProductosContent() {
                 <span className="text-blue-600 font-bold">✓</span>
                 <span>
                   <strong>Precios formateados</strong> como moneda
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-bold">✓</span>
-                <span>
-                  <strong>Fechas en formato local</strong> (DD/MM/YYYY)
                 </span>
               </li>
             </ul>

@@ -130,16 +130,19 @@ function NuevoPackContent() {
         foto_url = await uploadImage(file);
       }
 
+      const packInsertData: Record<string, unknown> = {
+        nombre: formData.nombre,
+        descripcion: formData.descripcion || null,
+        precio: parseFloat(formData.precio),
+      };
+
+      if (foto_url) {
+        packInsertData.imagen_url = foto_url;
+      }
+
       const { data: packData, error: insertError } = await supabase
         .from('packs')
-        .insert([
-          {
-            nombre: formData.nombre,
-            descripcion: formData.descripcion || null,
-            precio: parseFloat(formData.precio),
-            foto_url: foto_url || null,
-          },
-        ])
+        .insert([packInsertData])
         .select()
         .single();
 

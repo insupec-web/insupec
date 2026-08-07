@@ -10,13 +10,11 @@ import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
 import { Upload, CheckCircle } from 'lucide-react';
 import * as XLSX from 'xlsx';
-import { formatMesAnio } from '@/lib/format';
 
 interface ProductoCSV {
   nombre: string;
   precio: string;
   stock: string;
-  vencimiento: string;
   laboratorio?: string;
 }
 
@@ -24,10 +22,8 @@ interface ProductoCSV {
 interface ProductoImport {
   nombre: string;
   precio: number;
-  cantidad: number;
-  vencimiento: string;
+  stock: number;
   laboratorio: string;
-  foto_url: string;
 }
 
 // Normaliza las claves de una fila: sin espacios y en minúscula.
@@ -46,30 +42,6 @@ function pick(row: Record<string, unknown>, ...keys: string[]): unknown {
     if (v !== undefined && v !== null && String(v).trim() !== '') return v;
   }
   return '';
-}
-
-// Convierte distintos formatos de fecha a YYYY-MM-DD.
-function parseVencimiento(value: unknown): string {
-  const fallback = new Date().toISOString().split('T')[0];
-  if (value === undefined || value === null || value === '') return fallback;
-
-  // Número de serie de Excel (días desde 1900).
-  if (typeof value === 'number') {
-    const d = new Date(Math.round((value - 25569) * 86400 * 1000));
-    if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
-  }
-
-  const str = String(value).trim();
-  let m = str.match(/^(\d{1,2})\/(\d{4})$/); // MM/YYYY
-  if (m) return `${m[2]}-${m[1].padStart(2, '0')}-01`;
-  m = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); // DD/MM/YYYY
-  if (m) return `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`;
-  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str; // YYYY-MM-DD
-  m = str.match(/^(\d{4})-(\d{1,2})$/); // YYYY-MM
-  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-01`;
-
-  const d = new Date(str);
-  return isNaN(d.getTime()) ? fallback : d.toISOString().split('T')[0];
 }
 
 // Convierte a número tolerando strings con símbolos o separadores.
@@ -114,10 +86,8 @@ async function extractProductos(file: File): Promise<ProductoImport[]> {
     productos.push({
       nombre,
       precio: Math.round(parseNumero(precioRaw) * 100) / 100,
-      cantidad: Math.round(parseNumero(pick(row, 'stock', 'cantidad'))),
-      vencimiento: parseVencimiento(pick(row, 'vencimiento', 'fecha', 'vto')),
+      stock: Math.round(parseNumero(pick(row, 'stock', 'cantidad'))),
       laboratorio: String(pick(row, 'laboratorio', 'lab', 'marca')).trim(),
-      foto_url: '',
     });
   }
   return productos;
@@ -158,8 +128,7 @@ function ImportarProductosContent() {
         productos.slice(0, 5).map((p) => ({
           nombre: p.nombre,
           precio: p.precio.toFixed(2),
-          stock: String(p.cantidad),
-          vencimiento: formatMesAnio(p.vencimiento),
+          stock: String(p.stock),
           laboratorio: p.laboratorio,
         }))
       );
@@ -243,15 +212,15 @@ function ImportarProductosContent() {
               <label className="block text-gray-700 font-semibold mb-4">Formato esperado del CSV o Excel:</label>
               <div className="bg-gray-50 p-4 rounded border border-gray-200 mb-4">
                 <code className="text-xs sm:text-sm text-gray-800">
-                  nombre,precio,stock,vencimiento,laboratorio
+                  nombre,precio,stock,laboratorio
                   <br />
-                  Leche 1L,2.50,100,12/2026,Bayer
+                  Leche 1L,2.50,100,Bayer
                   <br />
-                  Queso,5.00,50,11/2026,Zoetis
+                  Queso,5.00,50,Zoetis
                 </code>
               </div>
               <p className="text-xs text-gray-600 mb-4">
-                Columnas: nombre, precio (o &quot;Precio Final&quot;), stock, vencimiento (MM/AAAA) y laboratorio.
+                Columnas: nombre, precio (o &quot;Precio Final&quot;), stock y laboratorio.
                 Se aceptan archivos Excel directamente.
               </p>
             </div>
@@ -287,7 +256,6 @@ function ImportarProductosContent() {
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Nombre</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Precio</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Stock</th>
-                        <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Vencimiento</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Laboratorio</th>
                       </tr>
                     </thead>
@@ -297,7 +265,6 @@ function ImportarProductosContent() {
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.nombre}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">${p.precio}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.stock}</td>
-                          <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.vencimiento}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.laboratorio || '-'}</td>
                         </tr>
                       ))}
@@ -332,7 +299,6 @@ function ImportarProductosContent() {
             <ul className="text-xs sm:text-sm text-gray-600 space-y-2">
               <li>✓ Las imágenes se asignarán automáticamente como placeholders</li>
               <li>✓ Puedes editar cada producto después de importar</li>
-              <li>✓ La fecha de vencimiento debe estar en formato YYYY-MM-DD</li>
               <li>✓ El precio y stock deben ser números válidos</li>
             </ul>
           </div>

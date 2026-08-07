@@ -70,7 +70,7 @@ function AdminDashboardContent() {
     const matchBusqueda = p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
       p.laboratorio.toLowerCase().includes(busqueda.toLowerCase());
     const matchLaboratorio = !selectedLaboratorio || p.laboratorio === selectedLaboratorio;
-    const stock = p.cantidad ?? p.stock ?? 0;
+    const stock = p.stock ?? 0;
     const matchStock = !showOnlyZeroStock || stock === 0;
     return matchBusqueda && matchLaboratorio && matchStock;
   });
@@ -231,7 +231,7 @@ function AdminDashboardContent() {
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Nombre</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Precio</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Stock</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800 hidden sm:table-cell">Vencimiento</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800 hidden sm:table-cell">Laboratorio</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Acciones</th>
                 </tr>
               </thead>
@@ -239,9 +239,9 @@ function AdminDashboardContent() {
                 {productosFiltrados.map((producto) => (
                   <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      {producto.foto_url ? (
+                      {producto.imagen_url ? (
                         <img
-                          src={producto.foto_url}
+                          src={producto.imagen_url}
                           alt={producto.nombre}
                           className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
                         />
@@ -255,7 +255,7 @@ function AdminDashboardContent() {
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {(() => {
-                        const stock = producto.cantidad ?? producto.stock ?? 0;
+                        const stock = producto.stock ?? 0;
                         return (
                           <span
                             className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold inline-block ${
@@ -271,7 +271,7 @@ function AdminDashboardContent() {
                         );
                       })()}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{new Date(producto.vencimiento).toLocaleDateString('es-AR')}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{producto.laboratorio}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex gap-2 sm:gap-3">
                         <button

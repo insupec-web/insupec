@@ -47,7 +47,7 @@ export default function InventoryStats({ productos }: { productos: Producto[] })
     let productsWithoutStock = 0;
 
     const productsWithValue = productos.map((p) => {
-      const stock = p.cantidad ?? p.stock ?? 0;
+      const stock = p.stock ?? 0;
       const valor = p.precio * stock;
 
       totalValue += valor;

@@ -6,8 +6,7 @@ import { useEffect, useState, use } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { useCart } from '@/hooks/useCart';
 import Link from 'next/link';
-import { ArrowLeft, Package, Calendar, Plus, Minus } from 'lucide-react';
-import { formatMesAnio } from '@/lib/format';
+import { ArrowLeft, Package, Plus, Minus } from 'lucide-react';
 import { formatPrice } from '@/lib/formatPrice';
 
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -50,7 +49,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         nombre: producto.nombre,
         precio: producto.precio,
         cantidad: quantity,
-        foto_url: producto.foto_url,
+        imagen_url: producto.imagen_url,
       });
       // addItem ya abre el drawer del carrito automáticamente.
     }
@@ -76,13 +75,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
     );
   }
 
-  const vencimiento = new Date(producto.vencimiento);
-  const hoy = new Date();
-  const diasParaVencer = Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24));
-  const cantidadDisponible = producto.cantidad ?? producto.stock ?? 0;
+  const cantidadDisponible = producto.stock ?? 0;
   const isOutOfStock = cantidadDisponible === 0;
-
-  const isAboutToExpire = diasParaVencer <= 7 && diasParaVencer >= 0;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
@@ -93,17 +87,12 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
         <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-200">
-          {producto.foto_url ? (
-            <img src={producto.foto_url} alt={producto.nombre} className="w-full h-full object-contain p-6" />
+          {producto.imagen_url ? (
+            <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-contain p-6" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package size={64} className="text-gray-300" />
             </div>
-          )}
-          {isAboutToExpire && (
-            <span className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-md text-xs font-bold">
-              VENCE PRONTO
-            </span>
           )}
         </div>
 
@@ -115,13 +104,6 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
           </div>
 
           <div className="space-y-3 mb-8 border-t border-b border-gray-100 py-5">
-            <div className="flex items-center gap-3 text-sm">
-              <Calendar size={18} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
-              <span className="text-gray-500">Vencimiento:</span>
-              <span className={`font-semibold ${isAboutToExpire ? 'text-red-600' : 'text-gray-800'}`}>
-                {formatMesAnio(producto.vencimiento)}
-              </span>
-            </div>
             <div className="flex items-center gap-3 text-sm">
               <Package size={18} className={isOutOfStock ? 'text-red-500' : 'text-gray-400'} />
               <span className="text-gray-500">Stock:</span>

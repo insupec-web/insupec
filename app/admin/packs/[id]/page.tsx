@@ -47,8 +47,8 @@ function EditPackContent({ id }: { id: string }) {
           precio: pack.precio.toString(),
         });
 
-        if (pack.foto_url) {
-          setPreview(pack.foto_url);
+        if (pack.imagen_url) {
+          setPreview(pack.imagen_url);
         }
 
         setProductos(productosData.data || []);
@@ -155,14 +155,19 @@ function EditPackContent({ id }: { id: string }) {
         foto_url = await uploadImage(file);
       }
 
+      const packUpdateData: Record<string, unknown> = {
+        nombre: formData.nombre,
+        descripcion: formData.descripcion || null,
+        precio: parseFloat(formData.precio),
+      };
+
+      if (foto_url) {
+        packUpdateData.imagen_url = foto_url;
+      }
+
       const { error: updateError } = await supabase
         .from('packs')
-        .update({
-          nombre: formData.nombre,
-          descripcion: formData.descripcion || null,
-          precio: parseFloat(formData.precio),
-          foto_url: foto_url || null,
-        })
+        .update(packUpdateData)
         .eq('id', id);
 
       if (updateError) {

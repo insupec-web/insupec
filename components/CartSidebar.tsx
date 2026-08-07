@@ -83,8 +83,8 @@ export default function CartSidebar() {
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 pb-4 border-b border-gray-100 last:border-0">
                   <div className="w-16 h-16 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
-                    {item.foto_url ? (
-                      <img src={item.foto_url} alt={item.nombre} className="w-full h-full object-cover" />
+                    {item.imagen_url ? (
+                      <img src={item.imagen_url} alt={item.nombre} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <ShoppingCart size={20} className="text-gray-300" />

@@ -9,7 +9,6 @@ import ProductSkeleton from '@/components/ProductSkeleton';
 import { Search } from 'lucide-react';
 
 export default function ProductosPage() {
-  const [tab, setTab] = useState<'productos' | 'ofertas'>('productos');
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,20 +43,6 @@ export default function ProductosPage() {
   const laboratorios = useMemo(() => {
     const labs = new Set(productos.map((p) => p.laboratorio).filter(Boolean));
     return Array.from(labs).sort();
-  }, [productos]);
-
-  const productosEnOferta = useMemo(() => {
-    // Ofertas: productos que vencen dentro de los próximos 3 meses (ventana
-    // móvil, antes era una fecha fija que quedaba desactualizada).
-    const fechaLimite = new Date();
-    fechaLimite.setMonth(fechaLimite.getMonth() + 3);
-    return productos
-      .filter((p) => {
-        if (!p.vencimiento) return false;
-        const vencimiento = new Date(p.vencimiento);
-        return vencimiento < fechaLimite;
-      })
-      .sort((a, b) => new Date(a.vencimiento).getTime() - new Date(b.vencimiento).getTime());
   }, [productos]);
 
   const productosFiltrados = useMemo(() => {
@@ -124,32 +109,6 @@ export default function ProductosPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
-        {/* Tabs */}
-      <div className="flex gap-2 mb-8 border-b border-gray-200">
-        <button
-          onClick={() => setTab('productos')}
-          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
-            tab === 'productos'
-              ? 'border-brand-600 text-brand-600 scale-105'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Productos <span className="text-xs text-gray-500">({productos.length})</span>
-        </button>
-        <button
-          onClick={() => setTab('ofertas')}
-          className={`px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
-            tab === 'ofertas'
-              ? 'border-brand-600 text-brand-600 scale-105'
-              : 'border-transparent text-gray-600 hover:text-gray-900'
-          }`}
-        >
-          Ofertas <span className="text-xs text-gray-500">({productosEnOferta.length})</span>
-        </button>
-      </div>
-
-      {/* TAB: Productos */}
-      {tab === 'productos' && (
         <div>
           <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-brand-100">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Productos</h1>
@@ -314,38 +273,6 @@ export default function ProductosPage() {
             </div>
           )}
         </div>
-      )}
-
-      {/* TAB: Ofertas */}
-      {tab === 'ofertas' && (
-        <div>
-          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-amber-200">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Ofertas</h1>
-            <p className="text-sm sm:text-base text-gray-500">Productos con vencimiento próximo a precios especiales</p>
-          </div>
-
-          {productosEnOferta.length === 0 ? (
-            <div className="text-center py-20 px-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin ofertas en este momento</h3>
-              <p className="text-gray-600 text-base mb-6">Todas nuestras ofertas están agotadas. Vuelve pronto para nuevas promociones!</p>
-              <button onClick={() => setTab('productos')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
-                Ver productos regulares
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-              {productosEnOferta.map((producto) => (
-                <div key={producto.id} className="relative">
-                  <ProductCard producto={producto} />
-                  <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
-                    Vence: {new Date(producto.vencimiento).toLocaleDateString('es-AR')}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 }

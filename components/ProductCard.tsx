@@ -4,23 +4,17 @@ import { Producto } from '@/lib/supabase';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
-import { formatMesAnio } from '@/lib/format';
 import { formatPrice } from '@/lib/formatPrice';
-import { Package, Calendar, Plus, Minus, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Package, Plus, Minus, ShoppingCart, CheckCircle } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
   const { addItem } = useCart();
 
-  const vencimiento = producto.vencimiento ? new Date(producto.vencimiento) : null;
-  const hoy = new Date();
-  const diasParaVencer = vencimiento ? Math.floor((vencimiento.getTime() - hoy.getTime()) / (1000 * 60 * 60 * 24)) : null;
-
-  const stock = producto.cantidad ?? producto.stock ?? 0;
+  const stock = producto.stock ?? 0;
   const isLowStock = stock < 5 && stock > 0;
   const isOutOfStock = stock === 0;
-  const isAboutToExpire = diasParaVencer !== null && diasParaVencer <= 7 && diasParaVencer >= 0;
 
   const handleAddToCart = () => {
     addItem({
@@ -28,7 +22,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       nombre: producto.nombre,
       precio: producto.precio,
       cantidad: quantity,
-      foto_url: producto.foto_url,
+      imagen_url: producto.imagen_url,
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
@@ -39,9 +33,9 @@ export default function ProductCard({ producto }: { producto: Producto }) {
     <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-400 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       {/* Foto del producto */}
       <Link href={`/productos/${producto.id}`} className="relative block h-44 sm:h-52 bg-gradient-to-br from-brand-50 to-gray-50 overflow-hidden">
-        {producto.foto_url ? (
+        {producto.imagen_url ? (
           <img
-            src={producto.foto_url}
+            src={producto.imagen_url}
             alt={producto.nombre}
             loading="lazy"
             decoding="async"
@@ -54,9 +48,6 @@ export default function ProductCard({ producto }: { producto: Producto }) {
         )}
         {/* Badges */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
-          {isAboutToExpire && (
-            <span className="bg-red-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">🔴 VENCE PRONTO</span>
-          )}
           {isLowStock && !isOutOfStock && (
             <span className="bg-amber-500 text-white px-3 py-1.5 rounded-full text-xs font-bold shadow-lg">⚡ ÚLTIMAS</span>
           )}
@@ -87,13 +78,6 @@ export default function ProductCard({ producto }: { producto: Producto }) {
               {isOutOfStock ? 'Sin stock' : `${stock} u.`}
             </span>
           </span>
-          <span className="inline-flex items-center gap-1">
-            <Calendar size={14} className={isAboutToExpire ? 'text-red-500' : 'text-gray-400'} />
-            <span className={isAboutToExpire ? 'text-red-600 font-semibold' : ''}>
-              {vencimiento ? formatMesAnio(producto.vencimiento) : 'Sin vencimiento'}
-            </span>
-          </span>
-          <span className="text-gray-400">•</span>
           <span className="text-gray-600 font-medium">{producto.laboratorio}</span>
         </div>
 
