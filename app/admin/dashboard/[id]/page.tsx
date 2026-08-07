@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 import { useState, useEffect, use, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
-import { mesAnioADate, dateAMesAnio } from '@/lib/format';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -17,7 +16,6 @@ function EditProductoContent({ id }: { id: string }) {
     nombre: '',
     precio: '',
     stock: '',
-    vencimiento: '',
     laboratorio: '',
   });
 
@@ -45,11 +43,10 @@ function EditProductoContent({ id }: { id: string }) {
           setFormData({
             nombre: data.nombre,
             precio: data.precio.toString(),
-            stock: ((data.cantidad ?? data.stock) ?? 0).toString(),
-            vencimiento: dateAMesAnio(data.vencimiento),
+            stock: (data.stock ?? 0).toString(),
             laboratorio: data.laboratorio || '',
           });
-          setPreview(data.foto_url);
+          setPreview(data.imagen_url);
         }
       } catch (err) {
         console.error('Error fetching producto:', err);
@@ -128,15 +125,10 @@ function EditProductoContent({ id }: { id: string }) {
       const updateData: Record<string, unknown> = {
         nombre: formData.nombre,
         precio: parseFloat(formData.precio),
-        cantidad: parseInt(formData.stock),
+        stock: parseInt(formData.stock),
         laboratorio: formData.laboratorio,
-        foto_url,
+        imagen_url: foto_url,
       };
-
-      // vencimiento es NOT NULL en la DB: solo actualizarlo si hay valor.
-      if (formData.vencimiento) {
-        updateData.vencimiento = mesAnioADate(formData.vencimiento);
-      }
 
       const { error: updateError } = await supabase
         .from('productos')
@@ -237,29 +229,17 @@ function EditProductoContent({ id }: { id: string }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Vencimiento (Mes/Año)</label>
-                <input
-                  type="month"
-                  name="vencimiento"
-                  value={formData.vencimiento}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
-                <input
-                  type="text"
-                  name="laboratorio"
-                  value={formData.laboratorio}
-                  onChange={handleInputChange}
-                  placeholder="Ej: Bayer, Zoetis, Eli Lilly"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
-                  required
-                />
-              </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
+              <input
+                type="text"
+                name="laboratorio"
+                value={formData.laboratorio}
+                onChange={handleInputChange}
+                placeholder="Ej: Bayer, Zoetis, Eli Lilly"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
+                required
+              />
             </div>
 
             <div>
