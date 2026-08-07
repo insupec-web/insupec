@@ -93,15 +93,18 @@ function NuevoProductoContent() {
         foto_url = await uploadImage(file);
       }
 
-      const { error: insertError } = await supabase.from('productos').insert([
-        {
-          nombre: formData.nombre,
-          precio: parseFloat(formData.precio),
-          stock: parseInt(formData.stock),
-          laboratorio: formData.laboratorio,
-          imagen_url: foto_url,
-        },
-      ]);
+      const insertData: Record<string, unknown> = {
+        nombre: formData.nombre,
+        precio: parseFloat(formData.precio),
+        stock: parseInt(formData.stock),
+        laboratorio: formData.laboratorio,
+      };
+
+      if (foto_url) {
+        insertData.imagen_url = foto_url;
+      }
+
+      const { error: insertError } = await supabase.from('productos').insert([insertData]);
 
       if (insertError) {
         throw insertError;

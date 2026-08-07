@@ -127,8 +127,11 @@ function EditProductoContent({ id }: { id: string }) {
         precio: parseFloat(formData.precio),
         stock: parseInt(formData.stock),
         laboratorio: formData.laboratorio,
-        imagen_url: foto_url,
       };
+
+      if (foto_url) {
+        updateData.imagen_url = foto_url;
+      }
 
       const { error: updateError } = await supabase
         .from('productos')

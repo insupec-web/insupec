@@ -100,8 +100,11 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         precio: parseFloat(precio),
         stock: parseInt(stock),
         laboratorio: laboratorio.trim(),
-        imagen_url: foto_url || null,
       };
+
+      if (foto_url) {
+        updateData.imagen_url = foto_url;
+      }
 
       const { data, error: updateError } = await supabase
         .from('productos')
@@ -231,18 +234,6 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
                 value={laboratorio}
                 onChange={(e) => setLaboratorio(e.target.value)}
                 placeholder="Nombre del laboratorio"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
-                disabled={saving}
-              />
-            </div>
-
-            {/* Vencimiento */}
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Vencimiento</label>
-              <input
-                type="month"
-                value={vencimiento}
-                onChange={(e) => setVencimiento(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                 disabled={saving}
               />
