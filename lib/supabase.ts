@@ -10,12 +10,16 @@ export interface Producto {
   nombre: string;
   precio: number;
   stock?: number;
-  cantidad?: number;
-  vencimiento: string;
-  foto_url: string;
+  imagen_url?: string;
   laboratorio: string;
   created_at: string;
-  moneda?: string;
+  updated_at: string;
+  descripcion?: string;
+  categoria?: string;
+  presentacion?: string;
+  activo?: boolean;
+  puntos?: number;
+  slug?: string;
 }
 
 export interface Pedido {
@@ -39,7 +43,7 @@ export interface CartItem {
   nombre: string;
   precio: number;
   cantidad: number;
-  foto_url: string;
+  imagen_url?: string;
   moneda?: string;
 }
 
@@ -48,7 +52,7 @@ export interface Pack {
   nombre: string;
   descripcion?: string;
   precio: number;
-  foto_url?: string;
+  imagen_url?: string;
   created_at: string;
 }
 
