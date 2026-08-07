@@ -60,16 +60,14 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileName = `${Date.now()}-${file.name}`;
-    const { error: uploadError, data } = await supabase.storage.from('productos').upload(fileName, file);
+    const { error: uploadError } = await supabase.storage.from('productos').upload(fileName, file);
 
     if (uploadError) {
       throw uploadError;
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/productos/${fileName}`;
-
-    return publicUrl;
+    const { data } = supabase.storage.from('productos').getPublicUrl(fileName);
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: FormEvent) => {
