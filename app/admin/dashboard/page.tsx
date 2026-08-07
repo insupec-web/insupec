@@ -239,9 +239,9 @@ function AdminDashboardContent() {
                 {productosFiltrados.map((producto) => (
                   <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      {producto.imagen_url ? (
+                      {producto.foto_url ? (
                         <img
-                          src={producto.imagen_url}
+                          src={producto.foto_url}
                           alt={producto.nombre}
                           className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
                         />

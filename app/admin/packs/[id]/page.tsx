@@ -47,8 +47,8 @@ function EditPackContent({ id }: { id: string }) {
           precio: pack.precio.toString(),
         });
 
-        if (pack.imagen_url) {
-          setPreview(pack.imagen_url);
+        if (pack.foto_url) {
+          setPreview(pack.foto_url);
         }
 
         setProductos(productosData.data || []);
@@ -160,7 +160,7 @@ function EditPackContent({ id }: { id: string }) {
       };
 
       if (foto_url) {
-        packUpdateData.imagen_url = foto_url;
+        packUpdateData.foto_url = foto_url;
       }
 
       const { error: updateError } = await supabase

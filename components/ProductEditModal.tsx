@@ -29,7 +29,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       setPrecio(producto.precio?.toString() || '');
       setStock((producto.stock ?? 0).toString());
       setLaboratorio(producto.laboratorio || '');
-      setPreview(producto.imagen_url || '');
+      setPreview(producto.foto_url || '');
       setError(null);
       setFile(null);
     }
@@ -101,7 +101,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       };
 
       if (foto_url) {
-        updateData.imagen_url = foto_url;
+        updateData.foto_url = foto_url;
       }
 
       const { data, error: updateError } = await supabase

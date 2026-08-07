@@ -99,7 +99,7 @@ function NuevoProductoContent() {
       };
 
       if (foto_url) {
-        insertData.imagen_url = foto_url;
+        insertData.foto_url = foto_url;
       }
 
       const { error: insertError } = await supabase.from('productos').insert([insertData]);

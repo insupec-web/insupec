@@ -135,7 +135,7 @@ function NuevoPackContent() {
       };
 
       if (foto_url) {
-        packInsertData.imagen_url = foto_url;
+        packInsertData.foto_url = foto_url;
       }
 
       const { data: packData, error: insertError } = await supabase

@@ -46,7 +46,7 @@ function EditProductoContent({ id }: { id: string }) {
             stock: (data.stock ?? 0).toString(),
             laboratorio: data.laboratorio || '',
           });
-          setPreview(data.imagen_url);
+          setPreview(data.foto_url);
         }
       } catch (err) {
         console.error('Error fetching producto:', err);
@@ -128,7 +128,7 @@ function EditProductoContent({ id }: { id: string }) {
       };
 
       if (foto_url) {
-        updateData.imagen_url = foto_url;
+        updateData.foto_url = foto_url;
       }
 
       const { error: updateError } = await supabase
