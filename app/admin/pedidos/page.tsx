@@ -108,11 +108,11 @@ function PedidosContent() {
             if (readError) throw readError;
 
             if (prod) {
-              const stockActual = (prod.cantidad ?? prod.stock) ?? 0;
+              const stockActual = prod.stock ?? 0;
               const nuevoStock = Math.max(0, stockActual - producto.cantidad);
               const { error: stockError } = await supabase
                 .from('productos')
-                .update({ ['cantidad' in prod ? 'cantidad' : 'stock']: nuevoStock })
+                .update({ stock: nuevoStock })
                 .eq('id', producto.id);
 
               if (stockError) throw stockError;
