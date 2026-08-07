@@ -2,7 +2,6 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
-import { mesAnioADate, dateAMesAnio } from '@/lib/format';
 import { X } from 'lucide-react';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -19,7 +18,6 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
   const [precio, setPrecio] = useState('');
   const [stock, setStock] = useState('');
   const [laboratorio, setLaboratorio] = useState('');
-  const [vencimiento, setVencimiento] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [saving, setSaving] = useState(false);
@@ -29,10 +27,9 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
     if (producto && isOpen) {
       setNombre(producto.nombre || '');
       setPrecio(producto.precio?.toString() || '');
-      setStock(((producto.cantidad ?? producto.stock) ?? 0).toString());
+      setStock((producto.stock ?? 0).toString());
       setLaboratorio(producto.laboratorio || '');
-      setVencimiento(producto.vencimiento ? dateAMesAnio(producto.vencimiento) : '');
-      setPreview(producto.foto_url || '');
+      setPreview(producto.imagen_url || '');
       setError(null);
       setFile(null);
     }
@@ -101,17 +98,10 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       const updateData: Record<string, unknown> = {
         nombre: nombre.trim(),
         precio: parseFloat(precio),
+        stock: parseInt(stock),
         laboratorio: laboratorio.trim(),
-        foto_url: foto_url || null,
+        imagen_url: foto_url || null,
       };
-
-      // La columna de stock se llama "cantidad" en el esquema actual, pero
-      // instalaciones viejas todavía usan "stock". Escribimos en la que exista.
-      updateData['cantidad' in producto ? 'cantidad' : 'stock'] = parseInt(stock);
-
-      if (vencimiento) {
-        updateData.vencimiento = mesAnioADate(vencimiento);
-      }
 
       const { data, error: updateError } = await supabase
         .from('productos')
