@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
-import { mesAnioADate } from '@/lib/format';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -17,7 +16,6 @@ function NuevoProductoContent() {
     nombre: '',
     precio: '',
     stock: '',
-    vencimiento: '',
     laboratorio: '',
   });
 
@@ -86,11 +84,6 @@ function NuevoProductoContent() {
       return;
     }
 
-    // La columna vencimiento es NOT NULL en la DB: sin fecha el insert falla.
-    if (!formData.vencimiento) {
-      setError('Selecciona la fecha de vencimiento');
-      return;
-    }
 
     setLoading(true);
 
@@ -104,10 +97,9 @@ function NuevoProductoContent() {
         {
           nombre: formData.nombre,
           precio: parseFloat(formData.precio),
-          cantidad: parseInt(formData.stock),
-          vencimiento: mesAnioADate(formData.vencimiento),
+          stock: parseInt(formData.stock),
           laboratorio: formData.laboratorio,
-          foto_url,
+          imagen_url: foto_url,
         },
       ]);
 
@@ -183,29 +175,17 @@ function NuevoProductoContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Vencimiento (Mes/Año)</label>
-                <input
-                  type="month"
-                  name="vencimiento"
-                  value={formData.vencimiento}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
-                <input
-                  type="text"
-                  name="laboratorio"
-                  value={formData.laboratorio}
-                  onChange={handleInputChange}
-                  placeholder="Ej: Bayer, Zoetis, Eli Lilly"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
-                  required
-                />
-              </div>
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Laboratorio *</label>
+              <input
+                type="text"
+                name="laboratorio"
+                value={formData.laboratorio}
+                onChange={handleInputChange}
+                placeholder="Ej: Bayer, Zoetis, Eli Lilly"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-brand-600"
+                required
+              />
             </div>
 
             <div>
