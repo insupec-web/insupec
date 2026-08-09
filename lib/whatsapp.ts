@@ -4,7 +4,6 @@ import { formatPrice } from '@/lib/formatPrice';
 interface ClientData {
   nombre: string;
   apellido: string;
-  razonSocial: string;
   email: string;
   telefono: string;
   direccion: string;
@@ -49,7 +48,6 @@ export function generateWhatsAppMessage(
 
 *DATOS DEL CLIENTE:*
 Nombre: ${clientData.nombre} ${clientData.apellido}
-Razón Social: ${clientData.razonSocial}
 Email: ${clientData.email}
 Teléfono: ${clientData.telefono}
 Dirección: ${clientData.direccion}

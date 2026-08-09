@@ -22,6 +22,9 @@ export const metadata: Metadata = {
   title: 'INSUPEC - Distribuidora de Confianza | Productos Auténticos',
   description: 'Compra productos auténticos en línea. Envío rápido 24-72h a todo el país. Distribuidora verificada y segura. Atención 24/7 en WhatsApp.',
   keywords: 'distribuidora online, productos, mayorista, envío a domicilio, distribuidora argentina',
+  icons: {
+    icon: '/favicon.ico',
+  },
   openGraph: {
     title: 'INSUPEC - Tu Distribuidora de Confianza',
     description: 'Productos 100% auténticos. Envío rápido y seguro.',
