@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
       Nombre: p.nombre,
       Precio: p.precio,
       Stock: p.stock ?? 0,
+      Vencimiento: p.vencimiento || '',
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(excelData);
@@ -26,11 +27,11 @@ export async function GET(request: NextRequest) {
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Productos');
 
     // Configurar estilos y formato de columnas
-    const columnWidths = [20, 30, 12, 10];
+    const columnWidths = [20, 30, 12, 10, 15];
     worksheet['!cols'] = columnWidths.map((width) => ({ wch: width }));
 
     // Agregar autofilter
-    worksheet['!autofilter'] = { ref: `A1:D${excelData.length + 1}` };
+    worksheet['!autofilter'] = { ref: `A1:E${excelData.length + 1}` };
 
     // Crear buffer
     const buffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'buffer' });
