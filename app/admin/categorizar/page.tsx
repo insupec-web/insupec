@@ -17,7 +17,7 @@ const CATEGORIAS = [
   'Limpieza',
 ];
 
-function Categorizar Content() {
+function CategorizarContent() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -177,7 +177,7 @@ export default function CategorizarPage() {
   return (
     <ProtectedAdminRoute>
       <div className="min-h-screen bg-gray-50">
-        <Categorizar Content />
+        <CategorizarContent />
       </div>
     </ProtectedAdminRoute>
   );
