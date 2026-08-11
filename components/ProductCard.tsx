@@ -79,6 +79,9 @@ export default function ProductCard({ producto }: { producto: Producto }) {
             </span>
           </span>
           <span className="text-gray-600 font-medium">{producto.laboratorio}</span>
+          {producto.vencimiento && (
+            <span className="text-gray-600 font-medium">Vto: {producto.vencimiento}</span>
+          )}
         </div>
 
         {/* Controles de cantidad y compra */}
