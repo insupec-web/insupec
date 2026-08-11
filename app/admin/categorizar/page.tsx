@@ -15,6 +15,7 @@ const CATEGORIAS = [
   'Solar',
   'Instrumental',
   'Limpieza',
+  'Cerco Eléctrico',
 ];
 
 function CategorizarContent() {

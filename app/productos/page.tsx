@@ -26,6 +26,7 @@ export default function ProductosPage() {
     'Solar',
     'Instrumental',
     'Limpieza',
+    'Cerco Eléctrico',
   ];
 
   useEffect(() => {
