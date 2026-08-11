@@ -27,6 +27,7 @@ export default function ProductosPage() {
     'Instrumental',
     'Limpieza',
     'Cerco Eléctrico',
+    'Hormiguicida',
   ];
 
   useEffect(() => {

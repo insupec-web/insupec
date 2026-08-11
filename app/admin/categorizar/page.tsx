@@ -16,6 +16,7 @@ const CATEGORIAS = [
   'Instrumental',
   'Limpieza',
   'Cerco Eléctrico',
+  'Hormiguicida',
 ];
 
 function CategorizarContent() {
