@@ -6,6 +6,16 @@ import { X } from 'lucide-react';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
+const CATEGORIAS = [
+  'Animales de Compañía',
+  'Grandes Animales',
+  'Solar',
+  'Instrumental',
+  'Limpieza',
+  'Cerco Eléctrico',
+  'Hormiguicida',
+];
+
 interface ProductEditModalProps {
   producto: Producto | null;
   isOpen: boolean;
@@ -18,6 +28,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
   const [precio, setPrecio] = useState('');
   const [stock, setStock] = useState('');
   const [laboratorio, setLaboratorio] = useState('');
+  const [categoria, setCategoria] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [saving, setSaving] = useState(false);
@@ -29,6 +40,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       setPrecio(producto.precio?.toString() || '');
       setStock((producto.stock ?? 0).toString());
       setLaboratorio(producto.laboratorio || '');
+      setCategoria(producto.categoria || '');
       setPreview(producto.foto_url || '');
       setError(null);
       setFile(null);
@@ -99,6 +111,10 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         stock: parseInt(stock),
         laboratorio: laboratorio.trim(),
       };
+
+      if (categoria) {
+        updateData.categoria = categoria;
+      }
 
       if (foto_url) {
         updateData.foto_url = foto_url;
@@ -235,6 +251,24 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                 disabled={saving}
               />
+            </div>
+
+            {/* Categoría */}
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Categoría</label>
+              <select
+                value={categoria}
+                onChange={(e) => setCategoria(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
+              >
+                <option value="">Sin categoría</option>
+                {CATEGORIAS.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Botones */}

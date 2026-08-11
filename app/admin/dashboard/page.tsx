@@ -241,6 +241,7 @@ function AdminDashboardContent() {
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Precio</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Stock</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800 hidden sm:table-cell">Laboratorio</th>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800 hidden lg:table-cell">Categoría</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Acciones</th>
                 </tr>
               </thead>
@@ -281,6 +282,15 @@ function AdminDashboardContent() {
                       })()}
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{producto.laboratorio}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
+                      {producto.categoria ? (
+                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          {producto.categoria}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-500">Sin categoría</span>
+                      )}
+                    </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex gap-2 sm:gap-3">
                         <button
