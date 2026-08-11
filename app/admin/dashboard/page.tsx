@@ -95,11 +95,11 @@ function AdminDashboardContent() {
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
           <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
             <Link
-              href="/admin/clasificar"
+              href="/admin/categorizar"
               className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
             >
               <Sparkles size={18} className="sm:w-5 sm:h-5" />
-              Clasificar con IA
+              Categorizar Productos
             </Link>
             <Link
               href="/admin/dashboard/nuevo"
