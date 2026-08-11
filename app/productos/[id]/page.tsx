@@ -49,7 +49,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         nombre: producto.nombre,
         precio: producto.precio,
         cantidad: quantity,
-        imagen_url: producto.imagen_url,
+        foto_url: producto.foto_url,
       });
       // addItem ya abre el drawer del carrito automáticamente.
     }
@@ -87,8 +87,8 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10">
         <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-200">
-          {producto.imagen_url ? (
-            <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-contain p-6" />
+          {producto.foto_url ? (
+            <img src={producto.foto_url} alt={producto.nombre} className="w-full h-full object-contain p-6" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Package size={64} className="text-gray-300" />

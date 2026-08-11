@@ -60,19 +60,17 @@ function NuevoProductoContent() {
     const fileName = `${Date.now()}-${file.name}`;
     console.log('Uploading file:', fileName);
 
-    const { error, data } = await supabase.storage.from('productos').upload(fileName, file);
+    const { error } = await supabase.storage.from('productos').upload(fileName, file);
 
     if (error) {
       console.error('Upload error:', error);
       throw error;
     }
 
-    console.log('Upload successful:', data);
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/productos/${fileName}`;
-
-    console.log('Generated URL:', publicUrl);
-    return publicUrl;
+    console.log('Upload successful');
+    const { data } = supabase.storage.from('productos').getPublicUrl(fileName);
+    console.log('Generated URL:', data.publicUrl);
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -101,7 +99,7 @@ function NuevoProductoContent() {
       };
 
       if (foto_url) {
-        insertData.imagen_url = foto_url;
+        insertData.foto_url = foto_url;
       }
 
       const { error: insertError } = await supabase.from('productos').insert([insertData]);

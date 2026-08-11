@@ -47,8 +47,8 @@ function EditPackContent({ id }: { id: string }) {
           precio: pack.precio.toString(),
         });
 
-        if (pack.imagen_url) {
-          setPreview(pack.imagen_url);
+        if (pack.foto_url) {
+          setPreview(pack.foto_url);
         }
 
         setProductos(productosData.data || []);
@@ -125,16 +125,14 @@ function EditPackContent({ id }: { id: string }) {
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileName = `${Date.now()}-${file.name}`;
-    const { error, data } = await supabase.storage.from('productos').upload(fileName, file);
+    const { error } = await supabase.storage.from('productos').upload(fileName, file);
 
     if (error) {
       throw error;
     }
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const publicUrl = `${supabaseUrl}/storage/v1/object/public/productos/${fileName}`;
-
-    return publicUrl;
+    const { data } = supabase.storage.from('productos').getPublicUrl(fileName);
+    return data.publicUrl;
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -162,7 +160,7 @@ function EditPackContent({ id }: { id: string }) {
       };
 
       if (foto_url) {
-        packUpdateData.imagen_url = foto_url;
+        packUpdateData.foto_url = foto_url;
       }
 
       const { error: updateError } = await supabase

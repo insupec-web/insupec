@@ -14,7 +14,6 @@ import { CheckCircle, Lock, Shield, Truck } from 'lucide-react';
 interface FormData {
   nombre: string;
   apellido: string;
-  razonSocial: string;
   email: string;
   telefono: string;
   direccion: string;
@@ -31,7 +30,6 @@ export default function CheckoutPage() {
   const [formData, setFormData] = useState<FormData>({
     nombre: '',
     apellido: '',
-    razonSocial: '',
     email: '',
     telefono: '',
     direccion: '',
@@ -90,14 +88,13 @@ export default function CheckoutPage() {
   };
 
   const validateForm = (): boolean => {
-    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'razonSocial', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
+    const requiredFields: (keyof FormData)[] = ['nombre', 'apellido', 'email', 'telefono', 'direccion', 'ciudad', 'codigoPostal'];
 
     for (const field of requiredFields) {
       if (!formData[field]) {
         const fieldNames: Record<string, string> = {
           nombre: 'Nombre',
           apellido: 'Apellido',
-          razonSocial: 'Razón Social',
           email: 'Email',
           telefono: 'Teléfono',
           direccion: 'Dirección',
@@ -116,11 +113,6 @@ export default function CheckoutPage() {
 
     if (formData.apellido.trim().length < 2) {
       setError('El apellido debe tener al menos 2 caracteres');
-      return false;
-    }
-
-    if (formData.razonSocial.trim().length < 2) {
-      setError('La razón social debe tener al menos 2 caracteres');
       return false;
     }
 
@@ -170,7 +162,6 @@ export default function CheckoutPage() {
       const pedidoBase = {
         nombre: formData.nombre,
         apellido: formData.apellido,
-        razon_social: formData.razonSocial,
         email: formData.email,
         telefono: formData.telefono,
         direccion: formData.direccion,
@@ -211,7 +202,6 @@ export default function CheckoutPage() {
         {
           nombre: formData.nombre,
           apellido: formData.apellido,
-          razonSocial: formData.razonSocial,
           email: formData.email,
           telefono: formData.telefono,
           direccion: formData.direccion,
@@ -380,19 +370,6 @@ export default function CheckoutPage() {
                     />
                   </div>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2 text-sm">Datos de la Empresa</label>
-                <input
-                  type="text"
-                  name="razonSocial"
-                  placeholder="Razón Social / Empresa *"
-                  value={formData.razonSocial}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-sm"
-                  required
-                />
               </div>
 
               <div>

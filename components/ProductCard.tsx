@@ -22,7 +22,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       nombre: producto.nombre,
       precio: producto.precio,
       cantidad: quantity,
-      imagen_url: producto.imagen_url,
+      foto_url: producto.foto_url,
     });
     setAddedToCart(true);
     setTimeout(() => setAddedToCart(false), 2000);
@@ -33,9 +33,9 @@ export default function ProductCard({ producto }: { producto: Producto }) {
     <div className="group bg-white rounded-2xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-400 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
       {/* Foto del producto */}
       <Link href={`/productos/${producto.id}`} className="relative block h-44 sm:h-52 bg-gradient-to-br from-brand-50 to-gray-50 overflow-hidden">
-        {producto.imagen_url ? (
+        {producto.foto_url ? (
           <img
-            src={producto.imagen_url}
+            src={producto.foto_url}
             alt={producto.nombre}
             loading="lazy"
             decoding="async"

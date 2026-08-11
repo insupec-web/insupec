@@ -18,7 +18,7 @@ export default function PackCard({ pack, productos }: { pack: Pack; productos: {
         nombre: producto.nombre,
         precio: producto.precio,
         cantidad: cantidad,
-        imagen_url: producto.imagen_url,
+        foto_url: producto.foto_url,
       });
     });
     setIsExpanded(false);
@@ -28,9 +28,9 @@ export default function PackCard({ pack, productos }: { pack: Pack; productos: {
     <div className="group bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col hover:border-brand-500 hover:shadow-lg transition-all duration-200">
       {/* Foto del pack */}
       <div className="relative block h-40 sm:h-48 bg-white overflow-hidden cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-        {pack.imagen_url ? (
+        {pack.foto_url ? (
           <img
-            src={pack.imagen_url}
+            src={pack.foto_url}
             alt={pack.nombre}
             className="w-full h-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
           />

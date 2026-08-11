@@ -64,7 +64,7 @@ function ExportarProductosContent() {
               <li className="flex items-start gap-2">
                 <span className="text-blue-600 font-bold">✓</span>
                 <span>
-                  <strong>Laboratorio, Nombre, Precio y Stock</strong>
+                  <strong>Laboratorio, Nombre, Precio, Stock y Vencimiento</strong>
                 </span>
               </li>
               <li className="flex items-start gap-2">

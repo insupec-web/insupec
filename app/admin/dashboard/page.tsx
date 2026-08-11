@@ -9,7 +9,7 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Search } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Sparkles } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
 import InventoryStats from '@/components/InventoryStats';
 
@@ -93,13 +93,22 @@ function AdminDashboardContent() {
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
-          <Link
-            href="/admin/dashboard/nuevo"
-            className="flex items-center justify-center sm:justify-start gap-2 bg-black text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors text-sm sm:text-base w-full sm:w-auto"
-          >
-            <Plus size={18} className="sm:w-5 sm:h-5" />
-            Crear Producto
-          </Link>
+          <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
+            <Link
+              href="/admin/categorizar"
+              className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
+            >
+              <Sparkles size={18} className="sm:w-5 sm:h-5" />
+              Categorizar Productos
+            </Link>
+            <Link
+              href="/admin/dashboard/nuevo"
+              className="flex items-center justify-center sm:justify-start gap-2 bg-black text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-bold hover:bg-gray-800 transition-colors text-sm sm:text-base w-full sm:w-auto"
+            >
+              <Plus size={18} className="sm:w-5 sm:h-5" />
+              Crear Producto
+            </Link>
+          </div>
         </div>
 
         {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
@@ -239,9 +248,9 @@ function AdminDashboardContent() {
                 {productosFiltrados.map((producto) => (
                   <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      {producto.imagen_url ? (
+                      {producto.foto_url ? (
                         <img
-                          src={producto.imagen_url}
+                          src={producto.foto_url}
                           alt={producto.nombre}
                           className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
                         />
