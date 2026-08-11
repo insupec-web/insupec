@@ -16,7 +16,17 @@ export default function ProductosPage() {
   const [sortPrice, setSortPrice] = useState<'asc' | 'desc' | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
+  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [expandLaboratorios, setExpandLaboratorios] = useState(false);
+  const [expandCategorias, setExpandCategorias] = useState(false);
+
+  const CATEGORIAS = [
+    'Animales de Compañía',
+    'Grandes Animales',
+    'Solar',
+    'Instrumental',
+    'Limpieza',
+  ];
 
   useEffect(() => {
     async function fetchData() {
@@ -57,6 +67,10 @@ export default function ProductosPage() {
       filtered = filtered.filter((p) => p.laboratorio === selectedLaboratorio);
     }
 
+    if (selectedCategoria) {
+      filtered = filtered.filter((p) => p.categoria === selectedCategoria);
+    }
+
     if (sortPrice) {
       filtered = [...filtered].sort((a, b) => {
         const priceA = a.precio || 0;
@@ -72,7 +86,7 @@ export default function ProductosPage() {
     }
 
     return filtered;
-  }, [productos, query, sortPrice, sortName, selectedLaboratorio]);
+  }, [productos, query, sortPrice, sortName, selectedLaboratorio, selectedCategoria]);
 
   if (loading) {
     return (
@@ -135,6 +149,44 @@ export default function ProductosPage() {
                 >
                   ✕
                 </button>
+              )}
+            </div>
+
+            <div>
+              <button
+                onClick={() => setExpandCategorias(!expandCategorias)}
+                className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                <span>Categoría:</span>
+                <span className="text-xs text-gray-500">{expandCategorias ? '▼' : '▶'} ({CATEGORIAS.length})</span>
+              </button>
+
+              {expandCategorias && (
+                <div className="flex gap-2 flex-wrap items-center mt-3">
+                  <button
+                    onClick={() => setSelectedCategoria(null)}
+                    className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                      !selectedCategoria
+                        ? 'bg-brand-600 text-white shadow-md scale-105'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                  >
+                    Todas
+                  </button>
+                  {CATEGORIAS.map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategoria(selectedCategoria === cat ? null : cat)}
+                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                        selectedCategoria === cat
+                          ? 'bg-brand-600 text-white shadow-md scale-105'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
               )}
             </div>
 
@@ -238,12 +290,13 @@ export default function ProductosPage() {
               </button>
             </div>
 
-            {(sortPrice || sortName || selectedLaboratorio) && (
+            {(sortPrice || sortName || selectedLaboratorio || selectedCategoria) && (
               <button
                 onClick={() => {
                   setSortPrice(null);
                   setSortName(null);
                   setSelectedLaboratorio(null);
+                  setSelectedCategoria(null);
                 }}
                 className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all transform hover:scale-102 border border-red-200"
               >
