@@ -15,12 +15,11 @@ export interface Producto {
   vencimiento?: string;
   created_at: string;
   updated_at: string;
-  descripcion?: string;
   categoria?: string;
-  presentacion?: string;
   activo?: boolean;
-  puntos?: number;
-  slug?: string;
+  moneda?: string;
+  oferta_activa?: boolean;
+  descuento_oferta?: number;
 }
 
 export interface Pedido {
