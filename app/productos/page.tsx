@@ -36,12 +36,12 @@ export default function ProductosPage() {
         const { data: productosData, error: productosError } = await supabase
           .from('productos')
           .select('*')
-          .eq('activo', true)
+          .or('activo.is.null,activo.eq.true')
           .order('created_at', { ascending: false });
 
         if (productosError) throw productosError;
 
-        setProductos(productosData || []);
+        setProductos((productosData || []).filter(p => p.activo !== false));
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos');

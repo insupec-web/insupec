@@ -112,7 +112,6 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         precio: parseFloat(precio),
         stock: parseInt(stock),
         laboratorio: laboratorio.trim(),
-        activo: activo,
       };
 
       if (categoria) {
@@ -123,14 +122,30 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         updateData.foto_url = foto_url;
       }
 
-      const { data, error: updateError } = await supabase
+      updateData.activo = activo;
+
+      let { data, error: updateError } = await supabase
         .from('productos')
         .update(updateData)
         .eq('id', producto.id)
         .select();
 
       if (updateError) {
-        throw updateError;
+        console.error('Error con updateData completo:', updateError);
+        if (updateError.message.includes('activo')) {
+          delete updateData.activo;
+          const { data: data2, error: updateError2 } = await supabase
+            .from('productos')
+            .update(updateData)
+            .eq('id', producto.id)
+            .select();
+          if (updateError2) {
+            throw updateError2;
+          }
+          data = data2;
+        } else {
+          throw updateError;
+        }
       }
 
       if (!data || data.length === 0) {
