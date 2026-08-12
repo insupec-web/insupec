@@ -9,16 +9,22 @@ export function formatPrice(price: number): string {
 export function toTitleCase(text: string): string {
   if (!text) return '';
 
-  const smallWords = ['y', 'o', 'de', 'del', 'la', 'el', 'a', 'en', 'x'];
+  const smallWords = ['y', 'o', 'de', 'del', 'la', 'el', 'a', 'en', 'x', 'cm', 'mm', 'cc', 'ml'];
 
   return text
     .toLowerCase()
-    .split(' ')
-    .map((word, index) => {
-      if (index === 0 || !smallWords.includes(word)) {
+    .split(/(\s+|-)/g)
+    .map((word, index, array) => {
+      if (!word || /^\s+$/.test(word) || word === '-') {
+        return word;
+      }
+
+      const isFirstWord = array.slice(0, index).every((w) => /^\s+$/.test(w) || w === '-' || w === '');
+
+      if (isFirstWord || !smallWords.includes(word)) {
         return word.charAt(0).toUpperCase() + word.slice(1);
       }
       return word;
     })
-    .join(' ');
+    .join('');
 }
