@@ -2,6 +2,7 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { dateAMesAnio, mesAnioADate } from '@/lib/format';
 import { X } from 'lucide-react';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -30,6 +31,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
   const [stock, setStock] = useState('');
   const [laboratorio, setLaboratorio] = useState('');
   const [categoria, setCategoria] = useState('');
+  const [vencimiento, setVencimiento] = useState('');
   const [activo, setActivo] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
@@ -43,6 +45,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       setStock((producto.stock ?? 0).toString());
       setLaboratorio(producto.laboratorio || '');
       setCategoria(producto.categoria || '');
+      setVencimiento(dateAMesAnio(producto.vencimiento));
       setActivo(producto.activo !== false);
       setPreview(producto.foto_url || '');
       setError(null);
@@ -118,6 +121,9 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       if (categoria) {
         updateData.categoria = categoria;
       }
+
+      // Se envía siempre: vaciar el campo debe poder borrar el vencimiento.
+      updateData.vencimiento = vencimiento ? mesAnioADate(vencimiento) : null;
 
       if (foto_url) {
         updateData.foto_url = foto_url;
@@ -258,6 +264,19 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
                 disabled={saving}
               />
+            </div>
+
+            {/* Vencimiento */}
+            <div>
+              <label className="block text-gray-700 font-semibold mb-2">Vencimiento</label>
+              <input
+                type="month"
+                value={vencimiento}
+                onChange={(e) => setVencimiento(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 text-sm"
+                disabled={saving}
+              />
+              <p className="text-xs text-gray-500 mt-1">Dejalo vacío si el producto no tiene vencimiento.</p>
             </div>
 
             {/* Categoría */}
