@@ -37,7 +37,6 @@ export default function ProductosPage() {
         const { data: productosData, error: productosError } = await supabase
           .from('productos')
           .select('*')
-          .or('activo.is.null,activo.eq.true')
           .order('created_at', { ascending: false });
 
         if (productosError) throw productosError;
