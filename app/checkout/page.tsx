@@ -162,6 +162,8 @@ export default function CheckoutPage() {
       const pedidoBase = {
         nombre: formData.nombre,
         apellido: formData.apellido,
+        // La columna es NOT NULL y el formulario ya no pide razón social (B2C).
+        razon_social: 'Consumidor Final',
         email: formData.email,
         telefono: formData.telefono,
         direccion: formData.direccion,
@@ -194,8 +196,11 @@ export default function CheckoutPage() {
         ({ error: insertError } = await supabase.from('pedidos').insert([pedidoBase]));
       }
 
+      // Si el pedido no se pudo guardar, igual abrimos WhatsApp: el mensaje es el
+      // canal por el que INSUPEC recibe el pedido, y perderlo es peor que quedarse
+      // sin el registro en la base.
       if (insertError) {
-        throw insertError;
+        console.error('No se pudo guardar el pedido en la base; se envía por WhatsApp igualmente:', insertError);
       }
 
       const whatsappMessage = generateWhatsAppMessage(

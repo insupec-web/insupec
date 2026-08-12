@@ -1,6 +1,7 @@
 'use client';
 
 import { Producto } from '@/lib/supabase';
+import { formatMesAnio } from '@/lib/format';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
@@ -80,7 +81,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           </span>
           <span className="text-gray-600 font-medium">{producto.laboratorio}</span>
           {producto.vencimiento && (
-            <span className="text-gray-600 font-medium">Vto: {producto.vencimiento}</span>
+            <span className="text-gray-600 font-medium">Vto: {formatMesAnio(producto.vencimiento)}</span>
           )}
         </div>
 

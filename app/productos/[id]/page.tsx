@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useState, use } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { formatMesAnio } from '@/lib/format';
 import { useCart } from '@/hooks/useCart';
 import Link from 'next/link';
 import { ArrowLeft, Package, Plus, Minus } from 'lucide-react';
@@ -118,7 +119,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
             {producto.vencimiento && (
               <div className="text-sm">
                 <span className="text-gray-500">Vencimiento:</span>
-                <span className="font-semibold text-gray-800 ml-2">{producto.vencimiento}</span>
+                <span className="font-semibold text-gray-800 ml-2">{formatMesAnio(producto.vencimiento)}</span>
               </div>
             )}
           </div>

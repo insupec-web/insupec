@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
 import { formatPrice } from '@/lib/formatPrice';
+import { formatMesAnio } from '@/lib/format';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -16,6 +17,7 @@ interface ProductoCSV {
   precio: string;
   stock: string;
   laboratorio?: string;
+  vencimiento?: string;
 }
 
 // Debe coincidir con las columnas reales de la tabla productos.
@@ -24,6 +26,7 @@ interface ProductoImport {
   precio: number;
   stock: number;
   laboratorio: string;
+  vencimiento?: string;
 }
 
 // Normaliza las claves de una fila: sin espacios y en minúscula.
@@ -52,6 +55,38 @@ function parseNumero(value: unknown): number {
   return isNaN(n) ? 0 : n;
 }
 
+// La DB guarda el vencimiento con precisión de mes: primer día del mes.
+function primerDiaDelMes(anio: number, mes: number): string {
+  if (!anio || mes < 1 || mes > 12) return '';
+  return `${anio}-${String(mes).padStart(2, '0')}-01`;
+}
+
+// Acepta los formatos con los que suele venir el vencimiento en la planilla:
+// fecha de Excel, 2026-08, 2026-08-01, 08/2026 y 01/08/2026.
+function parseVencimiento(value: unknown): string {
+  if (value === undefined || value === null || String(value).trim() === '') return '';
+
+  if (value instanceof Date && !isNaN(value.getTime())) {
+    return primerDiaDelMes(value.getUTCFullYear(), value.getUTCMonth() + 1);
+  }
+
+  // Número de serie de Excel (días desde 1899-12-30).
+  if (typeof value === 'number' && value > 0) {
+    const d = new Date(Math.round((value - 25569) * 86400 * 1000));
+    return isNaN(d.getTime()) ? '' : primerDiaDelMes(d.getUTCFullYear(), d.getUTCMonth() + 1);
+  }
+
+  const s = String(value).trim();
+  let m;
+  if ((m = s.match(/^(\d{4})[-/](\d{1,2})(?:[-/]\d{1,2})?$/))) return primerDiaDelMes(+m[1], +m[2]);
+  if ((m = s.match(/^(\d{1,2})[-/](\d{4})$/))) return primerDiaDelMes(+m[2], +m[1]);
+  if ((m = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{2,4})$/))) {
+    const anio = +m[3] < 100 ? 2000 + +m[3] : +m[3];
+    return primerDiaDelMes(anio, +m[2]);
+  }
+  return '';
+}
+
 // Lee un archivo CSV/Excel y devuelve los productos listos para guardar.
 async function extractProductos(file: File): Promise<ProductoImport[]> {
   const isExcel = /\.(xlsx|xls)$/i.test(file.name);
@@ -59,7 +94,7 @@ async function extractProductos(file: File): Promise<ProductoImport[]> {
 
   if (isExcel) {
     const buffer = await file.arrayBuffer();
-    const workbook = XLSX.read(buffer, { type: 'array' });
+    const workbook = XLSX.read(buffer, { type: 'array', cellDates: true });
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' }) as Record<string, unknown>[];
   } else {
@@ -83,11 +118,15 @@ async function extractProductos(file: File): Promise<ProductoImport[]> {
 
     // Preferir "precio final" sobre "precio" si existe.
     const precioRaw = pick(row, 'precio final', 'precio', 'precio venta');
+    const vencimiento = parseVencimiento(
+      pick(row, 'vencimiento', 'vto', 'vto.', 'fecha vencimiento', 'fecha de vencimiento')
+    );
     productos.push({
       nombre,
       precio: Math.round(parseNumero(precioRaw) * 100) / 100,
       stock: Math.round(parseNumero(pick(row, 'stock', 'cantidad'))),
       laboratorio: String(pick(row, 'laboratorio', 'lab', 'marca')).trim(),
+      ...(vencimiento ? { vencimiento } : {}),
     });
   }
   return productos;
@@ -130,6 +169,7 @@ function ImportarProductosContent() {
           precio: p.precio.toFixed(2),
           stock: String(p.stock),
           laboratorio: p.laboratorio,
+          vencimiento: formatMesAnio(p.vencimiento),
         }))
       );
     } catch (err) {
@@ -157,13 +197,47 @@ function ImportarProductosContent() {
         return;
       }
 
-      const { error: insertError } = await supabase.from('productos').insert(productos);
+      // Los productos que ya existen se actualizan en lugar de duplicarse. Solo se
+      // tocan las columnas de la planilla: la foto y la categoría se conservan.
+      const { data: existentes, error: fetchError } = await supabase
+        .from('productos')
+        .select('id, nombre');
 
-      if (insertError) {
-        throw insertError;
+      if (fetchError) {
+        throw fetchError;
       }
 
-      setSuccess(`✅ Se importaron ${productos.length} productos exitosamente`);
+      const clave = (nombre: string) => nombre.toLowerCase().replace(/\s+/g, ' ').trim();
+      const idPorNombre = new Map((existentes || []).map((p) => [clave(p.nombre), p.id]));
+
+      const nuevos: ProductoImport[] = [];
+      const actualizados: (ProductoImport & { id: string })[] = [];
+      for (const producto of productos) {
+        const id = idPorNombre.get(clave(producto.nombre));
+        if (id) {
+          actualizados.push({ id, ...producto });
+        } else {
+          nuevos.push(producto);
+        }
+      }
+
+      if (nuevos.length > 0) {
+        const { error: insertError } = await supabase.from('productos').insert(nuevos);
+        if (insertError) {
+          throw insertError;
+        }
+      }
+
+      if (actualizados.length > 0) {
+        const { error: upsertError } = await supabase.from('productos').upsert(actualizados);
+        if (upsertError) {
+          throw upsertError;
+        }
+      }
+
+      setSuccess(
+        `✅ Importación lista: ${nuevos.length} productos nuevos y ${actualizados.length} actualizados`
+      );
       setFile(null);
       setPreview([]);
 
@@ -257,6 +331,7 @@ function ImportarProductosContent() {
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Precio</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Stock</th>
                         <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Laboratorio</th>
+                        <th className="border border-gray-300 px-2 sm:px-4 py-2 text-left">Vencimiento</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -266,6 +341,7 @@ function ImportarProductosContent() {
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">${p.precio}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.stock}</td>
                           <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.laboratorio || '-'}</td>
+                          <td className="border border-gray-300 px-2 sm:px-4 py-2">{p.vencimiento || '-'}</td>
                         </tr>
                       ))}
                     </tbody>
