@@ -122,30 +122,18 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         updateData.foto_url = foto_url;
       }
 
-      updateData.activo = activo;
+      if (activo !== (producto.activo !== false)) {
+        updateData.activo = activo;
+      }
 
-      let { data, error: updateError } = await supabase
+      const { data, error: updateError } = await supabase
         .from('productos')
         .update(updateData)
         .eq('id', producto.id)
         .select();
 
       if (updateError) {
-        console.error('Error con updateData completo:', updateError);
-        if (updateError.message.includes('activo')) {
-          delete updateData.activo;
-          const { data: data2, error: updateError2 } = await supabase
-            .from('productos')
-            .update(updateData)
-            .eq('id', producto.id)
-            .select();
-          if (updateError2) {
-            throw updateError2;
-          }
-          data = data2;
-        } else {
-          throw updateError;
-        }
+        throw updateError;
       }
 
       if (!data || data.length === 0) {
