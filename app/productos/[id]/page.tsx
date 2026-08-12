@@ -7,7 +7,7 @@ import { supabase, Producto } from '@/lib/supabase';
 import { useCart } from '@/hooks/useCart';
 import Link from 'next/link';
 import { ArrowLeft, Package, Plus, Minus } from 'lucide-react';
-import { formatPrice } from '@/lib/formatPrice';
+import { formatPrice, toTitleCase } from '@/lib/formatPrice';
 
 export default function ProductoDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -97,7 +97,7 @@ export default function ProductoDetailPage({ params }: { params: Promise<{ id: s
         </div>
 
         <div className="flex flex-col">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{producto.nombre}</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{toTitleCase(producto.nombre)}</h1>
 
           <div className="mb-6">
             <span className="text-4xl font-extrabold text-brand-600">${formatPrice(producto.precio)}</span>

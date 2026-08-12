@@ -4,7 +4,7 @@ import { Producto } from '@/lib/supabase';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useCart } from '@/hooks/useCart';
-import { formatPrice } from '@/lib/formatPrice';
+import { formatPrice, toTitleCase } from '@/lib/formatPrice';
 import { Package, Plus, Minus, ShoppingCart, CheckCircle } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
@@ -61,7 +61,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
         {/* Nombre del producto */}
         <Link href={`/productos/${producto.id}`}>
           <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 hover:text-brand-700 transition-colors line-clamp-2 min-h-[2.75rem]">
-            {producto.nombre}
+            {toTitleCase(producto.nombre)}
           </h3>
         </Link>
 
