@@ -337,10 +337,31 @@ export default function ProductosPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-              {productosFiltrados.map((producto) => (
-                <ProductCard key={producto.id} producto={producto} />
-              ))}
+            <div className="space-y-10">
+              {productosFiltrados.length > 0 && !selectedCategoria && !sortPrice && !sortName ? (
+                CATEGORIAS.map((categoria) => {
+                  const productosCategoria = productosFiltrados.filter((p) => p.categoria === categoria);
+                  if (productosCategoria.length === 0) return null;
+                  return (
+                    <div key={categoria}>
+                      <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-brand-200">
+                        {categoria}
+                      </h2>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                        {productosCategoria.map((producto) => (
+                          <ProductCard key={producto.id} producto={producto} />
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
+                  {productosFiltrados.map((producto) => (
+                    <ProductCard key={producto.id} producto={producto} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
