@@ -14,6 +14,7 @@ const CATEGORIAS = [
   'Limpieza',
   'Cerco Eléctrico',
   'Hormiguicida',
+  'Caravanas',
 ];
 
 interface ProductEditModalProps {

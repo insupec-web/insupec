@@ -17,6 +17,7 @@ const CATEGORIAS = [
   'Limpieza',
   'Cerco Eléctrico',
   'Hormiguicida',
+  'Caravanas',
 ];
 
 function CategorizarContent() {

@@ -28,6 +28,7 @@ export default function ProductosPage() {
     'Limpieza',
     'Cerco Eléctrico',
     'Hormiguicida',
+    'Caravanas',
   ];
 
   useEffect(() => {
