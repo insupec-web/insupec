@@ -29,6 +29,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
   const [stock, setStock] = useState('');
   const [laboratorio, setLaboratorio] = useState('');
   const [categoria, setCategoria] = useState('');
+  const [activo, setActivo] = useState(true);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
   const [saving, setSaving] = useState(false);
@@ -41,6 +42,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       setStock((producto.stock ?? 0).toString());
       setLaboratorio(producto.laboratorio || '');
       setCategoria(producto.categoria || '');
+      setActivo(producto.activo !== false);
       setPreview(producto.foto_url || '');
       setError(null);
       setFile(null);
@@ -110,6 +112,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
         precio: parseFloat(precio),
         stock: parseInt(stock),
         laboratorio: laboratorio.trim(),
+        activo: activo,
       };
 
       if (categoria) {
@@ -269,6 +272,22 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Visible en la web */}
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="activo"
+                checked={activo}
+                onChange={(e) => setActivo(e.target.checked)}
+                disabled={saving}
+                className="w-5 h-5 rounded border-gray-300 cursor-pointer"
+              />
+              <label htmlFor="activo" className="text-gray-700 font-semibold cursor-pointer">
+                Mostrar en la web
+              </label>
+              {!activo && <span className="text-xs text-red-600 font-semibold">(Oculto)</span>}
             </div>
 
             {/* Botones */}

@@ -36,6 +36,7 @@ export default function ProductosPage() {
         const { data: productosData, error: productosError } = await supabase
           .from('productos')
           .select('*')
+          .eq('activo', true)
           .order('created_at', { ascending: false });
 
         if (productosError) throw productosError;
@@ -56,6 +57,12 @@ export default function ProductosPage() {
     const labs = new Set(productos.map((p) => p.laboratorio).filter(Boolean));
     return Array.from(labs).sort();
   }, [productos]);
+
+  const getCategoryIndex = (categoria?: string): number => {
+    if (!categoria) return CATEGORIAS.length;
+    const index = CATEGORIAS.indexOf(categoria);
+    return index === -1 ? CATEGORIAS.length : index;
+  };
 
   const productosFiltrados = useMemo(() => {
     let filtered = productos;
@@ -84,6 +91,15 @@ export default function ProductosPage() {
         const nameA = a.nombre.toLowerCase();
         const nameB = b.nombre.toLowerCase();
         return sortName === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+      });
+    } else {
+      filtered = [...filtered].sort((a, b) => {
+        const indexA = getCategoryIndex(a.categoria);
+        const indexB = getCategoryIndex(b.categoria);
+        if (indexA !== indexB) {
+          return indexA - indexB;
+        }
+        return a.nombre.localeCompare(b.nombre);
       });
     }
 
