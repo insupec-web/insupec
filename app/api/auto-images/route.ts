@@ -42,13 +42,40 @@ async function searchUnsplashImage(query: string): Promise<string | null> {
 }
 
 function extractKeywords(productName: string): string {
-  const words = productName.toLowerCase().split(' ');
-  const stopWords = ['de', 'del', 'la', 'el', 'y', 'o', 'a', 'en', 'x', 'inc', 'inc.', 's/clip', 'c/clip'];
+  const lowerName = productName.toLowerCase();
 
-  return words
-    .filter((word) => word.length > 2 && !stopWords.includes(word) && !/^\d+$/.test(word))
-    .slice(0, 3)
-    .join(' ');
+  const keywordMap: { [key: string]: string } = {
+    'jeringa': 'syringe',
+    'aguja': 'needle',
+    'herradura': 'horseshoe',
+    'caravana': 'ear tag livestock',
+    'dosificador': 'farm equipment',
+    'arandela': 'washer',
+    'embolo': 'plunger syringe',
+    'mango': 'handle tool',
+    'tubo': 'tube',
+    'valvula': 'valve',
+    'bebedero': 'water feeder livestock',
+    'chupete': 'teat bottle',
+    'canula': 'cannula',
+    'bolsa': 'plastic bag',
+    'aplicador': 'applicator',
+  };
+
+  for (const [spanish, english] of Object.entries(keywordMap)) {
+    if (lowerName.includes(spanish)) {
+      return english;
+    }
+  }
+
+  const words = lowerName.split(' ');
+  const stopWords = ['de', 'del', 'la', 'el', 'y', 'o', 'a', 'en', 'x', 'inc', 'inc.', 's/clip', 'c/clip', 'primor', 'walmur', 'mustad', 'concorde'];
+
+  const filtered = words
+    .filter((word) => word.length > 3 && !stopWords.includes(word) && !/^\d+$/.test(word))
+    .slice(0, 2);
+
+  return filtered.length > 0 ? filtered.join(' ') : 'farm livestock';
 }
 
 async function downloadAndUploadImage(imageUrl: string, productId: string): Promise<string | null> {
