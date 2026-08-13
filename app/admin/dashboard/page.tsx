@@ -301,20 +301,22 @@ function AdminDashboardContent() {
           </span>
         </div>
 
-        {/* Stats Grid ultra compacto */}
-        <div className="grid grid-cols-2 gap-1 mb-1.5 bg-white bg-opacity-70 rounded p-1.5">
-          <div className="text-center">
-            <div className="text-xs font-bold text-gray-900 truncate">
-              ${formatPrice(producto.precio)}
-            </div>
+        {/* Precio prominente */}
+        <div className="mb-1.5 bg-white bg-opacity-90 rounded p-1 text-center border border-gray-200">
+          <div className="text-xs text-gray-600">Precio</div>
+          <div className="text-sm font-bold text-gray-900 leading-tight">
+            ${formatPrice(producto.precio)}
           </div>
-          <div className="text-center border-l border-gray-300">
-            <div className={`text-xs font-bold ${
-              stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
-            }`}>
-              {stock}
-            </div>
-          </div>
+        </div>
+
+        {/* Stock */}
+        <div className="text-center text-xs mb-1.5">
+          <span className="text-gray-600">Stock:</span>
+          <span className={`font-bold ml-1 ${
+            stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
+          }`}>
+            {stock}
+          </span>
         </div>
 
         {/* Botón visibilidad */}
