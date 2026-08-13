@@ -23,6 +23,8 @@ function AdminDashboardContent() {
   const [showOnlyZeroStock, setShowOnlyZeroStock] = useState(false);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
+  const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
 
   useEffect(() => {
     fetchProductos();
@@ -63,6 +65,40 @@ function AdminDashboardContent() {
     }
   };
 
+  const toggleSeleccion = (id: string) => {
+    setSeleccionados((prev) => {
+      const siguiente = new Set(prev);
+      if (siguiente.has(id)) {
+        siguiente.delete(id);
+      } else {
+        siguiente.add(id);
+      }
+      return siguiente;
+    });
+  };
+
+  // Cambia la visibilidad de todos los seleccionados en una sola consulta.
+  const handleVisibilidadMasiva = async (visible: boolean) => {
+    const ids = Array.from(seleccionados);
+    if (ids.length === 0) return;
+
+    setAplicandoMasivo(true);
+    const previos = productos;
+    setProductos((prev) => prev.map((p) => (seleccionados.has(p.id) ? { ...p, activo: visible } : p)));
+
+    const { error } = await supabase.from('productos').update({ activo: visible }).in('id', ids);
+
+    if (error) {
+      console.error('Error al cambiar la visibilidad en lote:', error);
+      setProductos(previos);
+      alert('No se pudo cambiar la visibilidad de los productos seleccionados');
+    } else {
+      setSeleccionados(new Set());
+    }
+
+    setAplicandoMasivo(false);
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
       return;
@@ -76,6 +112,11 @@ function AdminDashboardContent() {
       }
 
       setProductos((prev) => prev.filter((p) => p.id !== id));
+      setSeleccionados((prev) => {
+        const siguiente = new Set(prev);
+        siguiente.delete(id);
+        return siguiente;
+      });
     } catch (err) {
       console.error('Error deleting producto:', err);
       alert('Error al eliminar el producto');
@@ -250,10 +291,56 @@ function AdminDashboardContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden overflow-x-auto">
+          <>
+            {seleccionados.size > 0 && (
+              <div className="sticky top-16 z-10 mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 shadow-sm">
+                <span className="text-sm font-semibold text-gray-800">
+                  {seleccionados.size} {seleccionados.size === 1 ? 'producto seleccionado' : 'productos seleccionados'}
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => handleVisibilidadMasiva(false)}
+                    disabled={aplicandoMasivo}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-black disabled:opacity-50"
+                  >
+                    <EyeOff size={16} />
+                    Ocultar de la web
+                  </button>
+                  <button
+                    onClick={() => handleVisibilidadMasiva(true)}
+                    disabled={aplicandoMasivo}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
+                  >
+                    <Eye size={16} />
+                    Mostrar en la web
+                  </button>
+                  <button
+                    onClick={() => setSeleccionados(new Set())}
+                    disabled={aplicandoMasivo}
+                    className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 transition-colors hover:text-gray-900 disabled:opacity-50"
+                  >
+                    Limpiar selección
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-white rounded-lg shadow-md overflow-hidden overflow-x-auto">
             <table className="w-full min-w-max text-sm">
               <thead className="bg-gray-200">
                 <tr>
+                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-brand-600 cursor-pointer"
+                      checked={productosFiltrados.length > 0 && productosFiltrados.every((p) => seleccionados.has(p.id))}
+                      onChange={(e) =>
+                        setSeleccionados(e.target.checked ? new Set(productosFiltrados.map((p) => p.id)) : new Set())
+                      }
+                      title="Seleccionar todos los productos de la lista"
+                      aria-label="Seleccionar todos"
+                    />
+                  </th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Foto</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Nombre</th>
                   <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Precio</th>
@@ -271,6 +358,15 @@ function AdminDashboardContent() {
                       producto.activo === false ? 'bg-gray-50 opacity-60' : ''
                     }`}
                   >
+                    <td className="px-3 sm:px-6 py-3 sm:py-4">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 accent-brand-600 cursor-pointer"
+                        checked={seleccionados.has(producto.id)}
+                        onChange={() => toggleSeleccion(producto.id)}
+                        aria-label={`Seleccionar ${producto.nombre}`}
+                      />
+                    </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {producto.foto_url ? (
                         <img
@@ -364,7 +460,8 @@ function AdminDashboardContent() {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
 
         <ProductEditModal
