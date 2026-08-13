@@ -9,7 +9,7 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Search, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Sparkles, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
 import InventoryStats from '@/components/InventoryStats';
 
@@ -25,6 +25,8 @@ function AdminDashboardContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
+  const [expandedPublishedCategories, setExpandedPublishedCategories] = useState<Set<string>>(new Set());
+  const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchProductos();
@@ -141,6 +143,210 @@ function AdminDashboardContent() {
       return sortName === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
     });
   }
+
+  // Group productos by visibility and category
+  const productosPublicados = productosFiltrados.filter((p) => p.activo !== false);
+  const productosOcultos = productosFiltrados.filter((p) => p.activo === false);
+
+  const groupByCategory = (prods: Producto[]) => {
+    const grouped: Record<string, Producto[]> = {};
+    prods.forEach((p) => {
+      const cat = p.categoria || 'Sin categoría';
+      if (!grouped[cat]) grouped[cat] = [];
+      grouped[cat].push(p);
+    });
+    return grouped;
+  };
+
+  const publishedByCategory = groupByCategory(productosPublicados);
+  const hiddenByCategory = groupByCategory(productosOcultos);
+
+  const toggleCategoryExpanded = (category: string, isPublished: boolean) => {
+    if (isPublished) {
+      setExpandedPublishedCategories((prev) => {
+        const next = new Set(prev);
+        if (next.has(category)) {
+          next.delete(category);
+        } else {
+          next.add(category);
+        }
+        return next;
+      });
+    } else {
+      setExpandedHiddenCategories((prev) => {
+        const next = new Set(prev);
+        if (next.has(category)) {
+          next.delete(category);
+        } else {
+          next.add(category);
+        }
+        return next;
+      });
+    }
+  };
+
+  const ProductRow = ({ producto }: { producto: Producto }) => (
+    <tr
+      className={`border-t border-gray-200 hover:bg-gray-50 transition-colors ${
+        producto.activo === false ? 'bg-gray-50' : ''
+      }`}
+    >
+      <td className="px-3 sm:px-6 py-3 sm:py-4">
+        <input
+          type="checkbox"
+          className="w-4 h-4 accent-brand-600 cursor-pointer"
+          checked={seleccionados.has(producto.id)}
+          onChange={() => toggleSeleccion(producto.id)}
+          aria-label={`Seleccionar ${producto.nombre}`}
+        />
+      </td>
+      <td className="px-3 sm:px-6 py-3 sm:py-4">
+        {producto.foto_url ? (
+          <img
+            src={producto.foto_url}
+            alt={producto.nombre}
+            className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
+          />
+        ) : (
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex items-center justify-center">
+            <span className="text-xs text-gray-500">Sin foto</span>
+          </div>
+        )}
+      </td>
+      <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm">{producto.nombre}</td>
+      <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
+      <td className="px-3 sm:px-6 py-3 sm:py-4">
+        {(() => {
+          const stock = producto.stock ?? 0;
+          return (
+            <span
+              className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold inline-block ${
+                stock === 0
+                  ? 'bg-red-100 text-red-800'
+                  : stock < 5
+                    ? 'bg-orange-100 text-orange-800'
+                    : 'bg-green-100 text-green-800'
+              }`}
+            >
+              {stock}
+            </span>
+          );
+        })()}
+      </td>
+      <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{producto.laboratorio}</td>
+      <td className="px-3 sm:px-6 py-3 sm:py-4">
+        <div className="flex gap-2 sm:gap-3">
+          <button
+            onClick={() => handleToggleActivo(producto)}
+            className={
+              producto.activo !== false
+                ? 'text-green-600 hover:text-green-800 transition-colors'
+                : 'text-gray-400 hover:text-gray-600 transition-colors'
+            }
+            title={
+              producto.activo !== false
+                ? 'Visible en la web. Clic para ocultar.'
+                : 'Oculto. Clic para mostrar en la web.'
+            }
+            aria-label={producto.activo !== false ? 'Ocultar producto' : 'Mostrar producto'}
+          >
+            {producto.activo !== false ? (
+              <Eye size={18} className="sm:w-5 sm:h-5" />
+            ) : (
+              <EyeOff size={18} className="sm:w-5 sm:h-5" />
+            )}
+          </button>
+          <button
+            onClick={() => {
+              setEditingProducto(producto);
+              setIsModalOpen(true);
+            }}
+            className="text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            <Edit2 size={18} className="sm:w-5 sm:h-5" />
+          </button>
+          <button
+            onClick={() => handleDelete(producto.id)}
+            className="text-red-600 hover:text-red-800 transition-colors"
+          >
+            <Trash2 size={18} className="sm:w-5 sm:h-5" />
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+
+  const CategorySection = ({
+    title,
+    productos: prods,
+    isPublished,
+  }: {
+    title: string;
+    productos: Producto[];
+    isPublished: boolean;
+  }) => {
+    const isExpanded = isPublished
+      ? expandedPublishedCategories.has(title)
+      : expandedHiddenCategories.has(title);
+
+    return (
+      <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <button
+          onClick={() => toggleCategoryExpanded(title, isPublished)}
+          className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 transition-colors border-b border-gray-200"
+        >
+          <div className="flex items-center gap-3">
+            <ChevronDown
+              size={18}
+              className={`text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+            />
+            <h3 className="font-semibold text-gray-800 text-sm sm:text-base">{title}</h3>
+            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-300 text-gray-700">
+              {prods.length}
+            </span>
+          </div>
+        </button>
+
+        {isExpanded && (
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-max text-sm">
+              <thead>
+                <tr className="bg-gray-100 border-t border-gray-200">
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 accent-brand-600 cursor-pointer"
+                      checked={prods.length > 0 && prods.every((p) => seleccionados.has(p.id))}
+                      onChange={(e) =>
+                        setSeleccionados(
+                          e.target.checked
+                            ? new Set([...seleccionados, ...prods.map((p) => p.id)])
+                            : new Set([...seleccionados].filter((id) => !prods.find((p) => p.id === id)))
+                        )
+                      }
+                      title="Seleccionar todos los productos de esta categoría"
+                      aria-label={`Seleccionar todos en ${title}`}
+                    />
+                  </th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Foto</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Nombre</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Precio</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Stock</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700 hidden sm:table-cell">Lab</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {prods.map((producto) => (
+                  <ProductRow key={producto.id} producto={producto} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <>
@@ -293,7 +499,7 @@ function AdminDashboardContent() {
         ) : (
           <>
             {seleccionados.size > 0 && (
-              <div className="sticky top-16 z-10 mb-3 flex flex-wrap items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 shadow-sm">
+              <div className="sticky top-16 z-10 mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 shadow-md">
                 <span className="text-sm font-semibold text-gray-800">
                   {seleccionados.size} {seleccionados.size === 1 ? 'producto seleccionado' : 'productos seleccionados'}
                 </span>
@@ -325,141 +531,70 @@ function AdminDashboardContent() {
               </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-md overflow-hidden overflow-x-auto">
-            <table className="w-full min-w-max text-sm">
-              <thead className="bg-gray-200">
-                <tr>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-brand-600 cursor-pointer"
-                      checked={productosFiltrados.length > 0 && productosFiltrados.every((p) => seleccionados.has(p.id))}
-                      onChange={(e) =>
-                        setSeleccionados(e.target.checked ? new Set(productosFiltrados.map((p) => p.id)) : new Set())
-                      }
-                      title="Seleccionar todos los productos de la lista"
-                      aria-label="Seleccionar todos"
-                    />
-                  </th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Foto</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Nombre</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Precio</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Stock</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800 hidden sm:table-cell">Laboratorio</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800 hidden lg:table-cell">Categoría</th>
-                  <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-gray-800">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {productosFiltrados.map((producto) => (
-                  <tr
-                    key={producto.id}
-                    className={`border-t border-gray-200 hover:bg-gray-50 ${
-                      producto.activo === false ? 'bg-gray-50 opacity-60' : ''
-                    }`}
-                  >
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <input
-                        type="checkbox"
-                        className="w-4 h-4 accent-brand-600 cursor-pointer"
-                        checked={seleccionados.has(producto.id)}
-                        onChange={() => toggleSeleccion(producto.id)}
-                        aria-label={`Seleccionar ${producto.nombre}`}
-                      />
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      {producto.foto_url ? (
-                        <img
-                          src={producto.foto_url}
-                          alt={producto.nombre}
-                          className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
+            <div className="space-y-8">
+              {/* Productos Publicados */}
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-gray-900">Publicados en la web</h2>
+                    <p className="text-sm text-gray-600 mt-1">{productosPublicados.length} productos visibles</p>
+                  </div>
+                  <div className="px-4 py-2 rounded-lg bg-green-100 text-green-800 font-bold text-lg">
+                    {productosPublicados.length}
+                  </div>
+                </div>
+
+                {productosPublicados.length === 0 ? (
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
+                    <p className="text-gray-600 text-sm">No hay productos publicados con los filtros actuales</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {Object.entries(publishedByCategory)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([category, prods]) => (
+                        <CategorySection
+                          key={`pub-${category}`}
+                          title={category}
+                          productos={prods}
+                          isPublished={true}
                         />
-                      ) : (
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex items-center justify-center">
-                          <span className="text-xs text-gray-500">Sin foto</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm truncate">
-                      {producto.nombre}
-                      {producto.activo === false && (
-                        <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 text-gray-700 align-middle">
-                          Oculto
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      {(() => {
-                        const stock = producto.stock ?? 0;
-                        return (
-                          <span
-                            className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold inline-block ${
-                              stock === 0
-                                ? 'bg-red-100 text-red-800'
-                                : stock < 5
-                                  ? 'bg-orange-100 text-orange-800'
-                                  : 'bg-green-100 text-green-800'
-                            }`}
-                          >
-                            {stock}
-                          </span>
-                        );
-                      })()}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{producto.laboratorio}</td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 hidden lg:table-cell">
-                      {producto.categoria ? (
-                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
-                          {producto.categoria}
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-500">Sin categoría</span>
-                      )}
-                    </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4">
-                      <div className="flex gap-2 sm:gap-3">
-                        <button
-                          onClick={() => handleToggleActivo(producto)}
-                          className={
-                            producto.activo !== false
-                              ? 'text-green-600 hover:text-green-800 transition-colors'
-                              : 'text-gray-400 hover:text-gray-600 transition-colors'
-                          }
-                          title={
-                            producto.activo !== false
-                              ? 'Visible en la web. Clic para ocultar.'
-                              : 'Oculto. Clic para mostrar en la web.'
-                          }
-                          aria-label={producto.activo !== false ? 'Ocultar producto' : 'Mostrar producto'}
-                        >
-                          {producto.activo !== false ? (
-                            <Eye size={18} className="sm:w-5 sm:h-5" />
-                          ) : (
-                            <EyeOff size={18} className="sm:w-5 sm:h-5" />
-                          )}
-                        </button>
-                        <button
-                          onClick={() => {
-                            setEditingProducto(producto);
-                            setIsModalOpen(true);
-                          }}
-                          className="text-blue-600 hover:text-blue-800 transition-colors"
-                        >
-                          <Edit2 size={18} className="sm:w-5 sm:h-5" />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(producto.id)}
-                          className="text-red-600 hover:text-red-800 transition-colors"
-                        >
-                          <Trash2 size={18} className="sm:w-5 sm:h-5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                      ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Productos Ocultos */}
+              <div className="mt-10 pt-10 border-t-2 border-gray-300">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-1">
+                    <h2 className="text-2xl font-bold text-gray-900">Ocultos de la web</h2>
+                    <p className="text-sm text-gray-600 mt-1">{productosOcultos.length} productos ocultos</p>
+                  </div>
+                  <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 font-bold text-lg">
+                    {productosOcultos.length}
+                  </div>
+                </div>
+
+                {productosOcultos.length === 0 ? (
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
+                    <p className="text-gray-600 text-sm">Todos los productos están publicados en la web</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {Object.entries(hiddenByCategory)
+                      .sort(([a], [b]) => a.localeCompare(b))
+                      .map(([category, prods]) => (
+                        <CategorySection
+                          key={`hidden-${category}`}
+                          title={category}
+                          productos={prods}
+                          isPublished={false}
+                        />
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
           </>
         )}
