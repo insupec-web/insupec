@@ -9,7 +9,7 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Search, Sparkles, Eye, EyeOff, ChevronDown } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Sparkles, Eye, EyeOff, ChevronDown, MoreVertical, AlertCircle } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
 import InventoryStats from '@/components/InventoryStats';
 
@@ -187,116 +187,168 @@ function AdminDashboardContent() {
 
   const ProductCard = ({ producto }: { producto: Producto }) => {
     const stock = producto.stock ?? 0;
-    const stockStatus = stock === 0 ? 'Agotado' : stock < 5 ? 'Bajo' : 'OK';
-    const stockColor = stock === 0 ? 'bg-red-50 border-red-200' : stock < 5 ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200';
+    const stockStatus = stock === 0 ? 'Agotado' : stock < 5 ? 'Bajo Stock' : 'En Stock';
+    const [showMenu, setShowMenu] = useState(false);
+
+    const getBgColor = () => {
+      if (stock === 0) return 'bg-red-50 border-red-300';
+      if (stock < 5) return 'bg-orange-50 border-orange-300';
+      return 'bg-emerald-50 border-emerald-300';
+    };
+
+    const getStatusBadgeColor = () => {
+      if (stock === 0) return 'bg-red-100 text-red-800 border border-red-300';
+      if (stock < 5) return 'bg-orange-100 text-orange-800 border border-orange-300';
+      return 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+    };
 
     return (
       <div
-        className={`border-2 rounded-xl p-4 transition-all hover:shadow-lg hover:scale-105 ${stockColor} ${
-          producto.activo === false ? 'opacity-60' : ''
+        className={`border-2 rounded-2xl p-4 sm:p-5 transition-all hover:shadow-xl hover:scale-102 ${getBgColor()} ${
+          producto.activo === false ? 'opacity-75 ring-2 ring-gray-400' : ''
         }`}
       >
-        <div className="flex gap-3 mb-3">
+        {/* Header con checkbox y menú */}
+        <div className="flex gap-3 mb-4 items-start justify-between">
           <input
             type="checkbox"
-            className="w-5 h-5 accent-brand-600 cursor-pointer rounded mt-1"
+            className="w-5 h-5 accent-brand-600 cursor-pointer rounded mt-0.5 flex-shrink-0"
             checked={seleccionados.has(producto.id)}
             onChange={() => toggleSeleccion(producto.id)}
             aria-label={`Seleccionar ${producto.nombre}`}
           />
-          <div className="flex-1 min-w-0">
-            {/* Foto y info principal */}
-            <div className="flex gap-3 mb-3">
-              {producto.foto_url ? (
-                <img
-                  src={producto.foto_url}
-                  alt={producto.nombre}
-                  className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
-                />
-              ) : (
-                <div className="w-16 h-16 bg-gray-300 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs text-gray-600 text-center">Sin foto</span>
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight line-clamp-2">
-                  {producto.nombre}
-                </h3>
-                <p className="text-xs text-gray-600 mt-1">{producto.laboratorio || 'Sin laboratorio'}</p>
+          <div className="relative">
+            <button
+              onClick={() => setShowMenu(!showMenu)}
+              className="p-2 hover:bg-white rounded-lg transition-colors"
+              title="Más opciones"
+            >
+              <MoreVertical size={20} className="text-gray-600" />
+            </button>
+            {showMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 z-50 w-48">
+                <button
+                  onClick={() => {
+                    setEditingProducto(producto);
+                    setIsModalOpen(true);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100 text-sm font-medium text-gray-700"
+                >
+                  <Edit2 size={16} className="text-blue-600" />
+                  Editar Producto
+                </button>
+                <button
+                  onClick={() => {
+                    handleToggleActivo(producto);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-2 border-b border-gray-100 text-sm font-medium text-gray-700"
+                >
+                  {producto.activo !== false ? (
+                    <>
+                      <EyeOff size={16} className="text-gray-600" />
+                      Ocultar de la Web
+                    </>
+                  ) : (
+                    <>
+                      <Eye size={16} className="text-green-600" />
+                      Mostrar en Web
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    handleDelete(producto.id);
+                    setShowMenu(false);
+                  }}
+                  className="w-full text-left px-4 py-3 hover:bg-red-50 flex items-center gap-2 text-sm font-medium text-red-700"
+                >
+                  <Trash2 size={16} />
+                  Eliminar
+                </button>
               </div>
-            </div>
-
-            {/* Stats en grid */}
-            <div className="grid grid-cols-3 gap-2 mb-3">
-              <div className="bg-white bg-opacity-70 rounded-lg p-2 text-center">
-                <div className="text-lg font-bold text-gray-900">${formatPrice(producto.precio)}</div>
-                <div className="text-xs text-gray-600">Precio</div>
-              </div>
-              <div
-                className={`rounded-lg p-2 text-center ${
-                  stock === 0
-                    ? 'bg-red-100'
-                    : stock < 5
-                      ? 'bg-orange-100'
-                      : 'bg-green-100'
-                }`}
-              >
-                <div className="text-lg font-bold text-gray-900">{stock}</div>
-                <div className="text-xs text-gray-600">Stock</div>
-              </div>
-              <div className="bg-white bg-opacity-70 rounded-lg p-2 text-center">
-                <div className="text-lg font-bold text-gray-900">{stockStatus}</div>
-                <div className="text-xs text-gray-600">Estado</div>
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => handleToggleActivo(producto)}
-                className={`flex-1 py-2 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-1 ${
-                  producto.activo !== false
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-gray-400 hover:bg-gray-500 text-white'
-                }`}
-                title={
-                  producto.activo !== false
-                    ? 'Visible en la web. Clic para ocultar.'
-                    : 'Oculto. Clic para mostrar en la web.'
-                }
-              >
-                {producto.activo !== false ? (
-                  <>
-                    <Eye size={14} />
-                    <span className="hidden sm:inline">Ver</span>
-                  </>
-                ) : (
-                  <>
-                    <EyeOff size={14} />
-                    <span className="hidden sm:inline">Oculto</span>
-                  </>
-                )}
-              </button>
-              <button
-                onClick={() => {
-                  setEditingProducto(producto);
-                  setIsModalOpen(true);
-                }}
-                className="py-2 px-3 rounded-lg font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-                title="Editar producto"
-              >
-                <Edit2 size={16} />
-              </button>
-              <button
-                onClick={() => handleDelete(producto.id)}
-                className="py-2 px-3 rounded-lg font-semibold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors"
-                title="Eliminar producto"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
+            )}
           </div>
         </div>
+
+        {/* Imagen grande */}
+        <div className="mb-4">
+          {producto.foto_url ? (
+            <img
+              src={producto.foto_url}
+              alt={producto.nombre}
+              className="w-full h-32 sm:h-40 object-cover rounded-xl"
+            />
+          ) : (
+            <div className="w-full h-32 sm:h-40 bg-gray-300 rounded-xl flex items-center justify-center">
+              <span className="text-sm text-gray-600">Sin foto</span>
+            </div>
+          )}
+        </div>
+
+        {/* Nombre - completamente visible */}
+        <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-snug mb-2 break-words">
+          {producto.nombre}
+        </h3>
+
+        {/* Laboratorio */}
+        <p className="text-xs text-gray-600 mb-3 truncate">
+          🏭 {producto.laboratorio || 'Sin laboratorio'}
+        </p>
+
+        {/* Status badge */}
+        <div className="mb-4">
+          <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-bold ${getStatusBadgeColor()}`}>
+            {stockStatus === 'Agotado' && '❌ '}
+            {stockStatus === 'Bajo Stock' && '⚠️ '}
+            {stockStatus === 'En Stock' && '✅ '}
+            {stockStatus}
+          </span>
+        </div>
+
+        {/* Stats Grid - clara y visible */}
+        <div className="grid grid-cols-3 gap-2 mb-4 bg-white bg-opacity-60 rounded-xl p-3">
+          <div className="text-center">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+              ${formatPrice(producto.precio)}
+            </div>
+            <div className="text-xs text-gray-600 mt-1">Precio</div>
+          </div>
+          <div className="text-center border-l-2 border-r-2 border-gray-300">
+            <div className={`text-xl sm:text-2xl font-bold ${
+              stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
+            }`}>
+              {stock}
+            </div>
+            <div className="text-xs text-gray-600 mt-1">Stock</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">{producto.categoria?.substring(0, 3) || '—'}</div>
+            <div className="text-xs text-gray-600 mt-1">Cat.</div>
+          </div>
+        </div>
+
+        {/* Visibilidad rápida */}
+        <button
+          onClick={() => handleToggleActivo(producto)}
+          className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${
+            producto.activo !== false
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              : 'bg-gray-500 hover:bg-gray-600 text-white'
+          }`}
+          title={
+            producto.activo !== false
+              ? 'Visible en la web. Clic para ocultar.'
+              : 'Oculto. Clic para mostrar en la web.'
+          }
+        >
+          {producto.activo !== false ? (
+            <>✅ Visible en Web</>
+          ) : (
+            <>🔒 Oculto</>
+          )}
+        </button>
       </div>
     );
   };
@@ -326,66 +378,72 @@ function AdminDashboardContent() {
     const stats = getCategoryStats(prods);
 
     return (
-      <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
+      <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-gray-300 bg-white">
         <button
           onClick={() => toggleCategoryExpanded(title, isPublished)}
-          className="w-full flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-indigo-50 via-blue-50 to-cyan-50 hover:from-indigo-100 hover:via-blue-100 hover:to-cyan-100 transition-all border-b-2 border-indigo-200"
+          className="w-full flex items-center justify-between px-4 sm:px-6 py-5 sm:py-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:via-purple-700 hover:to-indigo-700 transition-all"
         >
-          <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="flex items-center gap-4 flex-1 min-w-0">
             <ChevronDown
-              size={20}
-              className={`text-indigo-600 transition-transform flex-shrink-0 font-bold ${isExpanded ? 'rotate-180' : ''}`}
+              size={24}
+              className={`text-white transition-transform flex-shrink-0 font-bold ${isExpanded ? 'rotate-180' : ''}`}
             />
             <div className="min-w-0">
-              <h3 className="font-bold text-indigo-900 text-base sm:text-lg">{title}</h3>
+              <h3 className="font-bold text-white text-lg sm:text-xl">{title}</h3>
             </div>
-            <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-200 text-indigo-800 flex-shrink-0">
+            <span className="px-4 py-2 rounded-full text-sm font-bold bg-white text-purple-700 flex-shrink-0 shadow-md">
               {prods.length}
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0 ml-2">
-            <div className="text-center px-2 py-1.5 bg-white rounded-lg border border-gray-200">
-              <div className="font-bold text-gray-900">{stats.totalStock}</div>
-              <div className="text-gray-500 text-xs">u.</div>
+          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0 ml-3">
+            <div className="text-center px-3 py-2 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
+              <div className="font-bold text-white text-lg">{stats.totalStock}</div>
+              <div className="text-gray-100 text-xs">unidades</div>
             </div>
             {stats.zeroStock > 0 && (
-              <div className="text-center px-2 py-1.5 bg-red-100 rounded-lg border border-red-300">
-                <div className="font-bold text-red-900">{stats.zeroStock}</div>
-                <div className="text-red-700 text-xs">❌</div>
+              <div className="text-center px-3 py-2 bg-red-500 rounded-lg shadow-md">
+                <div className="font-bold text-white text-lg">{stats.zeroStock}</div>
+                <div className="text-red-100 text-xs">agotados</div>
               </div>
             )}
             {stats.lowStock > 0 && (
-              <div className="text-center px-2 py-1.5 bg-orange-100 rounded-lg border border-orange-300">
-                <div className="font-bold text-orange-900">{stats.lowStock}</div>
-                <div className="text-orange-700 text-xs">⚠️</div>
+              <div className="text-center px-3 py-2 bg-orange-500 rounded-lg shadow-md">
+                <div className="font-bold text-white text-lg">{stats.lowStock}</div>
+                <div className="text-orange-100 text-xs">bajos</div>
               </div>
             )}
           </div>
         </button>
 
         {isExpanded && (
-          <div className="p-4 sm:p-6 bg-gray-50">
-            <div className="flex gap-2 mb-4">
-              <input
-                type="checkbox"
-                className="w-5 h-5 accent-brand-600 cursor-pointer rounded"
-                checked={prods.length > 0 && prods.every((p) => seleccionados.has(p.id))}
-                onChange={(e) =>
-                  setSeleccionados(
-                    e.target.checked
-                      ? new Set([...seleccionados, ...prods.map((p) => p.id)])
-                      : new Set([...seleccionados].filter((id) => !prods.find((p) => p.id === id)))
-                  )
-                }
-                title="Seleccionar todos los productos de esta categoría"
-                aria-label={`Seleccionar todos en ${title}`}
-              />
-              <label className="text-sm font-semibold text-gray-700 cursor-pointer">
-                Seleccionar todos en esta categoría
-              </label>
+          <div className="p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 p-4 bg-white rounded-xl border-2 border-gray-200">
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  className="w-6 h-6 accent-purple-600 cursor-pointer rounded"
+                  checked={prods.length > 0 && prods.every((p) => seleccionados.has(p.id))}
+                  onChange={(e) =>
+                    setSeleccionados(
+                      e.target.checked
+                        ? new Set([...seleccionados, ...prods.map((p) => p.id)])
+                        : new Set([...seleccionados].filter((id) => !prods.find((p) => p.id === id)))
+                    )
+                  }
+                  title="Seleccionar todos los productos de esta categoría"
+                  aria-label={`Seleccionar todos en ${title}`}
+                />
+                <label className="text-sm sm:text-base font-bold text-gray-800 cursor-pointer">
+                  Seleccionar todos en {title}
+                </label>
+              </div>
+              <div className="flex-1" />
+              <span className="px-4 py-2 rounded-lg text-sm font-bold bg-purple-100 text-purple-800">
+                {prods.filter((p) => seleccionados.has(p.id)).length} seleccionados
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
               {prods.map((producto) => (
                 <ProductCard key={producto.id} producto={producto} />
               ))}
