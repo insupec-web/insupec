@@ -187,7 +187,7 @@ function AdminDashboardContent() {
 
   const ProductCard = ({ producto }: { producto: Producto }) => {
     const stock = producto.stock ?? 0;
-    const stockStatus = stock === 0 ? 'Agotado' : stock < 5 ? 'Bajo Stock' : 'En Stock';
+    const stockStatus = stock === 0 ? 'Agotado' : stock < 5 ? 'Bajo' : 'OK';
     const [showMenu, setShowMenu] = useState(false);
 
     const getBgColor = () => {
@@ -197,22 +197,22 @@ function AdminDashboardContent() {
     };
 
     const getStatusBadgeColor = () => {
-      if (stock === 0) return 'bg-red-100 text-red-800 border border-red-300';
-      if (stock < 5) return 'bg-orange-100 text-orange-800 border border-orange-300';
-      return 'bg-emerald-100 text-emerald-800 border border-emerald-300';
+      if (stock === 0) return 'bg-red-100 text-red-800';
+      if (stock < 5) return 'bg-orange-100 text-orange-800';
+      return 'bg-emerald-100 text-emerald-800';
     };
 
     return (
       <div
-        className={`border-2 rounded-2xl p-4 sm:p-5 transition-all hover:shadow-xl hover:scale-102 ${getBgColor()} ${
-          producto.activo === false ? 'opacity-75 ring-2 ring-gray-400' : ''
+        className={`border-2 rounded-xl p-3 transition-all hover:shadow-lg hover:scale-105 ${getBgColor()} ${
+          producto.activo === false ? 'opacity-70 ring-2 ring-gray-400' : ''
         }`}
       >
         {/* Header con checkbox y menú */}
-        <div className="flex gap-3 mb-4 items-start justify-between">
+        <div className="flex gap-2 mb-3 items-start justify-between">
           <input
             type="checkbox"
-            className="w-5 h-5 accent-brand-600 cursor-pointer rounded mt-0.5 flex-shrink-0"
+            className="w-4 h-4 accent-brand-600 cursor-pointer rounded mt-0.5 flex-shrink-0"
             checked={seleccionados.has(producto.id)}
             onChange={() => toggleSeleccion(producto.id)}
             aria-label={`Seleccionar ${producto.nombre}`}
@@ -220,40 +220,40 @@ function AdminDashboardContent() {
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-2 hover:bg-white rounded-lg transition-colors"
+              className="p-1.5 hover:bg-white rounded-lg transition-colors"
               title="Más opciones"
             >
-              <MoreVertical size={20} className="text-gray-600" />
+              <MoreVertical size={18} className="text-gray-600" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-xl shadow-lg border border-gray-200 z-50 w-48">
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 w-44">
                 <button
                   onClick={() => {
                     setEditingProducto(producto);
                     setIsModalOpen(true);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-4 py-3 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100 text-sm font-medium text-gray-700"
+                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100 text-xs font-medium text-gray-700"
                 >
-                  <Edit2 size={16} className="text-blue-600" />
-                  Editar Producto
+                  <Edit2 size={14} className="text-blue-600" />
+                  Editar
                 </button>
                 <button
                   onClick={() => {
                     handleToggleActivo(producto);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-4 py-3 hover:bg-green-50 flex items-center gap-2 border-b border-gray-100 text-sm font-medium text-gray-700"
+                  className="w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 border-b border-gray-100 text-xs font-medium text-gray-700"
                 >
                   {producto.activo !== false ? (
                     <>
-                      <EyeOff size={16} className="text-gray-600" />
-                      Ocultar de la Web
+                      <EyeOff size={14} className="text-gray-600" />
+                      Ocultar
                     </>
                   ) : (
                     <>
-                      <Eye size={16} className="text-green-600" />
-                      Mostrar en Web
+                      <Eye size={14} className="text-green-600" />
+                      Mostrar
                     </>
                   )}
                 </button>
@@ -262,9 +262,9 @@ function AdminDashboardContent() {
                     handleDelete(producto.id);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-4 py-3 hover:bg-red-50 flex items-center gap-2 text-sm font-medium text-red-700"
+                  className="w-full text-left px-3 py-2 hover:bg-red-50 flex items-center gap-2 text-xs font-medium text-red-700"
                 >
-                  <Trash2 size={16} />
+                  <Trash2 size={14} />
                   Eliminar
                 </button>
               </div>
@@ -272,67 +272,67 @@ function AdminDashboardContent() {
           </div>
         </div>
 
-        {/* Imagen grande */}
-        <div className="mb-4">
+        {/* Imagen compacta */}
+        <div className="mb-3">
           {producto.foto_url ? (
             <img
               src={producto.foto_url}
               alt={producto.nombre}
-              className="w-full h-32 sm:h-40 object-cover rounded-xl"
+              className="w-full h-24 object-cover rounded-lg"
             />
           ) : (
-            <div className="w-full h-32 sm:h-40 bg-gray-300 rounded-xl flex items-center justify-center">
-              <span className="text-sm text-gray-600">Sin foto</span>
+            <div className="w-full h-24 bg-gray-300 rounded-lg flex items-center justify-center">
+              <span className="text-xs text-gray-600">Sin foto</span>
             </div>
           )}
         </div>
 
-        {/* Nombre - completamente visible */}
-        <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-snug mb-2 break-words">
+        {/* Nombre compacto */}
+        <h3 className="font-bold text-gray-900 text-xs leading-tight mb-1 line-clamp-2">
           {producto.nombre}
         </h3>
 
         {/* Laboratorio */}
-        <p className="text-xs text-gray-600 mb-3 truncate">
-          🏭 {producto.laboratorio || 'Sin laboratorio'}
+        <p className="text-xs text-gray-600 mb-2 truncate">
+          {producto.laboratorio || '—'}
         </p>
 
         {/* Status badge */}
-        <div className="mb-4">
-          <span className={`inline-block px-3 py-1.5 rounded-lg text-xs font-bold ${getStatusBadgeColor()}`}>
-            {stockStatus === 'Agotado' && '❌ '}
-            {stockStatus === 'Bajo Stock' && '⚠️ '}
-            {stockStatus === 'En Stock' && '✅ '}
-            {stockStatus}
+        <div className="mb-2">
+          <span className={`inline-block px-2 py-1 rounded-lg text-xs font-bold ${getStatusBadgeColor()}`}>
+            {stockStatus === 'Agotado' && '❌'}
+            {stockStatus === 'Bajo' && '⚠️'}
+            {stockStatus === 'OK' && '✅'}
+            {' ' + stockStatus}
           </span>
         </div>
 
-        {/* Stats Grid - clara y visible */}
-        <div className="grid grid-cols-3 gap-2 mb-4 bg-white bg-opacity-60 rounded-xl p-3">
+        {/* Stats Grid compacto */}
+        <div className="grid grid-cols-3 gap-1.5 mb-3 bg-white bg-opacity-70 rounded-lg p-2">
           <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
+            <div className="text-sm font-bold text-gray-900">
               ${formatPrice(producto.precio)}
             </div>
-            <div className="text-xs text-gray-600 mt-1">Precio</div>
+            <div className="text-xs text-gray-600">Precio</div>
           </div>
-          <div className="text-center border-l-2 border-r-2 border-gray-300">
-            <div className={`text-xl sm:text-2xl font-bold ${
+          <div className="text-center border-l border-r border-gray-300">
+            <div className={`text-sm font-bold ${
               stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
             }`}>
               {stock}
             </div>
-            <div className="text-xs text-gray-600 mt-1">Stock</div>
+            <div className="text-xs text-gray-600">Stock</div>
           </div>
           <div className="text-center">
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">{producto.categoria?.substring(0, 3) || '—'}</div>
-            <div className="text-xs text-gray-600 mt-1">Cat.</div>
+            <div className="text-sm font-bold text-gray-900">{producto.categoria?.substring(0, 3) || '—'}</div>
+            <div className="text-xs text-gray-600">Cat</div>
           </div>
         </div>
 
-        {/* Visibilidad rápida */}
+        {/* Botón visibilidad */}
         <button
           onClick={() => handleToggleActivo(producto)}
-          className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${
+          className={`w-full py-2 rounded-lg font-bold text-xs transition-all ${
             producto.activo !== false
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
               : 'bg-gray-500 hover:bg-gray-600 text-white'
@@ -343,11 +343,7 @@ function AdminDashboardContent() {
               : 'Oculto. Clic para mostrar en la web.'
           }
         >
-          {producto.activo !== false ? (
-            <>✅ Visible en Web</>
-          ) : (
-            <>🔒 Oculto</>
-          )}
+          {producto.activo !== false ? '✅ Web' : '🔒 Oculto'}
         </button>
       </div>
     );
