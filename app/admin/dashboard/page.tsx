@@ -185,96 +185,121 @@ function AdminDashboardContent() {
     }
   };
 
-  const ProductRow = ({ producto }: { producto: Producto }) => (
-    <tr
-      className={`border-t border-gray-200 hover:bg-gray-50 transition-colors ${
-        producto.activo === false ? 'bg-gray-50' : ''
-      }`}
-    >
-      <td className="px-3 sm:px-6 py-3 sm:py-4">
-        <input
-          type="checkbox"
-          className="w-4 h-4 accent-brand-600 cursor-pointer"
-          checked={seleccionados.has(producto.id)}
-          onChange={() => toggleSeleccion(producto.id)}
-          aria-label={`Seleccionar ${producto.nombre}`}
-        />
-      </td>
-      <td className="px-3 sm:px-6 py-3 sm:py-4">
-        {producto.foto_url ? (
-          <img
-            src={producto.foto_url}
-            alt={producto.nombre}
-            className="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded"
+  const ProductCard = ({ producto }: { producto: Producto }) => {
+    const stock = producto.stock ?? 0;
+    const stockStatus = stock === 0 ? 'Agotado' : stock < 5 ? 'Bajo' : 'OK';
+    const stockColor = stock === 0 ? 'bg-red-50 border-red-200' : stock < 5 ? 'bg-orange-50 border-orange-200' : 'bg-green-50 border-green-200';
+
+    return (
+      <div
+        className={`border-2 rounded-xl p-4 transition-all hover:shadow-lg hover:scale-105 ${stockColor} ${
+          producto.activo === false ? 'opacity-60' : ''
+        }`}
+      >
+        <div className="flex gap-3 mb-3">
+          <input
+            type="checkbox"
+            className="w-5 h-5 accent-brand-600 cursor-pointer rounded mt-1"
+            checked={seleccionados.has(producto.id)}
+            onChange={() => toggleSeleccion(producto.id)}
+            aria-label={`Seleccionar ${producto.nombre}`}
           />
-        ) : (
-          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gray-200 rounded flex items-center justify-center">
-            <span className="text-xs text-gray-500">Sin foto</span>
+          <div className="flex-1 min-w-0">
+            {/* Foto y info principal */}
+            <div className="flex gap-3 mb-3">
+              {producto.foto_url ? (
+                <img
+                  src={producto.foto_url}
+                  alt={producto.nombre}
+                  className="w-16 h-16 object-cover rounded-lg flex-shrink-0"
+                />
+              ) : (
+                <div className="w-16 h-16 bg-gray-300 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs text-gray-600 text-center">Sin foto</span>
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <h3 className="font-bold text-gray-900 text-sm sm:text-base leading-tight line-clamp-2">
+                  {producto.nombre}
+                </h3>
+                <p className="text-xs text-gray-600 mt-1">{producto.laboratorio || 'Sin laboratorio'}</p>
+              </div>
+            </div>
+
+            {/* Stats en grid */}
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="bg-white bg-opacity-70 rounded-lg p-2 text-center">
+                <div className="text-lg font-bold text-gray-900">${formatPrice(producto.precio)}</div>
+                <div className="text-xs text-gray-600">Precio</div>
+              </div>
+              <div
+                className={`rounded-lg p-2 text-center ${
+                  stock === 0
+                    ? 'bg-red-100'
+                    : stock < 5
+                      ? 'bg-orange-100'
+                      : 'bg-green-100'
+                }`}
+              >
+                <div className="text-lg font-bold text-gray-900">{stock}</div>
+                <div className="text-xs text-gray-600">Stock</div>
+              </div>
+              <div className="bg-white bg-opacity-70 rounded-lg p-2 text-center">
+                <div className="text-lg font-bold text-gray-900">{stockStatus}</div>
+                <div className="text-xs text-gray-600">Estado</div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleToggleActivo(producto)}
+                className={`flex-1 py-2 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-1 ${
+                  producto.activo !== false
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-gray-400 hover:bg-gray-500 text-white'
+                }`}
+                title={
+                  producto.activo !== false
+                    ? 'Visible en la web. Clic para ocultar.'
+                    : 'Oculto. Clic para mostrar en la web.'
+                }
+              >
+                {producto.activo !== false ? (
+                  <>
+                    <Eye size={14} />
+                    <span className="hidden sm:inline">Ver</span>
+                  </>
+                ) : (
+                  <>
+                    <EyeOff size={14} />
+                    <span className="hidden sm:inline">Oculto</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  setEditingProducto(producto);
+                  setIsModalOpen(true);
+                }}
+                className="py-2 px-3 rounded-lg font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                title="Editar producto"
+              >
+                <Edit2 size={16} />
+              </button>
+              <button
+                onClick={() => handleDelete(producto.id)}
+                className="py-2 px-3 rounded-lg font-semibold text-sm bg-red-600 hover:bg-red-700 text-white transition-colors"
+                title="Eliminar producto"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
           </div>
-        )}
-      </td>
-      <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm">{producto.nombre}</td>
-      <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
-      <td className="px-3 sm:px-6 py-3 sm:py-4">
-        {(() => {
-          const stock = producto.stock ?? 0;
-          return (
-            <span
-              className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-semibold inline-block ${
-                stock === 0
-                  ? 'bg-red-100 text-red-800'
-                  : stock < 5
-                    ? 'bg-orange-100 text-orange-800'
-                    : 'bg-green-100 text-green-800'
-              }`}
-            >
-              {stock}
-            </span>
-          );
-        })()}
-      </td>
-      <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 hidden sm:table-cell text-sm">{producto.laboratorio}</td>
-      <td className="px-3 sm:px-6 py-3 sm:py-4">
-        <div className="flex gap-2 sm:gap-3">
-          <button
-            onClick={() => handleToggleActivo(producto)}
-            className={
-              producto.activo !== false
-                ? 'text-green-600 hover:text-green-800 transition-colors'
-                : 'text-gray-400 hover:text-gray-600 transition-colors'
-            }
-            title={
-              producto.activo !== false
-                ? 'Visible en la web. Clic para ocultar.'
-                : 'Oculto. Clic para mostrar en la web.'
-            }
-            aria-label={producto.activo !== false ? 'Ocultar producto' : 'Mostrar producto'}
-          >
-            {producto.activo !== false ? (
-              <Eye size={18} className="sm:w-5 sm:h-5" />
-            ) : (
-              <EyeOff size={18} className="sm:w-5 sm:h-5" />
-            )}
-          </button>
-          <button
-            onClick={() => {
-              setEditingProducto(producto);
-              setIsModalOpen(true);
-            }}
-            className="text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            <Edit2 size={18} className="sm:w-5 sm:h-5" />
-          </button>
-          <button
-            onClick={() => handleDelete(producto.id)}
-            className="text-red-600 hover:text-red-800 transition-colors"
-          >
-            <Trash2 size={18} className="sm:w-5 sm:h-5" />
-          </button>
         </div>
-      </td>
-    </tr>
-  );
+      </div>
+    );
+  };
 
   const getCategoryStats = (prods: Producto[]) => {
     const totalStock = prods.reduce((sum, p) => sum + (p.stock ?? 0), 0);
@@ -301,76 +326,70 @@ function AdminDashboardContent() {
     const stats = getCategoryStats(prods);
 
     return (
-      <div className="border border-gray-200 rounded-lg overflow-hidden">
+      <div className="rounded-2xl overflow-hidden shadow-sm border border-gray-200 bg-white">
         <button
           onClick={() => toggleCategoryExpanded(title, isPublished)}
-          className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 transition-colors border-b border-blue-200"
+          className="w-full flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 bg-gradient-to-r from-indigo-50 via-blue-50 to-cyan-50 hover:from-indigo-100 hover:via-blue-100 hover:to-cyan-100 transition-all border-b-2 border-indigo-200"
         >
-          <div className="flex items-center gap-3 flex-1">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <ChevronDown
-              size={18}
-              className={`text-blue-600 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
+              size={20}
+              className={`text-indigo-600 transition-transform flex-shrink-0 font-bold ${isExpanded ? 'rotate-180' : ''}`}
             />
-            <h3 className="font-bold text-blue-900 text-sm sm:text-base">{title}</h3>
-            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-200 text-blue-800">
+            <div className="min-w-0">
+              <h3 className="font-bold text-indigo-900 text-base sm:text-lg">{title}</h3>
+            </div>
+            <span className="px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-200 text-indigo-800 flex-shrink-0">
               {prods.length}
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0">
-            <div className="text-center">
-              <div className="font-bold text-gray-800">{stats.totalStock}</div>
-              <div className="text-gray-600">unidades</div>
+          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0 ml-2">
+            <div className="text-center px-2 py-1.5 bg-white rounded-lg border border-gray-200">
+              <div className="font-bold text-gray-900">{stats.totalStock}</div>
+              <div className="text-gray-500 text-xs">u.</div>
             </div>
             {stats.zeroStock > 0 && (
-              <div className="text-center px-2 py-1 bg-red-100 rounded">
-                <div className="font-bold text-red-800">{stats.zeroStock}</div>
-                <div className="text-red-600">sin stock</div>
+              <div className="text-center px-2 py-1.5 bg-red-100 rounded-lg border border-red-300">
+                <div className="font-bold text-red-900">{stats.zeroStock}</div>
+                <div className="text-red-700 text-xs">❌</div>
               </div>
             )}
             {stats.lowStock > 0 && (
-              <div className="text-center px-2 py-1 bg-orange-100 rounded">
-                <div className="font-bold text-orange-800">{stats.lowStock}</div>
-                <div className="text-orange-600">bajo</div>
+              <div className="text-center px-2 py-1.5 bg-orange-100 rounded-lg border border-orange-300">
+                <div className="font-bold text-orange-900">{stats.lowStock}</div>
+                <div className="text-orange-700 text-xs">⚠️</div>
               </div>
             )}
           </div>
         </button>
 
         {isExpanded && (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-max text-sm">
-              <thead>
-                <tr className="bg-gray-100 border-t border-gray-200">
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left">
-                    <input
-                      type="checkbox"
-                      className="w-4 h-4 accent-brand-600 cursor-pointer"
-                      checked={prods.length > 0 && prods.every((p) => seleccionados.has(p.id))}
-                      onChange={(e) =>
-                        setSeleccionados(
-                          e.target.checked
-                            ? new Set([...seleccionados, ...prods.map((p) => p.id)])
-                            : new Set([...seleccionados].filter((id) => !prods.find((p) => p.id === id)))
-                        )
-                      }
-                      title="Seleccionar todos los productos de esta categoría"
-                      aria-label={`Seleccionar todos en ${title}`}
-                    />
-                  </th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Foto</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Nombre</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Precio</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Stock</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700 hidden sm:table-cell">Lab</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left font-semibold text-gray-700">Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {prods.map((producto) => (
-                  <ProductRow key={producto.id} producto={producto} />
-                ))}
-              </tbody>
-            </table>
+          <div className="p-4 sm:p-6 bg-gray-50">
+            <div className="flex gap-2 mb-4">
+              <input
+                type="checkbox"
+                className="w-5 h-5 accent-brand-600 cursor-pointer rounded"
+                checked={prods.length > 0 && prods.every((p) => seleccionados.has(p.id))}
+                onChange={(e) =>
+                  setSeleccionados(
+                    e.target.checked
+                      ? new Set([...seleccionados, ...prods.map((p) => p.id)])
+                      : new Set([...seleccionados].filter((id) => !prods.find((p) => p.id === id)))
+                  )
+                }
+                title="Seleccionar todos los productos de esta categoría"
+                aria-label={`Seleccionar todos en ${title}`}
+              />
+              <label className="text-sm font-semibold text-gray-700 cursor-pointer">
+                Seleccionar todos en esta categoría
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {prods.map((producto) => (
+                <ProductCard key={producto.id} producto={producto} />
+              ))}
+            </div>
           </div>
         )}
       </div>
