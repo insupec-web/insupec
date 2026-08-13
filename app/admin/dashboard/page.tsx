@@ -381,35 +381,35 @@ function AdminDashboardContent() {
       <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-gray-300 bg-white">
         <button
           onClick={() => toggleCategoryExpanded(title, isPublished)}
-          className="w-full flex items-center justify-between px-4 sm:px-6 py-5 sm:py-6 bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:via-purple-700 hover:to-indigo-700 transition-all"
+          className="w-full flex items-center justify-between px-4 sm:px-6 py-5 sm:py-6 bg-gradient-to-r from-emerald-100 via-teal-100 to-cyan-100 hover:from-emerald-200 hover:via-teal-200 hover:to-cyan-200 transition-all border-b-4 border-emerald-600"
         >
           <div className="flex items-center gap-4 flex-1 min-w-0">
             <ChevronDown
               size={24}
-              className={`text-white transition-transform flex-shrink-0 font-bold ${isExpanded ? 'rotate-180' : ''}`}
+              className={`text-emerald-700 transition-transform flex-shrink-0 font-bold ${isExpanded ? 'rotate-180' : ''}`}
             />
             <div className="min-w-0">
-              <h3 className="font-bold text-white text-lg sm:text-xl">{title}</h3>
+              <h3 className="font-bold text-gray-900 text-lg sm:text-xl">{title}</h3>
             </div>
-            <span className="px-4 py-2 rounded-full text-sm font-bold bg-white text-purple-700 flex-shrink-0 shadow-md">
+            <span className="px-4 py-2 rounded-full text-sm font-bold bg-emerald-600 text-white flex-shrink-0 shadow-md">
               {prods.length}
             </span>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0 ml-3">
-            <div className="text-center px-3 py-2 bg-white bg-opacity-20 rounded-lg backdrop-blur-sm">
-              <div className="font-bold text-white text-lg">{stats.totalStock}</div>
-              <div className="text-gray-100 text-xs">unidades</div>
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-3">
+            <div className="text-center px-4 py-3 bg-white rounded-lg shadow-md border-2 border-gray-300">
+              <div className="font-bold text-gray-900 text-2xl sm:text-3xl">{stats.totalStock}</div>
+              <div className="text-gray-600 text-xs font-semibold mt-1">unidades</div>
             </div>
             {stats.zeroStock > 0 && (
-              <div className="text-center px-3 py-2 bg-red-500 rounded-lg shadow-md">
-                <div className="font-bold text-white text-lg">{stats.zeroStock}</div>
-                <div className="text-red-100 text-xs">agotados</div>
+              <div className="text-center px-4 py-3 bg-red-500 rounded-lg shadow-md">
+                <div className="font-bold text-white text-2xl sm:text-3xl">{stats.zeroStock}</div>
+                <div className="text-red-100 text-xs font-semibold mt-1">agotados</div>
               </div>
             )}
             {stats.lowStock > 0 && (
-              <div className="text-center px-3 py-2 bg-orange-500 rounded-lg shadow-md">
-                <div className="font-bold text-white text-lg">{stats.lowStock}</div>
-                <div className="text-orange-100 text-xs">bajos</div>
+              <div className="text-center px-4 py-3 bg-orange-500 rounded-lg shadow-md">
+                <div className="font-bold text-white text-2xl sm:text-3xl">{stats.lowStock}</div>
+                <div className="text-orange-100 text-xs font-semibold mt-1">bajos</div>
               </div>
             )}
           </div>
