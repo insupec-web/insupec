@@ -276,6 +276,16 @@ function AdminDashboardContent() {
     </tr>
   );
 
+  const getCategoryStats = (prods: Producto[]) => {
+    const totalStock = prods.reduce((sum, p) => sum + (p.stock ?? 0), 0);
+    const zeroStock = prods.filter((p) => (p.stock ?? 0) === 0).length;
+    const lowStock = prods.filter((p) => {
+      const stock = p.stock ?? 0;
+      return stock > 0 && stock < 5;
+    }).length;
+    return { totalStock, zeroStock, lowStock };
+  };
+
   const CategorySection = ({
     title,
     productos: prods,
@@ -288,22 +298,41 @@ function AdminDashboardContent() {
     const isExpanded = isPublished
       ? expandedPublishedCategories.has(title)
       : expandedHiddenCategories.has(title);
+    const stats = getCategoryStats(prods);
 
     return (
       <div className="border border-gray-200 rounded-lg overflow-hidden">
         <button
           onClick={() => toggleCategoryExpanded(title, isPublished)}
-          className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-150 transition-colors border-b border-gray-200"
+          className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-150 transition-colors border-b border-blue-200"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1">
             <ChevronDown
               size={18}
-              className={`text-gray-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+              className={`text-blue-600 transition-transform flex-shrink-0 ${isExpanded ? 'rotate-180' : ''}`}
             />
-            <h3 className="font-semibold text-gray-800 text-sm sm:text-base">{title}</h3>
-            <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-300 text-gray-700">
+            <h3 className="font-bold text-blue-900 text-sm sm:text-base">{title}</h3>
+            <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-200 text-blue-800">
               {prods.length}
             </span>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm flex-shrink-0">
+            <div className="text-center">
+              <div className="font-bold text-gray-800">{stats.totalStock}</div>
+              <div className="text-gray-600">unidades</div>
+            </div>
+            {stats.zeroStock > 0 && (
+              <div className="text-center px-2 py-1 bg-red-100 rounded">
+                <div className="font-bold text-red-800">{stats.zeroStock}</div>
+                <div className="text-red-600">sin stock</div>
+              </div>
+            )}
+            {stats.lowStock > 0 && (
+              <div className="text-center px-2 py-1 bg-orange-100 rounded">
+                <div className="font-bold text-orange-800">{stats.lowStock}</div>
+                <div className="text-orange-600">bajo</div>
+              </div>
+            )}
           </div>
         </button>
 
@@ -534,13 +563,35 @@ function AdminDashboardContent() {
             <div className="space-y-8">
               {/* Productos Publicados */}
               <div>
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900">Publicados en la web</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                      ✅ Publicados en la web
+                    </h2>
                     <p className="text-sm text-gray-600 mt-1">{productosPublicados.length} productos visibles</p>
                   </div>
-                  <div className="px-4 py-2 rounded-lg bg-green-100 text-green-800 font-bold text-lg">
-                    {productosPublicados.length}
+                  <div className="flex items-center gap-3">
+                    {productosPublicados.length > 0 && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setExpandedPublishedCategories(
+                            new Set(Object.keys(publishedByCategory))
+                          )}
+                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors"
+                        >
+                          Expandir todas
+                        </button>
+                        <button
+                          onClick={() => setExpandedPublishedCategories(new Set())}
+                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors"
+                        >
+                          Contraer todas
+                        </button>
+                      </div>
+                    )}
+                    <div className="px-4 py-2 rounded-lg bg-green-100 text-green-800 font-bold text-lg whitespace-nowrap">
+                      {productosPublicados.length}
+                    </div>
                   </div>
                 </div>
 
@@ -566,13 +617,35 @@ function AdminDashboardContent() {
 
               {/* Productos Ocultos */}
               <div className="mt-10 pt-10 border-t-2 border-gray-300">
-                <div className="flex items-center gap-3 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                   <div className="flex-1">
-                    <h2 className="text-2xl font-bold text-gray-900">Ocultos de la web</h2>
+                    <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                      🔒 Ocultos de la web
+                    </h2>
                     <p className="text-sm text-gray-600 mt-1">{productosOcultos.length} productos ocultos</p>
                   </div>
-                  <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 font-bold text-lg">
-                    {productosOcultos.length}
+                  <div className="flex items-center gap-3">
+                    {productosOcultos.length > 0 && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setExpandedHiddenCategories(
+                            new Set(Object.keys(hiddenByCategory))
+                          )}
+                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
+                        >
+                          Expandir todas
+                        </button>
+                        <button
+                          onClick={() => setExpandedHiddenCategories(new Set())}
+                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors"
+                        >
+                          Contraer todas
+                        </button>
+                      </div>
+                    )}
+                    <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 font-bold text-lg whitespace-nowrap">
+                      {productosOcultos.length}
+                    </div>
                   </div>
                 </div>
 
