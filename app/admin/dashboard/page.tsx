@@ -204,15 +204,15 @@ function AdminDashboardContent() {
 
     return (
       <div
-        className={`border-2 rounded-xl p-3 transition-all hover:shadow-lg hover:scale-105 ${getBgColor()} ${
-          producto.activo === false ? 'opacity-70 ring-2 ring-gray-400' : ''
+        className={`border rounded-lg p-2 transition-all hover:shadow-md hover:scale-105 ${getBgColor()} ${
+          producto.activo === false ? 'opacity-70 ring-1 ring-gray-400' : ''
         }`}
       >
         {/* Header con checkbox y menú */}
-        <div className="flex gap-2 mb-3 items-start justify-between">
+        <div className="flex gap-1 mb-2 items-start justify-between">
           <input
             type="checkbox"
-            className="w-4 h-4 accent-brand-600 cursor-pointer rounded mt-0.5 flex-shrink-0"
+            className="w-3 h-3 accent-brand-600 cursor-pointer rounded mt-0.5 flex-shrink-0"
             checked={seleccionados.has(producto.id)}
             onChange={() => toggleSeleccion(producto.id)}
             aria-label={`Seleccionar ${producto.nombre}`}
@@ -220,22 +220,22 @@ function AdminDashboardContent() {
           <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="p-1.5 hover:bg-white rounded-lg transition-colors"
+              className="p-0.5 hover:bg-white rounded transition-colors"
               title="Más opciones"
             >
-              <MoreVertical size={18} className="text-gray-600" />
+              <MoreVertical size={14} className="text-gray-600" />
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 z-50 w-44">
+              <div className="absolute right-0 top-full mt-0.5 bg-white rounded-lg shadow-lg border border-gray-200 z-50 w-40">
                 <button
                   onClick={() => {
                     setEditingProducto(producto);
                     setIsModalOpen(true);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-blue-50 flex items-center gap-2 border-b border-gray-100 text-xs font-medium text-gray-700"
+                  className="w-full text-left px-2 py-1.5 hover:bg-blue-50 flex items-center gap-1 border-b border-gray-100 text-xs font-medium text-gray-700"
                 >
-                  <Edit2 size={14} className="text-blue-600" />
+                  <Edit2 size={12} className="text-blue-600" />
                   Editar
                 </button>
                 <button
@@ -243,17 +243,17 @@ function AdminDashboardContent() {
                     handleToggleActivo(producto);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-green-50 flex items-center gap-2 border-b border-gray-100 text-xs font-medium text-gray-700"
+                  className="w-full text-left px-2 py-1.5 hover:bg-green-50 flex items-center gap-1 border-b border-gray-100 text-xs font-medium text-gray-700"
                 >
                   {producto.activo !== false ? (
                     <>
-                      <EyeOff size={14} className="text-gray-600" />
+                      <EyeOff size={12} className="text-gray-600" />
                       Ocultar
                     </>
                   ) : (
                     <>
-                      <Eye size={14} className="text-green-600" />
-                      Mostrar
+                      <Eye size={12} className="text-green-600" />
+                      Ver
                     </>
                   )}
                 </button>
@@ -262,77 +262,65 @@ function AdminDashboardContent() {
                     handleDelete(producto.id);
                     setShowMenu(false);
                   }}
-                  className="w-full text-left px-3 py-2 hover:bg-red-50 flex items-center gap-2 text-xs font-medium text-red-700"
+                  className="w-full text-left px-2 py-1.5 hover:bg-red-50 flex items-center gap-1 text-xs font-medium text-red-700"
                 >
-                  <Trash2 size={14} />
-                  Eliminar
+                  <Trash2 size={12} />
+                  Borrar
                 </button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Imagen compacta */}
-        <div className="mb-3">
+        {/* Imagen mini */}
+        <div className="mb-1.5">
           {producto.foto_url ? (
             <img
               src={producto.foto_url}
               alt={producto.nombre}
-              className="w-full h-24 object-cover rounded-lg"
+              className="w-full h-16 object-cover rounded"
             />
           ) : (
-            <div className="w-full h-24 bg-gray-300 rounded-lg flex items-center justify-center">
+            <div className="w-full h-16 bg-gray-300 rounded flex items-center justify-center">
               <span className="text-xs text-gray-600">Sin foto</span>
             </div>
           )}
         </div>
 
-        {/* Nombre compacto */}
-        <h3 className="font-bold text-gray-900 text-xs leading-tight mb-1 line-clamp-2">
+        {/* Nombre mini */}
+        <h3 className="font-bold text-gray-900 text-xs leading-tight mb-0.5 line-clamp-1">
           {producto.nombre}
         </h3>
 
-        {/* Laboratorio */}
-        <p className="text-xs text-gray-600 mb-2 truncate">
-          {producto.laboratorio || '—'}
-        </p>
-
         {/* Status badge */}
-        <div className="mb-2">
-          <span className={`inline-block px-2 py-1 rounded-lg text-xs font-bold ${getStatusBadgeColor()}`}>
-            {stockStatus === 'Agotado' && '❌'}
-            {stockStatus === 'Bajo' && '⚠️'}
-            {stockStatus === 'OK' && '✅'}
-            {' ' + stockStatus}
+        <div className="mb-1.5">
+          <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold ${getStatusBadgeColor()}`}>
+            {stockStatus === 'Agotado' && '❌ Agot.'}
+            {stockStatus === 'Bajo' && '⚠️ Bajo'}
+            {stockStatus === 'OK' && '✅ OK'}
           </span>
         </div>
 
-        {/* Stats Grid compacto */}
-        <div className="grid grid-cols-3 gap-1.5 mb-3 bg-white bg-opacity-70 rounded-lg p-2">
+        {/* Stats Grid ultra compacto */}
+        <div className="grid grid-cols-2 gap-1 mb-1.5 bg-white bg-opacity-70 rounded p-1.5">
           <div className="text-center">
-            <div className="text-sm font-bold text-gray-900">
+            <div className="text-xs font-bold text-gray-900 truncate">
               ${formatPrice(producto.precio)}
             </div>
-            <div className="text-xs text-gray-600">Precio</div>
           </div>
-          <div className="text-center border-l border-r border-gray-300">
-            <div className={`text-sm font-bold ${
+          <div className="text-center border-l border-gray-300">
+            <div className={`text-xs font-bold ${
               stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
             }`}>
               {stock}
             </div>
-            <div className="text-xs text-gray-600">Stock</div>
-          </div>
-          <div className="text-center">
-            <div className="text-sm font-bold text-gray-900">{producto.categoria?.substring(0, 3) || '—'}</div>
-            <div className="text-xs text-gray-600">Cat</div>
           </div>
         </div>
 
         {/* Botón visibilidad */}
         <button
           onClick={() => handleToggleActivo(producto)}
-          className={`w-full py-2 rounded-lg font-bold text-xs transition-all ${
+          className={`w-full py-1.5 rounded text-xs font-bold transition-all ${
             producto.activo !== false
               ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
               : 'bg-gray-500 hover:bg-gray-600 text-white'
@@ -343,7 +331,7 @@ function AdminDashboardContent() {
               : 'Oculto. Clic para mostrar en la web.'
           }
         >
-          {producto.activo !== false ? '✅ Web' : '🔒 Oculto'}
+          {producto.activo !== false ? '✅' : '🔒'}
         </button>
       </div>
     );
@@ -439,7 +427,7 @@ function AdminDashboardContent() {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
+            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
               {prods.map((producto) => (
                 <ProductCard key={producto.id} producto={producto} />
               ))}
