@@ -9,7 +9,7 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Search, Sparkles } from 'lucide-react';
+import { Edit2, Trash2, Plus, Search, Sparkles, Eye, EyeOff } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
 import InventoryStats from '@/components/InventoryStats';
 
@@ -42,6 +42,24 @@ function AdminDashboardContent() {
       setError('Error al cargar los productos');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleActivo = async (producto: Producto) => {
+    const visible = producto.activo !== false;
+
+    // Optimista: la fila cambia al instante y se revierte si la DB rechaza.
+    setProductos((prev) => prev.map((p) => (p.id === producto.id ? { ...p, activo: !visible } : p)));
+
+    const { error } = await supabase
+      .from('productos')
+      .update({ activo: !visible })
+      .eq('id', producto.id);
+
+    if (error) {
+      console.error('Error al cambiar la visibilidad:', error);
+      setProductos((prev) => prev.map((p) => (p.id === producto.id ? { ...p, activo: visible } : p)));
+      alert('No se pudo cambiar la visibilidad del producto');
     }
   };
 
@@ -247,7 +265,12 @@ function AdminDashboardContent() {
               </thead>
               <tbody>
                 {productosFiltrados.map((producto) => (
-                  <tr key={producto.id} className="border-t border-gray-200 hover:bg-gray-50">
+                  <tr
+                    key={producto.id}
+                    className={`border-t border-gray-200 hover:bg-gray-50 ${
+                      producto.activo === false ? 'bg-gray-50 opacity-60' : ''
+                    }`}
+                  >
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {producto.foto_url ? (
                         <img
@@ -261,7 +284,14 @@ function AdminDashboardContent() {
                         </div>
                       )}
                     </td>
-                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm truncate">{producto.nombre}</td>
+                    <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 text-sm truncate">
+                      {producto.nombre}
+                      {producto.activo === false && (
+                        <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-200 text-gray-700 align-middle">
+                          Oculto
+                        </span>
+                      )}
+                    </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4 text-gray-800 font-semibold text-sm">${formatPrice(producto.precio)}</td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       {(() => {
@@ -293,6 +323,26 @@ function AdminDashboardContent() {
                     </td>
                     <td className="px-3 sm:px-6 py-3 sm:py-4">
                       <div className="flex gap-2 sm:gap-3">
+                        <button
+                          onClick={() => handleToggleActivo(producto)}
+                          className={
+                            producto.activo !== false
+                              ? 'text-green-600 hover:text-green-800 transition-colors'
+                              : 'text-gray-400 hover:text-gray-600 transition-colors'
+                          }
+                          title={
+                            producto.activo !== false
+                              ? 'Visible en la web. Clic para ocultar.'
+                              : 'Oculto. Clic para mostrar en la web.'
+                          }
+                          aria-label={producto.activo !== false ? 'Ocultar producto' : 'Mostrar producto'}
+                        >
+                          {producto.activo !== false ? (
+                            <Eye size={18} className="sm:w-5 sm:h-5" />
+                          ) : (
+                            <EyeOff size={18} className="sm:w-5 sm:h-5" />
+                          )}
+                        </button>
                         <button
                           onClick={() => {
                             setEditingProducto(producto);

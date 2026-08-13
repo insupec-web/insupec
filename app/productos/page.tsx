@@ -34,14 +34,26 @@ export default function ProductosPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: productosData, error: productosError } = await supabase
+        // Se filtra en el servidor para no mandar al navegador los productos
+        // ocultos. Si la columna activo no existe (PostgREST devuelve 42703),
+        // se reintenta sin el filtro para que el catálogo no quede caído.
+        let { data: productosData, error: productosError } = await supabase
           .from('productos')
           .select('*')
+          .or('activo.is.null,activo.eq.true')
           .order('created_at', { ascending: false });
+
+        if (productosError?.code === '42703') {
+          console.warn('Falta la columna activo en productos; ejecuta SUPABASE_ADD_ACTIVO.sql');
+          ({ data: productosData, error: productosError } = await supabase
+            .from('productos')
+            .select('*')
+            .order('created_at', { ascending: false }));
+        }
 
         if (productosError) throw productosError;
 
-        setProductos((productosData || []).filter(p => p.activo !== false));
+        setProductos((productosData || []).filter((p) => p.activo !== false));
       } catch (err) {
         console.error('Error fetching data:', err);
         setError('Error al cargar los datos');
