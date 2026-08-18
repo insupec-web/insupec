@@ -9,7 +9,7 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Search, Sparkles, Eye, EyeOff, ChevronDown, MoreVertical, AlertCircle } from 'lucide-react';
+import { Edit2, Trash2, Plus, Minus, Search, Sparkles, Eye, EyeOff, MoreVertical } from 'lucide-react';
 import TrafficStats from '@/components/TrafficStats';
 import InventoryStats from '@/components/InventoryStats';
 
@@ -26,8 +26,6 @@ function AdminDashboardContent() {
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
   const [precioMasivo, setPrecioMasivo] = useState('');
-  const [expandedPublishedCategories, setExpandedPublishedCategories] = useState<Set<string>>(new Set());
-  const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchProductos();
@@ -65,6 +63,22 @@ function AdminDashboardContent() {
       console.error('Error al cambiar la visibilidad:', error);
       setProductos((prev) => prev.map((p) => (p.id === producto.id ? { ...p, activo: visible } : p)));
       alert('No se pudo cambiar la visibilidad del producto');
+    }
+  };
+
+  const handleStockChange = async (producto: Producto, nuevoStock: number) => {
+    const stockActual = producto.stock ?? 0;
+    const stockValido = Math.max(0, nuevoStock);
+    if (stockValido === stockActual) return;
+
+    setProductos((prev) => prev.map((p) => (p.id === producto.id ? { ...p, stock: stockValido } : p)));
+
+    const { error } = await supabase.from('productos').update({ stock: stockValido }).eq('id', producto.id);
+
+    if (error) {
+      console.error('Error al actualizar el stock:', error);
+      setProductos((prev) => prev.map((p) => (p.id === producto.id ? { ...p, stock: stockActual } : p)));
+      alert('No se pudo actualizar el stock');
     }
   };
 
@@ -169,51 +183,27 @@ function AdminDashboardContent() {
     });
   }
 
-  // Group productos by visibility and category
   const productosPublicados = productosFiltrados.filter((p) => p.activo !== false);
   const productosOcultos = productosFiltrados.filter((p) => p.activo === false);
-
-  const groupByCategory = (prods: Producto[]) => {
-    const grouped: Record<string, Producto[]> = {};
-    prods.forEach((p) => {
-      const cat = p.categoria || 'Sin categoría';
-      if (!grouped[cat]) grouped[cat] = [];
-      grouped[cat].push(p);
-    });
-    return grouped;
-  };
-
-  const publishedByCategory = groupByCategory(productosPublicados);
-  const hiddenByCategory = groupByCategory(productosOcultos);
-
-  const toggleCategoryExpanded = (category: string, isPublished: boolean) => {
-    if (isPublished) {
-      setExpandedPublishedCategories((prev) => {
-        const next = new Set(prev);
-        if (next.has(category)) {
-          next.delete(category);
-        } else {
-          next.add(category);
-        }
-        return next;
-      });
-    } else {
-      setExpandedHiddenCategories((prev) => {
-        const next = new Set(prev);
-        if (next.has(category)) {
-          next.delete(category);
-        } else {
-          next.add(category);
-        }
-        return next;
-      });
-    }
-  };
 
   const ProductCard = ({ producto }: { producto: Producto }) => {
     const stock = producto.stock ?? 0;
     const stockStatus = stock === 0 ? 'Agotado' : stock < 5 ? 'Bajo' : 'OK';
     const [showMenu, setShowMenu] = useState(false);
+    const [stockInput, setStockInput] = useState(String(stock));
+
+    useEffect(() => {
+      setStockInput(String(stock));
+    }, [stock]);
+
+    const commitStockInput = () => {
+      const parsed = parseInt(stockInput, 10);
+      if (isNaN(parsed)) {
+        setStockInput(String(stock));
+        return;
+      }
+      handleStockChange(producto, parsed);
+    };
 
     const getBgColor = () => {
       if (stock === 0) return 'bg-red-50 border-red-300';
@@ -242,7 +232,18 @@ function AdminDashboardContent() {
             onChange={() => toggleSeleccion(producto.id)}
             aria-label={`Seleccionar ${producto.nombre}`}
           />
-          <div className="relative">
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => {
+                setEditingProducto(producto);
+                setIsModalOpen(true);
+              }}
+              className="p-0.5 hover:bg-white rounded transition-colors"
+              title="Editar producto"
+            >
+              <Edit2 size={14} className="text-blue-600" />
+            </button>
+            <div className="relative">
             <button
               onClick={() => setShowMenu(!showMenu)}
               className="p-0.5 hover:bg-white rounded transition-colors"
@@ -252,17 +253,6 @@ function AdminDashboardContent() {
             </button>
             {showMenu && (
               <div className="absolute right-0 top-full mt-0.5 bg-white rounded-lg shadow-lg border border-gray-200 z-50 w-40">
-                <button
-                  onClick={() => {
-                    setEditingProducto(producto);
-                    setIsModalOpen(true);
-                    setShowMenu(false);
-                  }}
-                  className="w-full text-left px-2 py-1.5 hover:bg-blue-50 flex items-center gap-1 border-b border-gray-100 text-xs font-medium text-gray-700"
-                >
-                  <Edit2 size={12} className="text-blue-600" />
-                  Editar
-                </button>
                 <button
                   onClick={() => {
                     handleToggleActivo(producto);
@@ -294,6 +284,7 @@ function AdminDashboardContent() {
                 </button>
               </div>
             )}
+            </div>
           </div>
         </div>
 
@@ -317,6 +308,11 @@ function AdminDashboardContent() {
           {producto.nombre}
         </h3>
 
+        {/* Categoría */}
+        <p className="text-[10px] text-gray-500 mb-0.5 line-clamp-1">
+          {producto.categoria || 'Sin categoría'}
+        </p>
+
         {/* Status badge */}
         <div className="mb-1.5">
           <span className={`inline-block px-1.5 py-0.5 rounded text-xs font-bold ${getStatusBadgeColor()}`}>
@@ -334,14 +330,35 @@ function AdminDashboardContent() {
           </div>
         </div>
 
-        {/* Stock */}
-        <div className="text-center text-xs mb-1.5">
-          <span className="text-gray-600">Stock:</span>
-          <span className={`font-bold ml-1 ${
-            stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
-          }`}>
-            {stock}
-          </span>
+        {/* Stock editable */}
+        <div className="flex items-center justify-center gap-1 mb-1.5">
+          <button
+            onClick={() => handleStockChange(producto, stock - 1)}
+            className="p-1 bg-white border border-gray-300 rounded hover:bg-gray-100 flex-shrink-0"
+            title="Restar 1 al stock"
+          >
+            <Minus size={10} />
+          </button>
+          <input
+            type="number"
+            value={stockInput}
+            onChange={(e) => setStockInput(e.target.value)}
+            onBlur={commitStockInput}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+            }}
+            className={`w-12 text-center text-xs font-bold border border-gray-300 rounded py-0.5 ${
+              stock === 0 ? 'text-red-700' : stock < 5 ? 'text-orange-700' : 'text-emerald-700'
+            }`}
+            aria-label={`Stock de ${producto.nombre}`}
+          />
+          <button
+            onClick={() => handleStockChange(producto, stock + 1)}
+            className="p-1 bg-white border border-gray-300 rounded hover:bg-gray-100 flex-shrink-0"
+            title="Sumar 1 al stock"
+          >
+            <Plus size={10} />
+          </button>
         </div>
 
         {/* Botón visibilidad */}
@@ -360,107 +377,6 @@ function AdminDashboardContent() {
         >
           {producto.activo !== false ? '✅' : '🔒'}
         </button>
-      </div>
-    );
-  };
-
-  const getCategoryStats = (prods: Producto[]) => {
-    const totalStock = prods.reduce((sum, p) => sum + (p.stock ?? 0), 0);
-    const zeroStock = prods.filter((p) => (p.stock ?? 0) === 0).length;
-    const lowStock = prods.filter((p) => {
-      const stock = p.stock ?? 0;
-      return stock > 0 && stock < 5;
-    }).length;
-    return { totalStock, zeroStock, lowStock };
-  };
-
-  const CategorySection = ({
-    title,
-    productos: prods,
-    isPublished,
-  }: {
-    title: string;
-    productos: Producto[];
-    isPublished: boolean;
-  }) => {
-    const isExpanded = isPublished
-      ? expandedPublishedCategories.has(title)
-      : expandedHiddenCategories.has(title);
-    const stats = getCategoryStats(prods);
-
-    return (
-      <div className="rounded-2xl overflow-hidden shadow-lg border-2 border-gray-300 bg-white">
-        <button
-          onClick={() => toggleCategoryExpanded(title, isPublished)}
-          className="w-full flex items-center justify-between px-4 sm:px-6 py-5 sm:py-6 bg-gradient-to-r from-emerald-100 via-teal-100 to-cyan-100 hover:from-emerald-200 hover:via-teal-200 hover:to-cyan-200 transition-all border-b-4 border-emerald-600"
-        >
-          <div className="flex items-center gap-4 flex-1 min-w-0">
-            <ChevronDown
-              size={24}
-              className={`text-emerald-700 transition-transform flex-shrink-0 font-bold ${isExpanded ? 'rotate-180' : ''}`}
-            />
-            <div className="min-w-0">
-              <h3 className="font-bold text-gray-900 text-lg sm:text-xl">{title}</h3>
-            </div>
-            <span className="px-4 py-2 rounded-full text-sm font-bold bg-emerald-600 text-white flex-shrink-0 shadow-md">
-              {prods.length}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-3">
-            <div className="text-center px-4 py-3 bg-white rounded-lg shadow-md border-2 border-gray-300">
-              <div className="font-bold text-gray-900 text-2xl sm:text-3xl">{stats.totalStock}</div>
-              <div className="text-gray-600 text-xs font-semibold mt-1">unidades</div>
-            </div>
-            {stats.zeroStock > 0 && (
-              <div className="text-center px-4 py-3 bg-red-500 rounded-lg shadow-md">
-                <div className="font-bold text-white text-2xl sm:text-3xl">{stats.zeroStock}</div>
-                <div className="text-red-100 text-xs font-semibold mt-1">agotados</div>
-              </div>
-            )}
-            {stats.lowStock > 0 && (
-              <div className="text-center px-4 py-3 bg-orange-500 rounded-lg shadow-md">
-                <div className="font-bold text-white text-2xl sm:text-3xl">{stats.lowStock}</div>
-                <div className="text-orange-100 text-xs font-semibold mt-1">bajos</div>
-              </div>
-            )}
-          </div>
-        </button>
-
-        {isExpanded && (
-          <div className="p-4 sm:p-8 bg-gradient-to-br from-gray-50 to-white">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6 p-4 bg-white rounded-xl border-2 border-gray-200">
-              <div className="flex items-center gap-3">
-                <input
-                  type="checkbox"
-                  className="w-6 h-6 accent-purple-600 cursor-pointer rounded"
-                  checked={prods.length > 0 && prods.every((p) => seleccionados.has(p.id))}
-                  onChange={(e) =>
-                    setSeleccionados(
-                      e.target.checked
-                        ? new Set([...seleccionados, ...prods.map((p) => p.id)])
-                        : new Set([...seleccionados].filter((id) => !prods.find((p) => p.id === id)))
-                    )
-                  }
-                  title="Seleccionar todos los productos de esta categoría"
-                  aria-label={`Seleccionar todos en ${title}`}
-                />
-                <label className="text-sm sm:text-base font-bold text-gray-800 cursor-pointer">
-                  Seleccionar todos en {title}
-                </label>
-              </div>
-              <div className="flex-1" />
-              <span className="px-4 py-2 rounded-lg text-sm font-bold bg-purple-100 text-purple-800">
-                {prods.filter((p) => seleccionados.has(p.id)).length} seleccionados
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
-              {prods.map((producto) => (
-                <ProductCard key={producto.id} producto={producto} />
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     );
   };
@@ -584,18 +500,36 @@ function AdminDashboardContent() {
             </button>
           </div>
 
-          {(selectedLaboratorio || sortName || showOnlyZeroStock) && (
-            <button
-              onClick={() => {
-                setSelectedLaboratorio(null);
-                setSortName(null);
-                setShowOnlyZeroStock(false);
-              }}
-              className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
-            >
-              Limpiar filtros
-            </button>
-          )}
+          <div className="flex gap-2 flex-wrap items-center">
+            {(selectedLaboratorio || sortName || showOnlyZeroStock) && (
+              <button
+                onClick={() => {
+                  setSelectedLaboratorio(null);
+                  setSortName(null);
+                  setShowOnlyZeroStock(false);
+                }}
+                className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                Limpiar filtros
+              </button>
+            )}
+            {productosFiltrados.length > 0 && (
+              <button
+                onClick={() =>
+                  setSeleccionados(
+                    productosFiltrados.every((p) => seleccionados.has(p.id))
+                      ? new Set()
+                      : new Set(productosFiltrados.map((p) => p.id))
+                  )
+                }
+                className="px-4 py-2 rounded-lg text-sm font-semibold bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors"
+              >
+                {productosFiltrados.every((p) => seleccionados.has(p.id))
+                  ? `Deseleccionar todos (${productosFiltrados.length})`
+                  : `Seleccionar todos los filtrados (${productosFiltrados.length})`}
+              </button>
+            )}
+          </div>
         </div>
 
         {loading ? (
@@ -671,35 +605,15 @@ function AdminDashboardContent() {
             <div className="space-y-8">
               {/* Productos Publicados */}
               <div>
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                       ✅ Publicados en la web
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">{productosPublicados.length} productos visibles</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {productosPublicados.length > 0 && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setExpandedPublishedCategories(
-                            new Set(Object.keys(publishedByCategory))
-                          )}
-                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-green-100 text-green-800 rounded-lg hover:bg-green-200 transition-colors"
-                        >
-                          Expandir todas
-                        </button>
-                        <button
-                          onClick={() => setExpandedPublishedCategories(new Set())}
-                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors"
-                        >
-                          Contraer todas
-                        </button>
-                      </div>
-                    )}
-                    <div className="px-4 py-2 rounded-lg bg-green-100 text-green-800 font-bold text-lg whitespace-nowrap">
-                      {productosPublicados.length}
-                    </div>
+                  <div className="px-4 py-2 rounded-lg bg-green-100 text-green-800 font-bold text-lg whitespace-nowrap">
+                    {productosPublicados.length}
                   </div>
                 </div>
 
@@ -708,52 +622,25 @@ function AdminDashboardContent() {
                     <p className="text-gray-600 text-sm">No hay productos publicados con los filtros actuales</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {Object.entries(publishedByCategory)
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .map(([category, prods]) => (
-                        <CategorySection
-                          key={`pub-${category}`}
-                          title={category}
-                          productos={prods}
-                          isPublished={true}
-                        />
-                      ))}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
+                    {productosPublicados.map((producto) => (
+                      <ProductCard key={producto.id} producto={producto} />
+                    ))}
                   </div>
                 )}
               </div>
 
               {/* Productos Ocultos */}
               <div className="mt-10 pt-10 border-t-2 border-gray-300">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                       🔒 Ocultos de la web
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">{productosOcultos.length} productos ocultos</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    {productosOcultos.length > 0 && (
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => setExpandedHiddenCategories(
-                            new Set(Object.keys(hiddenByCategory))
-                          )}
-                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-red-100 text-red-800 rounded-lg hover:bg-red-200 transition-colors"
-                        >
-                          Expandir todas
-                        </button>
-                        <button
-                          onClick={() => setExpandedHiddenCategories(new Set())}
-                          className="px-3 py-2 text-xs sm:text-sm font-semibold bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors"
-                        >
-                          Contraer todas
-                        </button>
-                      </div>
-                    )}
-                    <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 font-bold text-lg whitespace-nowrap">
-                      {productosOcultos.length}
-                    </div>
+                  <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 font-bold text-lg whitespace-nowrap">
+                    {productosOcultos.length}
                   </div>
                 </div>
 
@@ -762,17 +649,10 @@ function AdminDashboardContent() {
                     <p className="text-gray-600 text-sm">Todos los productos están publicados en la web</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {Object.entries(hiddenByCategory)
-                      .sort(([a], [b]) => a.localeCompare(b))
-                      .map(([category, prods]) => (
-                        <CategorySection
-                          key={`hidden-${category}`}
-                          title={category}
-                          productos={prods}
-                          isPublished={false}
-                        />
-                      ))}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-3">
+                    {productosOcultos.map((producto) => (
+                      <ProductCard key={producto.id} producto={producto} />
+                    ))}
                   </div>
                 )}
               </div>
