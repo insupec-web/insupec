@@ -25,6 +25,7 @@ function AdminDashboardContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
+  const [precioMasivo, setPrecioMasivo] = useState('');
   const [expandedPublishedCategories, setExpandedPublishedCategories] = useState<Set<string>>(new Set());
   const [expandedHiddenCategories, setExpandedHiddenCategories] = useState<Set<string>>(new Set());
 
@@ -95,6 +96,30 @@ function AdminDashboardContent() {
       setProductos(previos);
       alert('No se pudo cambiar la visibilidad de los productos seleccionados');
     } else {
+      setSeleccionados(new Set());
+    }
+
+    setAplicandoMasivo(false);
+  };
+
+  // Aplica un precio nuevo a todos los seleccionados en una sola consulta.
+  const handlePrecioMasivo = async () => {
+    const ids = Array.from(seleccionados);
+    const nuevoPrecio = parseFloat(precioMasivo);
+    if (ids.length === 0 || isNaN(nuevoPrecio) || nuevoPrecio < 0) return;
+
+    setAplicandoMasivo(true);
+    const previos = productos;
+    setProductos((prev) => prev.map((p) => (seleccionados.has(p.id) ? { ...p, precio: nuevoPrecio } : p)));
+
+    const { error } = await supabase.from('productos').update({ precio: nuevoPrecio }).in('id', ids);
+
+    if (error) {
+      console.error('Error al cambiar el precio en lote:', error);
+      setProductos(previos);
+      alert('No se pudo cambiar el precio de los productos seleccionados');
+    } else {
+      setPrecioMasivo('');
       setSeleccionados(new Set());
     }
 
@@ -595,7 +620,27 @@ function AdminDashboardContent() {
                 <span className="text-sm font-semibold text-gray-800">
                   {seleccionados.size} {seleccionados.size === 1 ? 'producto seleccionado' : 'productos seleccionados'}
                 </span>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm text-gray-600">$</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={precioMasivo}
+                      onChange={(e) => setPrecioMasivo(e.target.value)}
+                      placeholder="Precio nuevo"
+                      className="w-28 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      disabled={aplicandoMasivo}
+                    />
+                    <button
+                      onClick={handlePrecioMasivo}
+                      disabled={aplicandoMasivo || !precioMasivo || isNaN(parseFloat(precioMasivo)) || parseFloat(precioMasivo) < 0}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                    >
+                      Aplicar precio
+                    </button>
+                  </div>
                   <button
                     onClick={() => handleVisibilidadMasiva(false)}
                     disabled={aplicandoMasivo}
