@@ -385,11 +385,11 @@ function AdminDashboardContent() {
     <>
       <AdminNav />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-20 sm:pt-28 pb-8 sm:pb-12">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-20 sm:pt-24 pb-6 sm:pb-8">
         <InventoryStats productos={productos} />
         <TrafficStats />
 
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
           <div className="flex gap-3 flex-col sm:flex-row w-full sm:w-auto">
             <Link
@@ -409,9 +409,9 @@ function AdminDashboardContent() {
           </div>
         </div>
 
-        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-xs sm:text-sm">{error}</div>}
+        {error && <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-3 sm:mb-4 text-xs sm:text-sm">{error}</div>}
 
-        <div className="mb-6 sm:mb-8 space-y-4">
+        <div className="mb-4 sm:mb-6 space-y-3">
           <div className="relative">
             <Search size={18} className="absolute left-3 top-3 text-gray-400" />
             <input
@@ -533,11 +533,11 @@ function AdminDashboardContent() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
+          <div className="text-center py-8">
             <p className="text-gray-600 text-sm sm:text-base">Cargando productos...</p>
           </div>
         ) : productosFiltrados.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-6 sm:p-8 text-center">
+          <div className="bg-white rounded-lg shadow-md p-5 sm:p-6 text-center">
             <p className="text-gray-600 mb-4 text-sm sm:text-base">
               {busqueda ? 'No se encontraron productos que coincidan con tu búsqueda' : 'No hay productos disponibles'}
             </p>
@@ -550,7 +550,7 @@ function AdminDashboardContent() {
         ) : (
           <>
             {seleccionados.size > 0 && (
-              <div className="sticky top-16 z-10 mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 shadow-md">
+              <div className="sticky top-16 z-10 mb-4 flex flex-wrap items-center gap-3 rounded-lg border border-brand-200 bg-brand-50 px-4 py-3 shadow-md">
                 <span className="text-sm font-semibold text-gray-800">
                   {seleccionados.size} {seleccionados.size === 1 ? 'producto seleccionado' : 'productos seleccionados'}
                 </span>
@@ -602,10 +602,10 @@ function AdminDashboardContent() {
               </div>
             )}
 
-            <div className="space-y-8">
+            <div className="space-y-6">
               {/* Productos Publicados */}
               <div>
-                <div className="flex items-center justify-between gap-3 mb-4">
+                <div className="flex items-center justify-between gap-3 mb-3">
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                       ✅ Publicados en la web
@@ -618,7 +618,7 @@ function AdminDashboardContent() {
                 </div>
 
                 {productosPublicados.length === 0 ? (
-                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-5 text-center">
                     <p className="text-gray-600 text-sm">No hay productos publicados con los filtros actuales</p>
                   </div>
                 ) : (
@@ -631,8 +631,8 @@ function AdminDashboardContent() {
               </div>
 
               {/* Productos Ocultos */}
-              <div className="mt-10 pt-10 border-t-2 border-gray-300">
-                <div className="flex items-center justify-between gap-3 mb-4">
+              <div className="mt-6 pt-6 border-t-2 border-gray-300">
+                <div className="flex items-center justify-between gap-3 mb-3">
                   <div className="flex-1">
                     <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
                       🔒 Ocultos de la web
@@ -645,7 +645,7 @@ function AdminDashboardContent() {
                 </div>
 
                 {productosOcultos.length === 0 ? (
-                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
+                  <div className="bg-gray-50 rounded-lg border border-gray-200 p-5 text-center">
                     <p className="text-gray-600 text-sm">Todos los productos están publicados en la web</p>
                   </div>
                 ) : (

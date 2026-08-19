@@ -72,30 +72,30 @@ export default function TrafficStats() {
 
   if (loading || !stats) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
+      <div className="bg-white rounded-lg shadow p-4 animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-1/4 mb-3"></div>
         <div className="h-8 bg-gray-200 rounded w-1/3"></div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-8">
-      <div className="flex items-center gap-2 mb-6">
+    <div className="bg-white rounded-lg shadow p-4 mb-6">
+      <div className="flex items-center gap-2 mb-4">
         <TrendingUp size={24} className="text-brand-600" />
         <h2 className="text-xl font-bold text-gray-900">Tráfico de la Web</h2>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <div className="bg-blue-50 rounded-lg p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+        <div className="bg-blue-50 rounded-lg p-3">
           <p className="text-sm text-gray-600 mb-1">Total de Visitas</p>
           <p className="text-3xl font-bold text-blue-600">{stats.totalVisits.toLocaleString()}</p>
         </div>
-        <div className="bg-green-50 rounded-lg p-4">
+        <div className="bg-green-50 rounded-lg p-3">
           <p className="text-sm text-gray-600 mb-1">Visitas Hoy</p>
           <p className="text-3xl font-bold text-green-600">{stats.visitsToday}</p>
         </div>
-        <div className="bg-purple-50 rounded-lg p-4">
+        <div className="bg-purple-50 rounded-lg p-3">
           <p className="text-sm text-gray-600 mb-1">Última Semana</p>
           <p className="text-3xl font-bold text-purple-600">{stats.visitsThisWeek}</p>
         </div>
@@ -103,10 +103,10 @@ export default function TrafficStats() {
 
       {stats.topPages.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">Páginas Más Visitadas</h3>
-          <div className="space-y-2">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Páginas Más Visitadas</h3>
+          <div className="space-y-1.5">
             {stats.topPages.map((item, idx) => (
-              <div key={idx} className="flex items-center justify-between bg-gray-50 p-3 rounded">
+              <div key={idx} className="flex items-center justify-between bg-gray-50 p-2.5 rounded">
                 <span className="text-sm text-gray-700 truncate">{item.page || '/'}</span>
                 <span className="text-sm font-bold text-brand-600">{item.count}</span>
               </div>
