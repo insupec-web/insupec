@@ -9,14 +9,7 @@ interface InventoryData {
   totalValue: number;
   totalUnits: number;
   totalProducts: number;
-  averageValuePerProduct: number;
   productsWithoutStock: number;
-  topValueProducts: Array<{
-    nombre: string;
-    laboratorio: string;
-    valor: number;
-    stock: number;
-  }>;
 }
 
 export default function InventoryStats({ productos }: { productos: Producto[] }) {
@@ -33,9 +26,7 @@ export default function InventoryStats({ productos }: { productos: Producto[] })
         totalValue: 0,
         totalUnits: 0,
         totalProducts: 0,
-        averageValuePerProduct: 0,
         productsWithoutStock: 0,
-        topValueProducts: [],
       });
       setLoading(false);
       return;
@@ -46,39 +37,21 @@ export default function InventoryStats({ productos }: { productos: Producto[] })
     let totalUnits = 0;
     let productsWithoutStock = 0;
 
-    const productsWithValue = productos.map((p) => {
+    productos.forEach((p) => {
       const stock = p.stock ?? 0;
-      const valor = p.precio * stock;
-
-      totalValue += valor;
+      totalValue += p.precio * stock;
       totalUnits += stock;
 
       if (stock === 0) {
         productsWithoutStock += 1;
       }
-
-      return {
-        nombre: p.nombre,
-        laboratorio: p.laboratorio,
-        valor,
-        stock,
-      };
     });
-
-    // Obtener top 5 productos con mayor valor
-    const topValueProducts = productsWithValue
-      .sort((a, b) => b.valor - a.valor)
-      .slice(0, 5);
-
-    const averageValuePerProduct = productos.length > 0 ? totalValue / productos.length : 0;
 
     setStats({
       totalValue,
       totalUnits,
       totalProducts: productos.length,
-      averageValuePerProduct,
       productsWithoutStock,
-      topValueProducts,
     });
 
     setLoading(false);
@@ -149,39 +122,7 @@ export default function InventoryStats({ productos }: { productos: Producto[] })
             <p className="text-xs text-gray-500 mt-2">Productos agotados</p>
           </div>
         </div>
-
-        {/* Valor Promedio */}
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-600 mb-2">Valor Promedio por Producto</p>
-          <p className="text-2xl font-bold text-gray-800">${formatPrice(stats.averageValuePerProduct)}</p>
-        </div>
       </div>
-
-      {/* Top Productos por Valor */}
-      {stats.topValueProducts.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Top 5 Productos por Valor</h3>
-          <div className="space-y-3">
-            {stats.topValueProducts.map((product, idx) => (
-              <div key={idx} className="flex items-center justify-between bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-brand-600 bg-brand-100 px-2.5 py-1 rounded-full">
-                      #{idx + 1}
-                    </span>
-                    <p className="text-sm font-semibold text-gray-900 truncate">{product.nombre}</p>
-                  </div>
-                  <p className="text-xs text-gray-500">{product.laboratorio}</p>
-                </div>
-                <div className="text-right ml-4 flex-shrink-0">
-                  <p className="text-sm font-bold text-gray-900">${formatPrice(product.valor)}</p>
-                  <p className="text-xs text-gray-500">{product.stock} unidades</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
