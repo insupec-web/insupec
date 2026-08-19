@@ -10,7 +10,6 @@ import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
 import { Edit2, Trash2, Plus, Minus, Search, Sparkles, Eye, EyeOff, MoreVertical } from 'lucide-react';
-import TrafficStats from '@/components/TrafficStats';
 import InventoryStats from '@/components/InventoryStats';
 
 function AdminDashboardContent() {
@@ -385,9 +384,8 @@ function AdminDashboardContent() {
     <>
       <AdminNav />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-20 sm:pt-24 pb-6 sm:pb-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 pt-16 sm:pt-20 pb-6 sm:pb-8">
         <InventoryStats productos={productos} />
-        <TrafficStats />
 
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4 sm:mb-6">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-800">Dashboard de Productos</h1>
