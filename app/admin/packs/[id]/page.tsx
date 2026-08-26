@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent, useEffect, use } from 'react';
 import { supabase, Producto, Pack } from '@/lib/supabase';
+import { uploadImagenProducto } from '@/lib/uploadImage';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -123,18 +124,6 @@ function EditPackContent({ id }: { id: string }) {
     }
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const { error } = await supabase.storage.from('productos').upload(fileName, file);
-
-    if (error) {
-      throw error;
-    }
-
-    const { data } = supabase.storage.from('productos').getPublicUrl(fileName);
-    return data.publicUrl;
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -150,7 +139,7 @@ function EditPackContent({ id }: { id: string }) {
       let foto_url = preview;
 
       if (file) {
-        foto_url = await uploadImage(file);
+        foto_url = await uploadImagenProducto(file);
       }
 
       const packUpdateData: Record<string, unknown> = {

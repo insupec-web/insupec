@@ -3,6 +3,7 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { dateAMesAnio, mesAnioADate } from '@/lib/format';
+import { uploadImagenProducto } from '@/lib/uploadImage';
 import { X } from 'lucide-react';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -76,18 +77,6 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
     }
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const fileName = `${Date.now()}-${file.name}`;
-    const { error: uploadError } = await supabase.storage.from('productos').upload(fileName, file);
-
-    if (uploadError) {
-      throw uploadError;
-    }
-
-    const { data } = supabase.storage.from('productos').getPublicUrl(fileName);
-    return data.publicUrl;
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -108,7 +97,7 @@ export default function ProductEditModal({ producto, isOpen, onClose, onSave }: 
       let foto_url = preview;
 
       if (file) {
-        foto_url = await uploadImage(file);
+        foto_url = await uploadImagenProducto(file);
       }
 
       const updateData: Record<string, unknown> = {

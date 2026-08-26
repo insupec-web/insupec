@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
+import { uploadImagenProducto } from '@/lib/uploadImage';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { useRouter } from 'next/navigation';
@@ -56,23 +57,6 @@ function NuevoProductoContent() {
     }
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const fileName = `${Date.now()}-${file.name}`;
-    console.log('Uploading file:', fileName);
-
-    const { error } = await supabase.storage.from('productos').upload(fileName, file);
-
-    if (error) {
-      console.error('Upload error:', error);
-      throw error;
-    }
-
-    console.log('Upload successful');
-    const { data } = supabase.storage.from('productos').getPublicUrl(fileName);
-    console.log('Generated URL:', data.publicUrl);
-    return data.publicUrl;
-  };
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -88,7 +72,7 @@ function NuevoProductoContent() {
     try {
       let foto_url = null;
       if (file) {
-        foto_url = await uploadImage(file);
+        foto_url = await uploadImagenProducto(file);
       }
 
       const insertData: Record<string, unknown> = {
