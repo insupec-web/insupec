@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
+import { CATEGORIAS } from '@/lib/categorias';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
 import { Search } from 'lucide-react';
@@ -18,18 +19,6 @@ export default function ProductosPage() {
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [expandLaboratorios, setExpandLaboratorios] = useState(false);
-  const [expandCategorias, setExpandCategorias] = useState(false);
-
-  const CATEGORIAS = [
-    'Animales de Compañía',
-    'Grandes Animales',
-    'Solar',
-    'Instrumental',
-    'Limpieza',
-    'Cerco Eléctrico',
-    'Hormiguicida',
-    'Caravanas',
-  ];
 
   useEffect(() => {
     async function fetchData() {
@@ -183,41 +172,32 @@ export default function ProductosPage() {
             </div>
 
             <div>
-              <button
-                onClick={() => setExpandCategorias(!expandCategorias)}
-                className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
-              >
-                <span>Categoría:</span>
-                <span className="text-xs text-gray-500">{expandCategorias ? '▼' : '▶'} ({CATEGORIAS.length})</span>
-              </button>
-
-              {expandCategorias && (
-                <div className="flex gap-2 flex-wrap items-center mt-3">
+              <span className="text-sm font-semibold text-gray-700">Categoría:</span>
+              <div className="flex gap-2 flex-wrap items-center mt-3">
+                <button
+                  onClick={() => setSelectedCategoria(null)}
+                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                    !selectedCategoria
+                      ? 'bg-brand-600 text-white shadow-md scale-105'
+                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                  }`}
+                >
+                  Todas
+                </button>
+                {CATEGORIAS.map((cat) => (
                   <button
-                    onClick={() => setSelectedCategoria(null)}
+                    key={cat}
+                    onClick={() => setSelectedCategoria(selectedCategoria === cat ? null : cat)}
                     className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                      !selectedCategoria
+                      selectedCategoria === cat
                         ? 'bg-brand-600 text-white shadow-md scale-105'
                         : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                     }`}
                   >
-                    Todas
+                    {cat}
                   </button>
-                  {CATEGORIAS.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => setSelectedCategoria(selectedCategoria === cat ? null : cat)}
-                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                        selectedCategoria === cat
-                          ? 'bg-brand-600 text-white shadow-md scale-105'
-                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-              )}
+                ))}
+              </div>
             </div>
 
             {laboratorios.length > 0 && (
