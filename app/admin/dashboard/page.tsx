@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { formatPrice } from '@/lib/formatPrice';
 import { uploadImagenProducto } from '@/lib/uploadImage';
+import { CATEGORIAS } from '@/lib/categorias';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
@@ -21,11 +22,13 @@ function AdminDashboardContent() {
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [showOnlyZeroStock, setShowOnlyZeroStock] = useState(false);
+  const [showOnlySinCategoria, setShowOnlySinCategoria] = useState(false);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
   const [precioMasivo, setPrecioMasivo] = useState('');
+  const [categoriaMasiva, setCategoriaMasiva] = useState('');
   const [subiendoFotoMasiva, setSubiendoFotoMasiva] = useState(false);
 
   useEffect(() => {
@@ -141,6 +144,29 @@ function AdminDashboardContent() {
     setAplicandoMasivo(false);
   };
 
+  // Aplica una categoría a todos los seleccionados en una sola consulta.
+  const handleCategoriaMasiva = async () => {
+    const ids = Array.from(seleccionados);
+    if (ids.length === 0 || !categoriaMasiva) return;
+
+    setAplicandoMasivo(true);
+    const previos = productos;
+    setProductos((prev) => prev.map((p) => (seleccionados.has(p.id) ? { ...p, categoria: categoriaMasiva } : p)));
+
+    const { error } = await supabase.from('productos').update({ categoria: categoriaMasiva }).in('id', ids);
+
+    if (error) {
+      console.error('Error al cambiar la categoría en lote:', error);
+      setProductos(previos);
+      alert('No se pudo cambiar la categoría de los productos seleccionados');
+    } else {
+      setCategoriaMasiva('');
+      setSeleccionados(new Set());
+    }
+
+    setAplicandoMasivo(false);
+  };
+
   // Sube una sola foto y se la aplica a todos los seleccionados.
   const handleFotoMasiva = async (file: File) => {
     const ids = Array.from(seleccionados);
@@ -198,7 +224,8 @@ function AdminDashboardContent() {
     const matchLaboratorio = !selectedLaboratorio || p.laboratorio === selectedLaboratorio;
     const stock = p.stock ?? 0;
     const matchStock = !showOnlyZeroStock || stock === 0;
-    return matchBusqueda && matchLaboratorio && matchStock;
+    const matchCategoria = !showOnlySinCategoria || !p.categoria;
+    return matchBusqueda && matchLaboratorio && matchStock && matchCategoria;
   });
 
   if (sortName) {
@@ -525,13 +552,30 @@ function AdminDashboardContent() {
             </button>
           </div>
 
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-semibold text-gray-700">Categoría:</span>
+            </div>
+            <button
+              onClick={() => setShowOnlySinCategoria(!showOnlySinCategoria)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                showOnlySinCategoria
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            >
+              Solo sin categoría ({productos.filter((p) => !p.categoria).length})
+            </button>
+          </div>
+
           <div className="flex gap-2 flex-wrap items-center">
-            {(selectedLaboratorio || sortName || showOnlyZeroStock) && (
+            {(selectedLaboratorio || sortName || showOnlyZeroStock || showOnlySinCategoria) && (
               <button
                 onClick={() => {
                   setSelectedLaboratorio(null);
                   setSortName(null);
                   setShowOnlyZeroStock(false);
+                  setShowOnlySinCategoria(false);
                 }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
               >
@@ -598,6 +642,26 @@ function AdminDashboardContent() {
                       className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
                     >
                       Aplicar precio
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      value={categoriaMasiva}
+                      onChange={(e) => setCategoriaMasiva(e.target.value)}
+                      disabled={aplicandoMasivo || subiendoFotoMasiva}
+                      className="px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    >
+                      <option value="">Categoría nueva...</option>
+                      {CATEGORIAS.map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleCategoriaMasiva}
+                      disabled={aplicandoMasivo || subiendoFotoMasiva || !categoriaMasiva}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-teal-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-teal-700 disabled:opacity-50"
+                    >
+                      Aplicar categoría
                     </button>
                   </div>
                   <label

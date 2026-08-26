@@ -4,20 +4,10 @@ import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { dateAMesAnio, mesAnioADate } from '@/lib/format';
 import { uploadImagenProducto } from '@/lib/uploadImage';
+import { CATEGORIAS } from '@/lib/categorias';
 import { X } from 'lucide-react';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
-
-const CATEGORIAS = [
-  'Animales de Compañía',
-  'Grandes Animales',
-  'Solar',
-  'Instrumental',
-  'Limpieza',
-  'Cerco Eléctrico',
-  'Hormiguicida',
-  'Caravanas',
-];
 
 interface ProductEditModalProps {
   producto: Producto | null;

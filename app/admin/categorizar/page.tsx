@@ -8,17 +8,7 @@ import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-
-const CATEGORIAS = [
-  'Animales de Compañía',
-  'Grandes Animales',
-  'Solar',
-  'Instrumental',
-  'Limpieza',
-  'Cerco Eléctrico',
-  'Hormiguicida',
-  'Caravanas',
-];
+import { CATEGORIAS } from '@/lib/categorias';
 
 function CategorizarContent() {
   const [productos, setProductos] = useState<Producto[]>([]);
