@@ -5,11 +5,12 @@ export const dynamic = 'force-dynamic';
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import { formatPrice } from '@/lib/formatPrice';
+import { uploadImagenProducto } from '@/lib/uploadImage';
 import AdminNav from '@/components/AdminNav';
 import { ProtectedAdminRoute } from '@/components/ProtectedAdminRoute';
 import ProductEditModal from '@/components/ProductEditModal';
 import Link from 'next/link';
-import { Edit2, Trash2, Plus, Minus, Search, Sparkles, Eye, EyeOff, MoreVertical } from 'lucide-react';
+import { Edit2, Trash2, Plus, Minus, Search, Sparkles, Eye, EyeOff, MoreVertical, ImageUp } from 'lucide-react';
 import InventoryStats from '@/components/InventoryStats';
 
 function AdminDashboardContent() {
@@ -25,6 +26,7 @@ function AdminDashboardContent() {
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
   const [aplicandoMasivo, setAplicandoMasivo] = useState(false);
   const [precioMasivo, setPrecioMasivo] = useState('');
+  const [subiendoFotoMasiva, setSubiendoFotoMasiva] = useState(false);
 
   useEffect(() => {
     fetchProductos();
@@ -137,6 +139,31 @@ function AdminDashboardContent() {
     }
 
     setAplicandoMasivo(false);
+  };
+
+  // Sube una sola foto y se la aplica a todos los seleccionados.
+  const handleFotoMasiva = async (file: File) => {
+    const ids = Array.from(seleccionados);
+    if (ids.length === 0) return;
+
+    setSubiendoFotoMasiva(true);
+    try {
+      const foto_url = await uploadImagenProducto(file);
+      const previos = productos;
+      setProductos((prev) => prev.map((p) => (seleccionados.has(p.id) ? { ...p, foto_url } : p)));
+
+      const { error } = await supabase.from('productos').update({ foto_url }).in('id', ids);
+
+      if (error) {
+        console.error('Error al aplicar la foto en lote:', error);
+        setProductos(previos);
+        alert('No se pudo aplicar la foto a los productos seleccionados');
+      }
+    } catch (err) {
+      console.error('Error al subir la foto:', err);
+      alert('No se pudo subir la foto');
+    }
+    setSubiendoFotoMasiva(false);
   };
 
   const handleDelete = async (id: string) => {
@@ -563,19 +590,38 @@ function AdminDashboardContent() {
                       onChange={(e) => setPrecioMasivo(e.target.value)}
                       placeholder="Precio nuevo"
                       className="w-28 px-2 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
-                      disabled={aplicandoMasivo}
+                      disabled={aplicandoMasivo || subiendoFotoMasiva}
                     />
                     <button
                       onClick={handlePrecioMasivo}
-                      disabled={aplicandoMasivo || !precioMasivo || isNaN(parseFloat(precioMasivo)) || parseFloat(precioMasivo) < 0}
+                      disabled={aplicandoMasivo || subiendoFotoMasiva || !precioMasivo || isNaN(parseFloat(precioMasivo)) || parseFloat(precioMasivo) < 0}
                       className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
                     >
                       Aplicar precio
                     </button>
                   </div>
+                  <label
+                    className={`inline-flex items-center gap-1.5 rounded-lg bg-purple-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-purple-700 cursor-pointer ${
+                      subiendoFotoMasiva ? 'opacity-50 pointer-events-none' : ''
+                    }`}
+                  >
+                    <ImageUp size={16} />
+                    {subiendoFotoMasiva ? 'Subiendo...' : 'Aplicar foto a todos'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={subiendoFotoMasiva}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleFotoMasiva(file);
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
                   <button
                     onClick={() => handleVisibilidadMasiva(false)}
-                    disabled={aplicandoMasivo}
+                    disabled={aplicandoMasivo || subiendoFotoMasiva}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-gray-800 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-black disabled:opacity-50"
                   >
                     <EyeOff size={16} />
@@ -583,7 +629,7 @@ function AdminDashboardContent() {
                   </button>
                   <button
                     onClick={() => handleVisibilidadMasiva(true)}
-                    disabled={aplicandoMasivo}
+                    disabled={aplicandoMasivo || subiendoFotoMasiva}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700 disabled:opacity-50"
                   >
                     <Eye size={16} />
@@ -591,7 +637,7 @@ function AdminDashboardContent() {
                   </button>
                   <button
                     onClick={() => setSeleccionados(new Set())}
-                    disabled={aplicandoMasivo}
+                    disabled={aplicandoMasivo || subiendoFotoMasiva}
                     className="rounded-lg px-3 py-2 text-sm font-semibold text-gray-600 transition-colors hover:text-gray-900 disabled:opacity-50"
                   >
                     Limpiar selección
@@ -637,6 +683,22 @@ function AdminDashboardContent() {
                     </h2>
                     <p className="text-sm text-gray-600 mt-1">{productosOcultos.length} productos ocultos</p>
                   </div>
+                  {productosOcultos.length > 0 && (
+                    <button
+                      onClick={() =>
+                        setSeleccionados(
+                          productosOcultos.every((p) => seleccionados.has(p.id))
+                            ? new Set([...seleccionados].filter((id) => !productosOcultos.find((p) => p.id === id)))
+                            : new Set([...seleccionados, ...productosOcultos.map((p) => p.id)])
+                        )
+                      }
+                      className="px-3 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-purple-100 text-purple-800 hover:bg-purple-200 transition-colors whitespace-nowrap"
+                    >
+                      {productosOcultos.every((p) => seleccionados.has(p.id))
+                        ? 'Deseleccionar ocultos'
+                        : 'Seleccionar todos los ocultos'}
+                    </button>
+                  )}
                   <div className="px-4 py-2 rounded-lg bg-red-100 text-red-800 font-bold text-lg whitespace-nowrap">
                     {productosOcultos.length}
                   </div>
