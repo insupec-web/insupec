@@ -482,39 +482,49 @@ export default function CheckoutPage() {
                     </div>
                   </label>
 
-                  {calificaParaCheque && (
-                    <div
-                      className="p-4 border-2 rounded-lg transition-colors"
-                      style={{ borderColor: formData.metodoPago.startsWith('echeq') ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)' }}
-                    >
-                      <span className="text-gray-800 font-semibold text-sm">Cheque / e-Cheq</span>
-                      <p className="text-gray-600 text-xs mb-3">Disponible para pedidos mayores a ${formatPrice(MINIMO_ECHEQ)} sin IVA</p>
-                      <div className="flex gap-2 flex-wrap">
-                        {(['30', '60', '90'] as const).map((plazo) => {
-                          const value = `echeq_${plazo}` as const;
-                          const selected = formData.metodoPago === value;
-                          return (
-                            <label
-                              key={plazo}
-                              className={`px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer border-2 transition-colors ${
-                                selected ? 'border-green-500 bg-green-50 text-green-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                              }`}
-                            >
-                              <input
-                                type="radio"
-                                name="metodoPago"
-                                value={value}
-                                checked={selected}
-                                onChange={(e) => setFormData((prev) => ({ ...prev, metodoPago: e.target.value as FormData['metodoPago'] }))}
-                                className="sr-only"
-                              />
-                              a {plazo} días
-                            </label>
-                          );
-                        })}
-                      </div>
+                  <div
+                    className={`p-4 border-2 rounded-lg transition-colors ${!calificaParaCheque ? 'opacity-60 bg-gray-50' : ''}`}
+                    style={{ borderColor: calificaParaCheque && formData.metodoPago.startsWith('echeq') ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)' }}
+                  >
+                    <span className="text-gray-800 font-semibold text-sm">Cheque / e-Cheq</span>
+                    {calificaParaCheque ? (
+                      <p className="text-gray-600 text-xs mb-3">Disponible para tu pedido</p>
+                    ) : (
+                      <p className="text-gray-600 text-xs mb-3">
+                        Si superás ${formatPrice(MINIMO_ECHEQ)} sin IVA te ofrecemos esta forma de pago
+                        {total > 0 && ` (te faltan $${formatPrice(MINIMO_ECHEQ - total)})`}
+                      </p>
+                    )}
+                    <div className="flex gap-2 flex-wrap">
+                      {(['30', '60', '90'] as const).map((plazo) => {
+                        const value = `echeq_${plazo}` as const;
+                        const selected = calificaParaCheque && formData.metodoPago === value;
+                        return (
+                          <label
+                            key={plazo}
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold border-2 transition-colors ${
+                              !calificaParaCheque
+                                ? 'border-gray-200 text-gray-400 cursor-not-allowed'
+                                : selected
+                                ? 'border-green-500 bg-green-50 text-green-800 cursor-pointer'
+                                : 'border-gray-200 text-gray-700 hover:bg-gray-50 cursor-pointer'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="metodoPago"
+                              value={value}
+                              checked={selected}
+                              disabled={!calificaParaCheque}
+                              onChange={(e) => setFormData((prev) => ({ ...prev, metodoPago: e.target.value as FormData['metodoPago'] }))}
+                              className="sr-only"
+                            />
+                            a {plazo} días
+                          </label>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
                 </div>
 
               </div>
