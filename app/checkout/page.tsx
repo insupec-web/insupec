@@ -20,9 +20,11 @@ interface FormData {
   ciudad: string;
   codigoPostal: string;
   factura: boolean;
-  metodoPago: 'efectivo' | 'transferencia';
+  metodoPago: 'efectivo' | 'transferencia' | 'echeq_30' | 'echeq_60' | 'echeq_90';
   transporte: 'envio' | 'retiro';
 }
+
+const MINIMO_ECHEQ = 500000;
 
 export default function CheckoutPage() {
   const { items, total, clearCart } = useCart();
@@ -58,12 +60,20 @@ export default function CheckoutPage() {
   const totalConDescuento = total - descuentoMonto;
   const ivaAmount = formData.factura ? totalConDescuento * 0.21 : 0;
   const totalFinal = totalConDescuento + ivaAmount;
+  const calificaParaCheque = total > MINIMO_ECHEQ;
 
   useEffect(() => {
     // Ya no existe UI para ingresar códigos de descuento: limpiar cualquier
     // descuento viejo guardado para que no se aplique de forma invisible.
     localStorage.removeItem('descuentoAplicado');
   }, []);
+
+  // Si el carrito cambió y el pedido ya no llega al mínimo, la opción de
+  // cheque deja de mostrarse; esto asegura que tampoco se envíe si había
+  // quedado seleccionada de antes.
+  const metodoPagoFinal = !calificaParaCheque && formData.metodoPago.startsWith('echeq')
+    ? 'efectivo'
+    : formData.metodoPago;
 
   if (items.length === 0) {
     return (
@@ -170,7 +180,7 @@ export default function CheckoutPage() {
         ciudad: formData.ciudad,
         codigo_postal: formData.codigoPostal,
         factura: formData.factura,
-        metodo_pago: formData.metodoPago,
+        metodo_pago: metodoPagoFinal,
         transporte: formData.transporte,
         productos: productosData,
         total: totalFinal,
@@ -213,7 +223,7 @@ export default function CheckoutPage() {
           ciudad: formData.ciudad,
           codigoPostal: formData.codigoPostal,
           factura: formData.factura,
-          metodoPago: formData.metodoPago,
+          metodoPago: metodoPagoFinal,
           transporte: formData.transporte,
         },
         items,
@@ -471,6 +481,40 @@ export default function CheckoutPage() {
                       <p className="text-gray-600 text-xs">Se abona después de confirmar el pedido</p>
                     </div>
                   </label>
+
+                  {calificaParaCheque && (
+                    <div
+                      className="p-4 border-2 rounded-lg transition-colors"
+                      style={{ borderColor: formData.metodoPago.startsWith('echeq') ? 'rgb(34, 197, 94)' : 'rgb(229, 231, 235)' }}
+                    >
+                      <span className="text-gray-800 font-semibold text-sm">Cheque / e-Cheq</span>
+                      <p className="text-gray-600 text-xs mb-3">Disponible para pedidos mayores a ${formatPrice(MINIMO_ECHEQ)} sin IVA</p>
+                      <div className="flex gap-2 flex-wrap">
+                        {(['30', '60', '90'] as const).map((plazo) => {
+                          const value = `echeq_${plazo}` as const;
+                          const selected = formData.metodoPago === value;
+                          return (
+                            <label
+                              key={plazo}
+                              className={`px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer border-2 transition-colors ${
+                                selected ? 'border-green-500 bg-green-50 text-green-800' : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="metodoPago"
+                                value={value}
+                                checked={selected}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, metodoPago: e.target.value as FormData['metodoPago'] }))}
+                                className="sr-only"
+                              />
+                              a {plazo} días
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
               </div>

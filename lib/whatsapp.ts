@@ -10,9 +10,17 @@ interface ClientData {
   ciudad: string;
   codigoPostal: string;
   factura: boolean;
-  metodoPago?: 'efectivo' | 'transferencia';
+  metodoPago?: 'efectivo' | 'transferencia' | 'echeq_30' | 'echeq_60' | 'echeq_90';
   transporte?: 'envio' | 'retiro';
 }
+
+const METODO_PAGO_LABELS: Record<string, string> = {
+  efectivo: 'Efectivo',
+  transferencia: 'Transferencia Bancaria (Alias: HORA.COCTEL.CETRO)',
+  echeq_30: 'Cheque / e-Cheq a 30 días',
+  echeq_60: 'Cheque / e-Cheq a 60 días',
+  echeq_90: 'Cheque / e-Cheq a 90 días',
+};
 
 export function generateWhatsAppMessage(
   clientData: ClientData,
@@ -23,7 +31,7 @@ export function generateWhatsAppMessage(
   ivaMonto?: number
 ): string {
   const factura = clientData.factura ? 'Sí' : 'No';
-  const metodoPago = clientData.metodoPago === 'transferencia' ? 'Transferencia Bancaria (Alias: HORA.COCTEL.CETRO)' : 'Efectivo';
+  const metodoPago = METODO_PAGO_LABELS[clientData.metodoPago || 'efectivo'] || 'Efectivo';
 
   const transporteText = clientData.transporte === 'retiro'
     ? 'Retira en Casa Central'

@@ -19,7 +19,7 @@ interface Pedido {
   direccion: string;
   ciudad: string;
   codigo_postal: string;
-  metodo_pago: 'efectivo' | 'transferencia';
+  metodo_pago: 'efectivo' | 'transferencia' | 'echeq_30' | 'echeq_60' | 'echeq_90';
   transporte: string;
   productos: Array<{id: string; nombre: string; cantidad: number; precio: number}>;
   total: number;
@@ -27,6 +27,14 @@ interface Pedido {
   timestamp: string;
   factura: boolean;
 }
+
+const METODO_PAGO_LABELS: Record<string, string> = {
+  efectivo: 'Efectivo',
+  transferencia: 'Transferencia (HORA.COCTEL.CETRO)',
+  echeq_30: 'Cheque / e-Cheq a 30 días',
+  echeq_60: 'Cheque / e-Cheq a 60 días',
+  echeq_90: 'Cheque / e-Cheq a 90 días',
+};
 
 function PedidosContent() {
   const [pedidos, setPedidos] = useState<Pedido[]>([]);
@@ -311,9 +319,7 @@ function PedidosContent() {
                         <div>
                           <p className="text-sm text-gray-600">Método de Pago</p>
                           <p className="font-semibold text-gray-900">
-                            {pedido.metodo_pago === 'transferencia'
-                              ? 'Transferencia (HORA.COCTEL.CETRO)'
-                              : 'Efectivo'}
+                            {METODO_PAGO_LABELS[pedido.metodo_pago] || 'Efectivo'}
                           </p>
                         </div>
                       </div>
