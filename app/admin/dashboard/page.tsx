@@ -31,6 +31,7 @@ function AdminDashboardContent() {
   const [precioMasivo, setPrecioMasivo] = useState('');
   const [categoriaMasiva, setCategoriaMasiva] = useState('');
   const [subiendoFotoMasiva, setSubiendoFotoMasiva] = useState(false);
+  const [fotosRotas, setFotosRotas] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     fetchProductos();
@@ -44,13 +45,31 @@ function AdminDashboardContent() {
         throw error;
       }
 
-      setProductos(data || []);
+      const lista = data || [];
+      setProductos(lista);
+      setFotosRotas(new Set());
+      verificarFotosRotas(lista);
     } catch (err) {
       console.error('Error fetching productos:', err);
       setError('Error al cargar los productos');
     } finally {
       setLoading(false);
     }
+  };
+
+  // Muchas foto_url quedaron apuntando a archivos que ya no existen en el
+  // storage (incidente viejo de Supabase). Un producto con URL cargada no es
+  // lo mismo que un producto con foto que realmente carga, así que se
+  // verifica cada imagen en el navegador para poder filtrar por las rotas.
+  const verificarFotosRotas = (lista: Producto[]) => {
+    lista.forEach((p) => {
+      if (!p.foto_url) return;
+      const img = new Image();
+      img.onerror = () => {
+        setFotosRotas((prev) => (prev.has(p.id) ? prev : new Set(prev).add(p.id)));
+      };
+      img.src = p.foto_url;
+    });
   };
 
   const handleToggleActivo = async (producto: Producto) => {
@@ -226,7 +245,7 @@ function AdminDashboardContent() {
     const stock = p.stock ?? 0;
     const matchStock = !showOnlyZeroStock || stock === 0;
     const matchCategoria = !showOnlySinCategoria || !p.categoria;
-    const matchFoto = !showOnlySinFoto || !p.foto_url;
+    const matchFoto = !showOnlySinFoto || !p.foto_url || fotosRotas.has(p.id);
     return matchBusqueda && matchLaboratorio && matchStock && matchCategoria && matchFoto;
   });
 
@@ -345,15 +364,16 @@ function AdminDashboardContent() {
 
         {/* Imagen mini */}
         <div className="mb-1.5">
-          {producto.foto_url ? (
+          {producto.foto_url && !fotosRotas.has(producto.id) ? (
             <img
               src={producto.foto_url}
               alt={producto.nombre}
               className="w-full h-16 object-cover rounded"
+              onError={() => setFotosRotas((prev) => (prev.has(producto.id) ? prev : new Set(prev).add(producto.id)))}
             />
           ) : (
             <div className="w-full h-16 bg-gray-300 rounded flex items-center justify-center">
-              <span className="text-xs text-gray-600">Sin foto</span>
+              <span className="text-xs text-gray-600">{producto.foto_url ? 'Foto rota' : 'Sin foto'}</span>
             </div>
           )}
         </div>
@@ -582,7 +602,7 @@ function AdminDashboardContent() {
                   : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
               }`}
             >
-              Solo sin foto ({productos.filter((p) => !p.foto_url).length})
+              Solo sin foto ({productos.filter((p) => !p.foto_url || fotosRotas.has(p.id)).length})
             </button>
           </div>
 
