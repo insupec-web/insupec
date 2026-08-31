@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'INSUPEC - Distribuidora de Confianza | Productos Auténticos',
+  title: 'Insupec',
   description: 'Compra productos auténticos en línea. Envío rápido 24-72h a todo el país. Distribuidora verificada y segura. Atención 24/7 en WhatsApp.',
   keywords: 'distribuidora online, productos, mayorista, envío a domicilio, distribuidora argentina',
   icons: [
@@ -27,8 +27,7 @@ export const metadata: Metadata = {
     { rel: 'icon', url: '/favicon.png', type: 'image/png' },
   ],
   openGraph: {
-    title: 'INSUPEC - Tu Distribuidora de Confianza',
-    description: 'Productos 100% auténticos. Envío rápido y seguro.',
+    title: 'Insupec',
     type: 'website',
     url: 'https://insupec.com',
   },

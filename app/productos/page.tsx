@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 
 import { useEffect, useMemo, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
-import { CATEGORIAS } from '@/lib/categorias';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
 import { Search } from 'lucide-react';
@@ -14,10 +13,7 @@ export default function ProductosPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState('');
-  const [sortPrice, setSortPrice] = useState<'asc' | 'desc' | null>(null);
-  const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
-  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [expandLaboratorios, setExpandLaboratorios] = useState(false);
 
   useEffect(() => {
@@ -59,12 +55,6 @@ export default function ProductosPage() {
     return Array.from(labs).sort();
   }, [productos]);
 
-  const getCategoryIndex = (categoria?: string): number => {
-    if (!categoria) return CATEGORIAS.length;
-    const index = CATEGORIAS.indexOf(categoria);
-    return index === -1 ? CATEGORIAS.length : index;
-  };
-
   const productosFiltrados = useMemo(() => {
     let filtered = productos;
 
@@ -77,35 +67,8 @@ export default function ProductosPage() {
       filtered = filtered.filter((p) => p.laboratorio === selectedLaboratorio);
     }
 
-    if (selectedCategoria) {
-      filtered = filtered.filter((p) => p.categoria === selectedCategoria);
-    }
-
-    if (sortPrice) {
-      filtered = [...filtered].sort((a, b) => {
-        const priceA = a.precio || 0;
-        const priceB = b.precio || 0;
-        return sortPrice === 'asc' ? priceA - priceB : priceB - priceA;
-      });
-    } else if (sortName) {
-      filtered = [...filtered].sort((a, b) => {
-        const nameA = a.nombre.toLowerCase();
-        const nameB = b.nombre.toLowerCase();
-        return sortName === 'asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-      });
-    } else {
-      filtered = [...filtered].sort((a, b) => {
-        const indexA = getCategoryIndex(a.categoria);
-        const indexB = getCategoryIndex(b.categoria);
-        if (indexA !== indexB) {
-          return indexA - indexB;
-        }
-        return a.nombre.localeCompare(b.nombre);
-      });
-    }
-
-    return filtered;
-  }, [productos, query, sortPrice, sortName, selectedLaboratorio, selectedCategoria]);
+    return [...filtered].sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [productos, query, selectedLaboratorio]);
 
   if (loading) {
     return (
@@ -120,7 +83,7 @@ export default function ProductosPage() {
           <div className="h-8 bg-gray-200 rounded-lg w-1/2 animate-pulse" />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
           {[...Array(6)].map((_, i) => (
             <ProductSkeleton key={i} />
           ))}
@@ -171,35 +134,6 @@ export default function ProductosPage() {
               )}
             </div>
 
-            <div>
-              <span className="text-sm font-semibold text-gray-700">Categoría:</span>
-              <div className="flex gap-2 flex-wrap items-center mt-3">
-                <button
-                  onClick={() => setSelectedCategoria(null)}
-                  className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                    !selectedCategoria
-                      ? 'bg-brand-600 text-white shadow-md scale-105'
-                      : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                  }`}
-                >
-                  Todas
-                </button>
-                {CATEGORIAS.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategoria(selectedCategoria === cat ? null : cat)}
-                    className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                      selectedCategoria === cat
-                        ? 'bg-brand-600 text-white shadow-md scale-105'
-                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {laboratorios.length > 0 && (
               <div>
                 <button
@@ -239,80 +173,6 @@ export default function ProductosPage() {
                 )}
               </div>
             )}
-
-            <div className="flex gap-2 flex-wrap items-center">
-              <span className="text-sm font-semibold text-gray-700">Precio:</span>
-              <button
-                onClick={() => {
-                  setSortPrice(sortPrice === 'asc' ? null : 'asc');
-                  setSortName(null);
-                }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                  sortPrice === 'asc'
-                    ? 'bg-brand-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
-                }`}
-              >
-                ↑ Menor
-              </button>
-              <button
-                onClick={() => {
-                  setSortPrice(sortPrice === 'desc' ? null : 'desc');
-                  setSortName(null);
-                }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                  sortPrice === 'desc'
-                    ? 'bg-brand-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
-                }`}
-              >
-                ↓ Mayor
-              </button>
-            </div>
-
-            <div className="flex gap-2 flex-wrap items-center">
-              <span className="text-sm font-semibold text-gray-700">Nombre:</span>
-              <button
-                onClick={() => {
-                  setSortName(sortName === 'asc' ? null : 'asc');
-                  setSortPrice(null);
-                }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                  sortName === 'asc'
-                    ? 'bg-brand-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
-                }`}
-              >
-                A → Z
-              </button>
-              <button
-                onClick={() => {
-                  setSortName(sortName === 'desc' ? null : 'desc');
-                  setSortPrice(null);
-                }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                  sortName === 'desc'
-                    ? 'bg-brand-600 text-white shadow-lg scale-105'
-                    : 'bg-gray-100 text-gray-800 hover:bg-gray-200 hover:scale-102'
-                }`}
-              >
-                Z → A
-              </button>
-            </div>
-
-            {(sortPrice || sortName || selectedLaboratorio || selectedCategoria) && (
-              <button
-                onClick={() => {
-                  setSortPrice(null);
-                  setSortName(null);
-                  setSelectedLaboratorio(null);
-                  setSelectedCategoria(null);
-                }}
-                className="px-4 py-2 rounded-xl text-sm font-semibold bg-red-50 text-red-600 hover:bg-red-100 transition-all transform hover:scale-102 border border-red-200"
-              >
-                ✕ Limpiar filtros
-              </button>
-            )}
           </div>
 
           {productos.length === 0 ? (
@@ -329,31 +189,10 @@ export default function ProductosPage() {
               </button>
             </div>
           ) : (
-            <div className="space-y-10">
-              {productosFiltrados.length > 0 && !selectedCategoria && !sortPrice && !sortName ? (
-                CATEGORIAS.map((categoria) => {
-                  const productosCategoria = productosFiltrados.filter((p) => p.categoria === categoria);
-                  if (productosCategoria.length === 0) return null;
-                  return (
-                    <div key={categoria}>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-brand-200">
-                        {categoria}
-                      </h2>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                        {productosCategoria.map((producto) => (
-                          <ProductCard key={producto.id} producto={producto} />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
-                  {productosFiltrados.map((producto) => (
-                    <ProductCard key={producto.id} producto={producto} />
-                  ))}
-                </div>
-              )}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
+              {productosFiltrados.map((producto) => (
+                <ProductCard key={producto.id} producto={producto} />
+              ))}
             </div>
           )}
         </div>
