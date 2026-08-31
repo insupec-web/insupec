@@ -23,6 +23,7 @@ function AdminDashboardContent() {
   const [sortName, setSortName] = useState<'asc' | 'desc' | null>(null);
   const [showOnlyZeroStock, setShowOnlyZeroStock] = useState(false);
   const [showOnlySinCategoria, setShowOnlySinCategoria] = useState(false);
+  const [showOnlySinFoto, setShowOnlySinFoto] = useState(false);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
@@ -225,7 +226,8 @@ function AdminDashboardContent() {
     const stock = p.stock ?? 0;
     const matchStock = !showOnlyZeroStock || stock === 0;
     const matchCategoria = !showOnlySinCategoria || !p.categoria;
-    return matchBusqueda && matchLaboratorio && matchStock && matchCategoria;
+    const matchFoto = !showOnlySinFoto || !p.foto_url;
+    return matchBusqueda && matchLaboratorio && matchStock && matchCategoria && matchFoto;
   });
 
   if (sortName) {
@@ -568,14 +570,31 @@ function AdminDashboardContent() {
             </button>
           </div>
 
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-semibold text-gray-700">Foto:</span>
+            </div>
+            <button
+              onClick={() => setShowOnlySinFoto(!showOnlySinFoto)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                showOnlySinFoto
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            >
+              Solo sin foto ({productos.filter((p) => !p.foto_url).length})
+            </button>
+          </div>
+
           <div className="flex gap-2 flex-wrap items-center">
-            {(selectedLaboratorio || sortName || showOnlyZeroStock || showOnlySinCategoria) && (
+            {(selectedLaboratorio || sortName || showOnlyZeroStock || showOnlySinCategoria || showOnlySinFoto) && (
               <button
                 onClick={() => {
                   setSelectedLaboratorio(null);
                   setSortName(null);
                   setShowOnlyZeroStock(false);
                   setShowOnlySinCategoria(false);
+                  setShowOnlySinFoto(false);
                 }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
               >
