@@ -15,6 +15,8 @@ export default function ProductosPage() {
   const [query, setQuery] = useState('');
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [expandLaboratorios, setExpandLaboratorios] = useState(false);
+  const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
+  const [expandCategorias, setExpandCategorias] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -55,6 +57,11 @@ export default function ProductosPage() {
     return Array.from(labs).sort();
   }, [productos]);
 
+  const categorias = useMemo(() => {
+    const cats = new Set(productos.map((p) => p.categoria).filter(Boolean));
+    return Array.from(cats).sort();
+  }, [productos]);
+
   const productosFiltrados = useMemo(() => {
     let filtered = productos;
 
@@ -67,8 +74,12 @@ export default function ProductosPage() {
       filtered = filtered.filter((p) => p.laboratorio === selectedLaboratorio);
     }
 
+    if (selectedCategoria) {
+      filtered = filtered.filter((p) => p.categoria === selectedCategoria);
+    }
+
     return [...filtered].sort((a, b) => a.nombre.localeCompare(b.nombre));
-  }, [productos, query, selectedLaboratorio]);
+  }, [productos, query, selectedLaboratorio, selectedCategoria]);
 
   if (loading) {
     return (
@@ -167,6 +178,46 @@ export default function ProductosPage() {
                         }`}
                       >
                         {lab}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {categorias.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setExpandCategorias(!expandCategorias)}
+                  className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+                >
+                  <span>Categoría:</span>
+                  <span className="text-xs text-gray-500">{expandCategorias ? '▼' : '▶'} ({categorias.length})</span>
+                </button>
+
+                {expandCategorias && (
+                  <div className="flex gap-2 flex-wrap items-center mt-3">
+                    <button
+                      onClick={() => setSelectedCategoria(null)}
+                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                        !selectedCategoria
+                          ? 'bg-brand-600 text-white shadow-md scale-105'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      Todas
+                    </button>
+                    {categorias.map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setSelectedCategoria(selectedCategoria === cat ? null : cat)}
+                        className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
+                          selectedCategoria === cat
+                            ? 'bg-brand-600 text-white shadow-md scale-105'
+                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                        }`}
+                      >
+                        {cat}
                       </button>
                     ))}
                   </div>
