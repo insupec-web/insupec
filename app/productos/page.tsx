@@ -81,9 +81,10 @@ export default function ProductosPage() {
     filtered.sort((a, b) => a.nombre.localeCompare(b.nombre));
 
     const grandesAnimales = filtered.filter((p) => p.categoria === 'Grandes Animales');
-    const otros = filtered.filter((p) => p.categoria !== 'Grandes Animales');
+    const pequenosAnimales = filtered.filter((p) => p.categoria === 'Pequeños Animales' || p.categoria === 'Animales de Compañía');
+    const otros = filtered.filter((p) => p.categoria !== 'Grandes Animales' && p.categoria !== 'Pequeños Animales' && p.categoria !== 'Animales de Compañía');
 
-    return { grandesAnimales, otros, total: [...grandesAnimales, ...otros] };
+    return { grandesAnimales, pequenosAnimales, otros, total: [...grandesAnimales, ...pequenosAnimales, ...otros] };
   }, [productos, query, selectedLaboratorio, selectedCategoria]);
 
   if (loading) {
@@ -257,9 +258,20 @@ export default function ProductosPage() {
                 </div>
               )}
 
+              {productosFiltrados.pequenosAnimales.length > 0 && (
+                <div className="mb-10">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-brand-400">Pequeños Animales</h2>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
+                    {productosFiltrados.pequenosAnimales.map((producto) => (
+                      <ProductCard key={producto.id} producto={producto} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {productosFiltrados.otros.length > 0 && (
                 <div>
-                  {productosFiltrados.grandesAnimales.length > 0 && (
+                  {(productosFiltrados.grandesAnimales.length > 0 || productosFiltrados.pequenosAnimales.length > 0) && (
                     <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-brand-200">Otros Productos</h2>
                   )}
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
