@@ -53,12 +53,12 @@ export default function ProductosPage() {
   }, []);
 
   const laboratorios = useMemo(() => {
-    const labs = new Set(productos.map((p) => p.laboratorio).filter(Boolean));
+    const labs = new Set(productos.map((p) => p.laboratorio).filter((l): l is string => Boolean(l)));
     return Array.from(labs).sort();
   }, [productos]);
 
   const categorias = useMemo(() => {
-    const cats = new Set(productos.map((p) => p.categoria).filter(Boolean));
+    const cats = new Set(productos.map((p) => p.categoria).filter((c): c is string => Boolean(c)));
     return Array.from(cats).sort();
   }, [productos]);
 
@@ -84,8 +84,18 @@ export default function ProductosPage() {
     const pequenosAnimales = filtered.filter((p) => p.categoria === 'Pequeños Animales' || p.categoria === 'Animales de Compañía');
     const otros = filtered.filter((p) => p.categoria !== 'Grandes Animales' && p.categoria !== 'Pequeños Animales' && p.categoria !== 'Animales de Compañía');
 
-    return { grandesAnimales, pequenosAnimales, otros, total: [...grandesAnimales, ...pequenosAnimales, ...otros] };
-  }, [productos, query, selectedLaboratorio, selectedCategoria]);
+    return {
+      grandesAnimales,
+      pequenosAnimales,
+      otros,
+      total: [...grandesAnimales, ...pequenosAnimales, ...otros],
+    };
+  }, [productos, query, selectedLaboratorio, selectedCategoria]) as {
+    grandesAnimales: Producto[];
+    pequenosAnimales: Producto[];
+    otros: Producto[];
+    total: Producto[];
+  };
 
   if (loading) {
     return (
