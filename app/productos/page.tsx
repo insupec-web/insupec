@@ -128,10 +128,7 @@ export default function ProductosPage() {
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
         <div>
           <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-brand-100">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-1">Productos</h1>
-            <p className="text-sm sm:text-base text-gray-500">
-              {productos.length} {productos.length === 1 ? 'producto disponible' : 'productos disponibles'}
-            </p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Productos</h1>
           </div>
 
           {/* Tabs de Categorías */}
