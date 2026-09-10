@@ -127,10 +127,6 @@ export default function ProductosPage() {
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 py-6 sm:py-10">
         <div>
-          <div className="mb-6 sm:mb-8 pb-4 border-b-2 border-brand-100">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Productos</h1>
-          </div>
-
           {/* Tabs de Categorías */}
           <div className="mb-6 sm:mb-8 border-b border-gray-300">
             <div className="flex overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4 gap-1">
