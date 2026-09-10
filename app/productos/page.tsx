@@ -232,11 +232,7 @@ export default function ProductosPage() {
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin productos disponibles</h3>
               <p className="text-gray-600 text-base mb-6">Estamos cargando nuestro catálogo. Vuelve pronto!</p>
             </div>
-<<<<<<< HEAD
-          ) : productosFiltrados.total.length === 0 ? (
-=======
           ) : Array.isArray(productosFiltrados) && productosFiltrados.length === 0 ? (
->>>>>>> claude/supabase-fotos-no-aparecen-4yi807
             <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No encontramos coincidencias</h3>
               <p className="text-gray-600 text-base mb-6">No hay productos en esta categoría{query && ` que coincidan con "${query}"`}</p>
@@ -245,50 +241,11 @@ export default function ProductosPage() {
               </button>
             </div>
           ) : (
-<<<<<<< HEAD
-            <>
-              {productosFiltrados.grandesAnimales.length > 0 && (
-                <div className="mb-10">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-brand-400">Grandes Animales</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
-                    {productosFiltrados.grandesAnimales.map((producto) => (
-                      <ProductCard key={producto.id} producto={producto} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {productosFiltrados.pequenosAnimales.length > 0 && (
-                <div className="mb-10">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-brand-400">Pequeños Animales</h2>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
-                    {productosFiltrados.pequenosAnimales.map((producto) => (
-                      <ProductCard key={producto.id} producto={producto} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {productosFiltrados.otros.length > 0 && (
-                <div>
-                  {(productosFiltrados.grandesAnimales.length > 0 || productosFiltrados.pequenosAnimales.length > 0) && (
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4 pb-2 border-b-2 border-brand-200">Otros Productos</h2>
-                  )}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
-                    {productosFiltrados.otros.map((producto) => (
-                      <ProductCard key={producto.id} producto={producto} />
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-=======
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
               {Array.isArray(productosFiltrados) && productosFiltrados.map((producto) => (
                 <ProductCard key={producto.id} producto={producto} />
               ))}
             </div>
->>>>>>> claude/supabase-fotos-no-aparecen-4yi807
           )}
         </div>
     </div>
