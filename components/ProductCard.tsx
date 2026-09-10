@@ -9,13 +9,18 @@ import { formatPrice, toTitleCase } from '@/lib/formatPrice';
 import { Package, Plus, Minus, ShoppingCart, CheckCircle } from 'lucide-react';
 
 export default function ProductCard({ producto }: { producto: Producto }) {
-  const [quantity, setQuantity] = useState(1);
+  const [qtyText, setQtyText] = useState('1');
   const [addedToCart, setAddedToCart] = useState(false);
-  const { addItem } = useCart();
+  const { addItem, items } = useCart();
 
   const stock = producto.stock ?? 0;
   const isLowStock = stock < 5 && stock > 0;
   const isOutOfStock = stock === 0;
+
+  const enCarrito = items.find((i) => i.id === producto.id)?.cantidad ?? 0;
+  const quantity = Math.min(Math.max(parseInt(qtyText, 10) || 1, 1), Math.max(stock, 1));
+
+  const setQuantity = (n: number) => setQtyText(String(Math.min(Math.max(n, 1), Math.max(stock, 1))));
 
   const handleAddToCart = () => {
     addItem({
@@ -26,8 +31,8 @@ export default function ProductCard({ producto }: { producto: Producto }) {
       foto_url: producto.foto_url,
     });
     setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
-    setQuantity(1);
+    setTimeout(() => setAddedToCart(false), 1500);
+    setQtyText('1');
   };
 
   return (
@@ -46,6 +51,11 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <div className="w-full h-full flex items-center justify-center">
             <Package size={48} className="text-gray-300" />
           </div>
+        )}
+        {enCarrito > 0 && (
+          <span className="absolute top-3 left-3 bg-brand-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg">
+            {enCarrito} en carrito
+          </span>
         )}
         {/* Badges */}
         <div className="absolute top-3 right-3 flex flex-col gap-2">
@@ -86,23 +96,33 @@ export default function ProductCard({ producto }: { producto: Producto }) {
         </div>
 
         {/* Controles de cantidad y compra */}
-        <div className="flex gap-2 mt-auto">
-          <div className="flex items-center border border-gray-300 rounded-lg bg-gray-50 overflow-hidden">
+        <div className="flex flex-col gap-2 mt-auto">
+          <div className="flex items-stretch border border-gray-300 rounded-lg bg-gray-50 overflow-hidden">
             <button
               type="button"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              onClick={() => setQuantity(quantity - 1)}
               disabled={isOutOfStock || quantity <= 1}
-              className="px-1.5 py-1.5 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-2 py-1.5 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               aria-label="Disminuir cantidad"
             >
               <Minus size={14} />
             </button>
-            <span className="w-7 text-center text-xs font-bold select-none">{quantity}</span>
+            <input
+              type="text"
+              inputMode="numeric"
+              value={qtyText}
+              onChange={(e) => setQtyText(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              onBlur={() => setQtyText(String(quantity))}
+              onFocus={(e) => e.currentTarget.select()}
+              disabled={isOutOfStock}
+              className="flex-1 w-full min-w-0 text-center text-sm font-bold bg-transparent focus:outline-none focus:bg-white disabled:cursor-not-allowed"
+              aria-label="Cantidad"
+            />
             <button
               type="button"
-              onClick={() => setQuantity((q) => Math.min(stock, q + 1))}
+              onClick={() => setQuantity(quantity + 1)}
               disabled={isOutOfStock || quantity >= stock}
-              className="px-1.5 py-1.5 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="px-2 py-1.5 text-gray-600 hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
               aria-label="Aumentar cantidad"
             >
               <Plus size={14} />
@@ -111,7 +131,7 @@ export default function ProductCard({ producto }: { producto: Producto }) {
           <button
             onClick={handleAddToCart}
             disabled={isOutOfStock}
-            className={`flex-1 py-2.5 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg ${
+            className={`w-full py-2.5 rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-lg ${
               isOutOfStock
                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                 : addedToCart

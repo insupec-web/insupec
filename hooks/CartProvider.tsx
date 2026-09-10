@@ -30,6 +30,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, mounted]);
 
+  // No se abre el carrito al agregar: interrumpe el armado de pedidos largos.
+  // El feedback queda en el badge del header y en la tarjeta del producto.
   const addItem = (item: CartItem) => {
     setItems((prev) => {
       const existing = prev.find((p) => p.id === item.id);
@@ -38,7 +40,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, item];
     });
-    setIsOpen(true);
   };
 
   const removeItem = (id: string) => {

@@ -77,7 +77,9 @@ export default function ProductosPage() {
 
     const q = query.trim().toLowerCase();
     if (q) {
-      filtered = filtered.filter((p) => p.nombre.toLowerCase().includes(q));
+      filtered = filtered.filter(
+        (p) => p.nombre.toLowerCase().includes(q) || (p.laboratorio ?? '').toLowerCase().includes(q)
+      );
     }
 
     if (selectedLaboratorio) {
@@ -164,7 +166,7 @@ export default function ProductosPage() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Buscar producto por nombre..."
+                placeholder="Buscar por nombre o laboratorio..."
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-all shadow-sm focus:shadow-md bg-gray-50 focus:bg-white"
               />
               {query && (
