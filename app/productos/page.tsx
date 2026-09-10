@@ -8,6 +8,12 @@ import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
 import { Search } from 'lucide-react';
 
+const ORDEN_CATEGORIAS: Record<string, number> = {
+  'Grandes Animales': 1,
+  'Pequeños Animales': 2,
+  'Animales de Compañía': 3,
+};
+
 export default function ProductosPage() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
@@ -16,7 +22,6 @@ export default function ProductosPage() {
   const [selectedLaboratorio, setSelectedLaboratorio] = useState<string | null>(null);
   const [expandLaboratorios, setExpandLaboratorios] = useState(false);
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
-  const [expandCategorias, setExpandCategorias] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -53,13 +58,18 @@ export default function ProductosPage() {
   }, []);
 
   const laboratorios = useMemo(() => {
-    const labs = new Set(productos.map((p) => p.laboratorio).filter(Boolean));
+    const labs = new Set(productos.map((p) => p.laboratorio).filter((l): l is string => Boolean(l)));
     return Array.from(labs).sort();
   }, [productos]);
 
   const categorias = useMemo(() => {
-    const cats = new Set(productos.map((p) => p.categoria).filter(Boolean));
-    return Array.from(cats).sort();
+    const cats = new Set(productos.map((p) => p.categoria).filter((c): c is string => Boolean(c)));
+    return Array.from(cats).sort((a, b) => {
+      const orderA = ORDEN_CATEGORIAS[a] ?? 999;
+      const orderB = ORDEN_CATEGORIAS[b] ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return a.localeCompare(b);
+    });
   }, [productos]);
 
   const productosFiltrados = useMemo(() => {
@@ -124,7 +134,37 @@ export default function ProductosPage() {
             </p>
           </div>
 
-          <div className="mb-6 sm:mb-8 space-y-4">
+          {/* Tabs de Categorías */}
+          <div className="mb-6 sm:mb-8 border-b border-gray-300">
+            <div className="flex overflow-x-auto -mx-3 sm:-mx-4 px-3 sm:px-4 gap-1">
+              <button
+                onClick={() => setSelectedCategoria(null)}
+                className={`whitespace-nowrap px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
+                  !selectedCategoria
+                    ? 'text-brand-600 border-brand-600'
+                    : 'text-gray-600 border-transparent hover:text-gray-900'
+                }`}
+              >
+                Todas
+              </button>
+              {categorias.map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setSelectedCategoria(cat)}
+                  className={`whitespace-nowrap px-4 py-3 font-semibold text-sm transition-all border-b-2 ${
+                    selectedCategoria === cat
+                      ? 'text-brand-600 border-brand-600'
+                      : 'text-gray-600 border-transparent hover:text-gray-900'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Barra de búsqueda */}
+          <div className="mb-6 sm:mb-8">
             <div className="relative max-w-xl group">
               <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-focus-within:text-brand-600 transition-colors" />
               <input
@@ -144,104 +184,65 @@ export default function ProductosPage() {
                 </button>
               )}
             </div>
-
-            {laboratorios.length > 0 && (
-              <div>
-                <button
-                  onClick={() => setExpandLaboratorios(!expandLaboratorios)}
-                  className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  <span>Laboratorio:</span>
-                  <span className="text-xs text-gray-500">{expandLaboratorios ? '▼' : '▶'} ({laboratorios.length})</span>
-                </button>
-
-                {expandLaboratorios && (
-                  <div className="flex gap-2 flex-wrap items-center mt-3">
-                    <button
-                      onClick={() => setSelectedLaboratorio(null)}
-                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                        !selectedLaboratorio
-                          ? 'bg-brand-600 text-white shadow-md scale-105'
-                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                      }`}
-                    >
-                      Todos
-                    </button>
-                    {laboratorios.map((lab) => (
-                      <button
-                        key={lab}
-                        onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
-                        className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                          selectedLaboratorio === lab
-                            ? 'bg-brand-600 text-white shadow-md scale-105'
-                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                        }`}
-                      >
-                        {lab}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {categorias.length > 0 && (
-              <div>
-                <button
-                  onClick={() => setExpandCategorias(!expandCategorias)}
-                  className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
-                >
-                  <span>Categoría:</span>
-                  <span className="text-xs text-gray-500">{expandCategorias ? '▼' : '▶'} ({categorias.length})</span>
-                </button>
-
-                {expandCategorias && (
-                  <div className="flex gap-2 flex-wrap items-center mt-3">
-                    <button
-                      onClick={() => setSelectedCategoria(null)}
-                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                        !selectedCategoria
-                          ? 'bg-brand-600 text-white shadow-md scale-105'
-                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                      }`}
-                    >
-                      Todas
-                    </button>
-                    {categorias.map((cat) => (
-                      <button
-                        key={cat}
-                        onClick={() => setSelectedCategoria(selectedCategoria === cat ? null : cat)}
-                        className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all transform ${
-                          selectedCategoria === cat
-                            ? 'bg-brand-600 text-white shadow-md scale-105'
-                            : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
-                        }`}
-                      >
-                        {cat}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
+
+          {/* Filtro Laboratorio */}
+          {laboratorios.length > 0 && (
+            <div className="mb-6 sm:mb-8">
+              <button
+                onClick={() => setExpandLaboratorios(!expandLaboratorios)}
+                className="flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                <span>Filtrar por Laboratorio:</span>
+                <span className="text-xs text-gray-500">{expandLaboratorios ? '▼' : '▶'}</span>
+              </button>
+
+              {expandLaboratorios && (
+                <div className="flex gap-2 flex-wrap items-center mt-3">
+                  <button
+                    onClick={() => setSelectedLaboratorio(null)}
+                    className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
+                      !selectedLaboratorio
+                        ? 'bg-brand-600 text-white'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                    }`}
+                  >
+                    Todos
+                  </button>
+                  {laboratorios.map((lab) => (
+                    <button
+                      key={lab}
+                      onClick={() => setSelectedLaboratorio(selectedLaboratorio === lab ? null : lab)}
+                      className={`px-3 py-2 rounded-xl text-sm font-semibold transition-all ${
+                        selectedLaboratorio === lab
+                          ? 'bg-brand-600 text-white'
+                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                      }`}
+                    >
+                      {lab}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {productos.length === 0 ? (
             <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Sin productos disponibles</h3>
               <p className="text-gray-600 text-base mb-6">Estamos cargando nuestro catálogo. Vuelve pronto!</p>
             </div>
-          ) : productosFiltrados.length === 0 ? (
+          ) : Array.isArray(productosFiltrados) && productosFiltrados.length === 0 ? (
             <div className="text-center py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl">
               <h3 className="text-xl font-semibold text-gray-800 mb-2">No encontramos coincidencias</h3>
-              <p className="text-gray-600 text-base mb-6">No hay productos que coincidan con "{query}"</p>
-              <button onClick={() => setQuery('')} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
+              <p className="text-gray-600 text-base mb-6">No hay productos en esta categoría{query && ` que coincidan con "${query}"`}</p>
+              <button onClick={() => { setQuery(''); setSelectedCategoria(null); }} className="px-6 py-2.5 bg-brand-600 text-white rounded-xl font-semibold hover:bg-brand-700 transition-all transform hover:scale-105">
                 Ver todos los productos
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
-              {productosFiltrados.map((producto) => (
+              {Array.isArray(productosFiltrados) && productosFiltrados.map((producto) => (
                 <ProductCard key={producto.id} producto={producto} />
               ))}
             </div>
