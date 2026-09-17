@@ -24,6 +24,7 @@ function AdminDashboardContent() {
   const [showOnlyZeroStock, setShowOnlyZeroStock] = useState(false);
   const [showOnlySinCategoria, setShowOnlySinCategoria] = useState(false);
   const [showOnlySinFoto, setShowOnlySinFoto] = useState(false);
+  const [showOnlyVencidos, setShowOnlyVencidos] = useState(false);
   const [editingProducto, setEditingProducto] = useState<Producto | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [seleccionados, setSeleccionados] = useState<Set<string>>(new Set());
@@ -246,7 +247,9 @@ function AdminDashboardContent() {
     const matchStock = !showOnlyZeroStock || stock === 0;
     const matchCategoria = !showOnlySinCategoria || !p.categoria;
     const matchFoto = !showOnlySinFoto || !p.foto_url || fotosRotas.has(p.id);
-    return matchBusqueda && matchLaboratorio && matchStock && matchCategoria && matchFoto;
+    const isExpired = p.vencimiento ? new Date(p.vencimiento) < new Date() : false;
+    const matchVencido = !showOnlyVencidos || isExpired;
+    return matchBusqueda && matchLaboratorio && matchStock && matchCategoria && matchFoto && matchVencido;
   });
 
   if (sortName) {
@@ -606,8 +609,24 @@ function AdminDashboardContent() {
             </button>
           </div>
 
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-sm font-semibold text-gray-700">Vencimiento:</span>
+            </div>
+            <button
+              onClick={() => setShowOnlyVencidos(!showOnlyVencidos)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                showOnlyVencidos
+                  ? 'bg-red-600 text-white'
+                  : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+              }`}
+            >
+              Solo vencidos ({productos.filter((p) => p.vencimiento && new Date(p.vencimiento) < new Date()).length})
+            </button>
+          </div>
+
           <div className="flex gap-2 flex-wrap items-center">
-            {(selectedLaboratorio || sortName || showOnlyZeroStock || showOnlySinCategoria || showOnlySinFoto) && (
+            {(selectedLaboratorio || sortName || showOnlyZeroStock || showOnlySinCategoria || showOnlySinFoto || showOnlyVencidos) && (
               <button
                 onClick={() => {
                   setSelectedLaboratorio(null);
@@ -615,6 +634,7 @@ function AdminDashboardContent() {
                   setShowOnlyZeroStock(false);
                   setShowOnlySinCategoria(false);
                   setShowOnlySinFoto(false);
+                  setShowOnlyVencidos(false);
                 }}
                 className="px-4 py-2 rounded-lg text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
               >
