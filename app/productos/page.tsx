@@ -6,7 +6,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import ProductCard from '@/components/ProductCard';
 import ProductSkeleton from '@/components/ProductSkeleton';
-import { Search } from 'lucide-react';
+import { Search, ShoppingCart, CheckCircle } from 'lucide-react';
+import { useCart } from '@/hooks/useCart';
+import { formatPrice } from '@/lib/formatPrice';
 
 const ORDEN_CATEGORIAS: Record<string, number> = {
   'Grandes Animales': 1,
@@ -90,8 +92,12 @@ export default function ProductosPage() {
       filtered = filtered.filter((p) => p.categoria === selectedCategoria);
     }
 
-    return [...filtered].sort((a, b) => a.nombre.localeCompare(b.nombre));
+    return [...filtered].filter(p => !p.vencimiento || new Date(p.vencimiento) >= new Date()).sort((a, b) => a.nombre.localeCompare(b.nombre));
   }, [productos, query, selectedLaboratorio, selectedCategoria]);
+
+  const productosVencidos = useMemo(() => {
+    return productos.filter(p => p.vencimiento && new Date(p.vencimiento) < new Date()).sort((a, b) => a.nombre.localeCompare(b.nombre));
+  }, [productos]);
 
   if (loading) {
     return (
@@ -242,7 +248,102 @@ export default function ProductosPage() {
               ))}
             </div>
           )}
+
+          {/* Sección Liquidación - Productos Vencidos */}
+          {productosVencidos.length > 0 && (
+            <div className="mt-16 pt-12 border-t-2 border-red-200">
+              <div className="mb-6 sm:mb-8">
+                <div className="inline-flex items-center gap-2 mb-2">
+                  <span className="text-4xl">🔥</span>
+                  <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-red-600">Liquidación - Súper Descuento</h2>
+                </div>
+                <p className="text-sm sm:text-base text-gray-600 mt-2">Productos vencidos a precios increíbles. ¡Aprovecha antes de que se agoten!</p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 lg:gap-5">
+                {productosVencidos.map((producto) => (
+                  <ExpiredProductCard key={producto.id} producto={producto} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+    </div>
+  );
+}
+
+function ExpiredProductCard({ producto }: { producto: Producto }) {
+  const precioOriginal = producto.precio;
+  const precioConDescuento = Math.round(precioOriginal * 0.4);
+  const descuentoPorcentaje = Math.round(((precioOriginal - precioConDescuento) / precioOriginal) * 100);
+  const { addItem } = useCart();
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const handleAddToCart = () => {
+    addItem({
+      id: producto.id,
+      nombre: producto.nombre,
+      precio: precioConDescuento,
+      cantidad: 1,
+      foto_url: producto.foto_url,
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  return (
+    <div className="group bg-red-50 border-2 border-red-300 rounded-2xl overflow-hidden h-full flex flex-col hover:border-red-500 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 relative">
+      {/* Badge de descuento */}
+      <div className="absolute top-2 right-2 z-10 bg-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
+        -{descuentoPorcentaje}%
+      </div>
+
+      {/* Foto del producto */}
+      <div className="relative block h-36 sm:h-44 bg-gradient-to-br from-red-100 to-gray-50 overflow-hidden">
+        {producto.foto_url ? (
+          <img
+            src={producto.foto_url}
+            alt={producto.nombre}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-contain p-3 group-hover:scale-110 transition-transform duration-300 opacity-75"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-4xl">📦</span>
+          </div>
+        )}
+        <div className="absolute inset-0 bg-red-200 opacity-20"></div>
+      </div>
+
+      <div className="p-3 flex flex-col flex-1">
+        {/* Nombre */}
+        <h3 className="font-semibold text-xs sm:text-sm text-gray-900 mb-2 hover:text-red-700 transition-colors line-clamp-2 min-h-[2rem]">
+          {producto.nombre}
+        </h3>
+
+        {/* Precios */}
+        <div className="mb-3 space-y-1">
+          <div className="text-xs sm:text-sm text-gray-500 line-through">
+            Antes: ${formatPrice(precioOriginal)}
+          </div>
+          <div className="text-lg sm:text-2xl font-extrabold text-red-600">
+            ${formatPrice(precioConDescuento)}
+          </div>
+        </div>
+
+        {/* Botón */}
+        <button
+          onClick={handleAddToCart}
+          className={`w-full py-2 rounded-lg font-bold text-xs sm:text-sm transition-all flex items-center justify-center gap-1 shadow-md ${
+            addedToCart
+              ? 'bg-green-500 text-white'
+              : 'bg-red-600 text-white hover:bg-red-700 hover:-translate-y-0.5'
+          }`}
+        >
+          {addedToCart ? '✓ Agregado' : '🛒 Comprar'}
+        </button>
+      </div>
     </div>
   );
 }
