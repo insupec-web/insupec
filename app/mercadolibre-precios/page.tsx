@@ -3,27 +3,25 @@
 import { useEffect, useState } from 'react';
 import { supabase, Producto } from '@/lib/supabase';
 import Link from 'next/link';
-import { ArrowLeft, Download } from 'lucide-react';
+import { ArrowLeft, Download, Settings } from 'lucide-react';
 
 interface ProductoConPrecio extends Producto {
   precioPublicar: number;
   comisionML: number;
 }
 
-const COMISIONES_POR_CATEGORIA: Record<string, number> = {
-  'Grandes Animales': 0.10,
-  'Animales de Compañía': 0.12,
-  'Cerco Eléctrico': 0.10,
-  'Hormiguicida': 0.12,
-  'Instrumental': 0.10,
-  'Limpieza': 0.12,
-  'Solar': 0.08,
+// Costos reales de Mercado Libre (según simulador oficial)
+const COSTOS_ML_DEFAULT = {
+  cargo_por_vender: 0.1024,  // 10.24%
+  costo_cuotas: 0.128,       // 12.8% (si ofreces cuotas)
+  iva: 0.21,                 // 21% en Argentina
 };
 
 export default function MercadoLibrePreciosPage() {
   const [productos, setProductos] = useState<ProductoConPrecio[]>([]);
   const [loading, setLoading] = useState(true);
-  const [comisionGlobal, setComisionGlobal] = useState(0.12);
+  const [costos, setCostos] = useState(COSTOS_ML_DEFAULT);
+  const [mostrarConfig, setMostrarConfig] = useState(false);
 
   useEffect(() => {
     async function fetchProductos() {
@@ -38,9 +36,12 @@ export default function MercadoLibrePreciosPage() {
 
         const activos = (data || []).filter(p => !p.vencimiento || new Date(p.vencimiento) >= new Date());
 
+        // Cálculo: si quieres recibir X, necesitas publicar a: X / (1 - descuentos_totales)
+        const descuentos_totales = costos.cargo_por_vender + costos.costo_cuotas + costos.iva;
+        const margen_efectivo = 1 - descuentos_totales;
+
         const conPrecios = activos.map(p => {
-          const comision = COMISIONES_POR_CATEGORIA[p.categoria || ''] || comisionGlobal;
-          const precioPublicar = Math.round((p.precio / (1 - comision)) * 100) / 100;
+          const precioPublicar = Math.round((p.precio / margen_efectivo) * 100) / 100;
           const comisionML = precioPublicar - p.precio;
 
           return {
@@ -59,24 +60,23 @@ export default function MercadoLibrePreciosPage() {
     }
 
     fetchProductos();
-  }, []);
+  }, [costos]);
+
+  const descuentos_totales = costos.cargo_por_vender + costos.costo_cuotas + costos.iva;
+  const margen_efectivo = (1 - descuentos_totales) * 100;
 
   const handleDownloadCSV = () => {
-    const headers = ['SKU', 'Producto', 'Categoría', 'Precio Original', 'Comisión ML %', 'Comisión $', 'PRECIO A PUBLICAR', 'Stock', 'IVA'];
-    const rows = productos.map(p => {
-      const comision = COMISIONES_POR_CATEGORIA[p.categoria || ''] || comisionGlobal;
-      return [
-        p.id,
-        `"${p.nombre.replace(/"/g, '""')}"`,
-        `"${(p.categoria || '').replace(/"/g, '""')}"`,
-        p.precio,
-        `${(comision * 100).toFixed(1)}%`,
-        p.comisionML.toFixed(2),
-        p.precioPublicar.toFixed(2),
-        p.stock || 0,
-        '21%'
-      ];
-    });
+    const headers = ['SKU', 'Producto', 'Precio Original', 'Cargo Vender %', 'Costo Cuotas %', 'IVA %', 'PRECIO A PUBLICAR', 'Stock'];
+    const rows = productos.map(p => [
+      p.id,
+      `"${p.nombre.replace(/"/g, '""')}"`,
+      p.precio,
+      `${(costos.cargo_por_vender * 100).toFixed(2)}%`,
+      `${(costos.costo_cuotas * 100).toFixed(2)}%`,
+      `${(costos.iva * 100).toFixed(2)}%`,
+      p.precioPublicar.toFixed(2),
+      p.stock || 0
+    ]);
 
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
 
@@ -96,8 +96,64 @@ export default function MercadoLibrePreciosPage() {
         Volver
       </Link>
 
-      <h1 className="text-4xl font-bold text-gray-900 mb-4">Calculadora de Precios Mercado Libre</h1>
-      <p className="text-gray-600 mb-8">Calcula automáticamente los precios para publicar considerando comisiones</p>
+      <div className="flex justify-between items-start mb-8">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Calculadora Mercado Libre</h1>
+          <p className="text-gray-600">Ajusta precios para que después de comisiones recibas lo que querés</p>
+        </div>
+        <button
+          onClick={() => setMostrarConfig(!mostrarConfig)}
+          className="flex items-center gap-2 bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+        >
+          <Settings size={18} />
+          Costos
+        </button>
+      </div>
+
+      {/* Configuración de costos */}
+      {mostrarConfig && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Ajustar Costos de Mercado Libre</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Cargo por vender (%)</label>
+              <input
+                type="number"
+                value={(costos.cargo_por_vender * 100).toFixed(2)}
+                onChange={(e) => setCostos({...costos, cargo_por_vender: parseFloat(e.target.value) / 100})}
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Varía según categoría (10-28%)</p>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Costo cuotas (%)</label>
+              <input
+                type="number"
+                value={(costos.costo_cuotas * 100).toFixed(2)}
+                onChange={(e) => setCostos({...costos, costo_cuotas: parseFloat(e.target.value) / 100})}
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Si ofreces cuotas sin interés</p>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">IVA (%)</label>
+              <input
+                type="number"
+                value={(costos.iva * 100).toFixed(2)}
+                onChange={(e) => setCostos({...costos, iva: parseFloat(e.target.value) / 100})}
+                step="0.01"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">Impuestos (21% en Argentina)</p>
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mt-4">
+            <strong>Margen neto después de costos: {margen_efectivo.toFixed(2)}%</strong>
+          </p>
+        </div>
+      )}
 
       {loading ? (
         <p className="text-gray-600">Cargando productos...</p>
@@ -118,7 +174,7 @@ export default function MercadoLibrePreciosPage() {
               <p className="text-2xl font-bold text-amber-900">${totalInvertido.toLocaleString('es-AR')}</p>
             </div>
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-600 text-sm font-semibold">COMISIONES</p>
+              <p className="text-red-600 text-sm font-semibold">SOBREPRECIO TOTAL</p>
               <p className="text-2xl font-bold text-red-900">${totalComisiones.toLocaleString('es-AR')}</p>
             </div>
           </div>
@@ -138,10 +194,9 @@ export default function MercadoLibrePreciosPage() {
               <thead>
                 <tr className="bg-gray-100 border-b border-gray-300">
                   <th className="px-4 py-3 text-left font-bold">Producto</th>
-                  <th className="px-4 py-3 text-center font-bold">Categoría</th>
-                  <th className="px-4 py-3 text-right font-bold">Precio Original</th>
-                  <th className="px-4 py-3 text-right font-bold">Comisión</th>
-                  <th className="px-4 py-3 text-right font-bold bg-green-100">👉 PUBLICAR A</th>
+                  <th className="px-4 py-3 text-right font-bold">Querés recibir</th>
+                  <th className="px-4 py-3 text-right font-bold">Sobreprecio</th>
+                  <th className="px-4 py-3 text-right font-bold bg-green-100">👉 PUBLICÁ A</th>
                   <th className="px-4 py-3 text-center font-bold">Stock</th>
                 </tr>
               </thead>
@@ -149,12 +204,11 @@ export default function MercadoLibrePreciosPage() {
                 {productos.map((p, idx) => (
                   <tr key={p.id} className={`border-b ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50`}>
                     <td className="px-4 py-3">
-                      <span className="font-semibold text-gray-900">{p.nombre.substring(0, 40)}</span>
+                      <span className="font-semibold text-gray-900 line-clamp-2">{p.nombre.substring(0, 50)}</span>
                     </td>
-                    <td className="px-4 py-3 text-center text-gray-600">{p.categoria || '-'}</td>
-                    <td className="px-4 py-3 text-right">${p.precio.toLocaleString('es-AR')}</td>
-                    <td className="px-4 py-3 text-right text-red-600">-${p.comisionML.toFixed(2)}</td>
-                    <td className="px-4 py-3 text-right font-bold text-green-700 bg-green-50">
+                    <td className="px-4 py-3 text-right font-semibold">${p.precio.toLocaleString('es-AR')}</td>
+                    <td className="px-4 py-3 text-right text-red-600">+${p.comisionML.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-right font-bold text-green-700 bg-green-50 text-lg">
                       ${p.precioPublicar.toFixed(2)}
                     </td>
                     <td className="px-4 py-3 text-center text-gray-600">{p.stock || 0}</td>
@@ -162,17 +216,6 @@ export default function MercadoLibrePreciosPage() {
                 ))}
               </tbody>
             </table>
-          </div>
-
-          {/* Instrucciones */}
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">📋 Cómo usar:</h3>
-            <ol className="list-decimal list-inside space-y-2 text-gray-700">
-              <li>Descarga el CSV con los precios calculados</li>
-              <li>Ve a Mercado Libre → "Publicá varios productos a la vez"</li>
-              <li>En la columna "Precio" de tu planilla, pegá los valores de "PUBLICAR A"</li>
-              <li>¡Publicá! Después de comisiones, te quedará el precio original</li>
-            </ol>
           </div>
         </div>
       )}
