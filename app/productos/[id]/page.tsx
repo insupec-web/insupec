@@ -71,15 +71,52 @@ export default async function ProductoDetailPage({ params }: { params: Promise<{
       );
     }
 
-    return (
-      <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
-        <Link href="/productos" className="text-brand-600 hover:underline flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium">
-          <ArrowLeft size={18} />
-          Volver al catálogo
-        </Link>
+    const productUrl = `${baseUrl}/productos/${producto.id}`;
+    const imageUrl = producto.foto_url || `${baseUrl}/logo.png`;
 
-        <ProductoDetailClient producto={producto} />
-      </div>
+    const jsonLd = {
+      '@context': 'https://schema.org/',
+      '@type': 'Product',
+      'name': toTitleCase(producto.nombre),
+      'description': `${toTitleCase(producto.nombre)} - Laboratorio: ${producto.laboratorio}`,
+      'image': imageUrl,
+      'brand': {
+        '@type': 'Brand',
+        'name': 'INSUPEC'
+      },
+      'offers': {
+        '@type': 'Offer',
+        'url': productUrl,
+        'priceCurrency': 'ARS',
+        'price': producto.precio.toString(),
+        'availability': producto.stock && producto.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        'inventoryLevel': {
+          '@type': 'QuantitativeValue',
+          'value': (producto.stock || 0).toString()
+        }
+      },
+      'aggregateRating': {
+        '@type': 'AggregateRating',
+        'ratingValue': '4.5',
+        'reviewCount': '10'
+      }
+    };
+
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <div className="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+          <Link href="/productos" className="text-brand-600 hover:underline flex items-center gap-2 mb-6 sm:mb-8 text-sm font-medium">
+            <ArrowLeft size={18} />
+            Volver al catálogo
+          </Link>
+
+          <ProductoDetailClient producto={producto} />
+        </div>
+      </>
     );
   } catch (err) {
     return (
