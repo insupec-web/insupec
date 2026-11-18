@@ -2,19 +2,25 @@ import { Producto } from '@/lib/supabase';
 import { formatPrice, toTitleCase } from '@/lib/formatPrice';
 import { formatMesAnio } from '@/lib/format';
 
-// Formato vertical 4:5 (1080x1350): pensado para compartir en WhatsApp / Instagram.
+// Formato 9:16 (1080x1920): estados de WhatsApp e historias de Instagram sin recorte.
+// Zona segura: el contenido clave queda entre y=150 y y=1770; los bordes superior e inferior
+// los tapan la barra de progreso y la respuesta de la app.
 export const CARD_W = 1080;
-export const CARD_H = 1350;
+export const CARD_H = 1920;
 
-const BRAND = '#48a828';
-const BRAND_700 = '#3c8c20';
-const BRAND_50 = '#f2f9ec';
-const INK = '#1f2937';
-const MUTED = '#6b7280';
-const FOOTER_BG = '#f3f4f6';
-const RED = '#dc2626';
-const AMBER = '#d97706';
-const FONT = 'Arial, Helvetica, sans-serif';
+const C = {
+  verde: '#48a828',
+  verdeOscuro: '#1e4d12',
+  verdeMedio: '#2d6b1a',
+  oro: '#c6a15b',
+  tinta: '#16200f',
+  gris: '#6b7a66',
+  suave: '#eef6e8',
+  borde: '#dfe9d6',
+  rojo: '#c2410c',
+  ambar: '#b45309',
+};
+const FONT = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 
 // Carga una imagen con CORS. Si falla o tarda demasiado devuelve null:
 // nunca se dibuja una imagen sin CORS porque contaminaría el canvas y toBlob() fallaría.
@@ -61,7 +67,6 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number
     }
     lines.push(current);
     if (lines.length === maxLines) {
-      // Quedan palabras sin mostrar: la última línea termina en "…".
       lines[maxLines - 1] = ellipsize(ctx, current, maxWidth);
       return lines;
     }
@@ -83,6 +88,26 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
   ctx.roundRect(x, y, w, h, r);
 }
 
+function texto(
+  ctx: CanvasRenderingContext2D,
+  value: string,
+  x: number,
+  y: number,
+  font: string,
+  color: string,
+  align: CanvasTextAlign = 'center',
+  spacing = 0,
+) {
+  ctx.font = font;
+  ctx.fillStyle = color;
+  ctx.textAlign = align;
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = `${spacing}px`;
+  ctx.fillText(value, x, y);
+  ctx.letterSpacing = '0px';
+  ctx.textAlign = 'left';
+}
+
 // Dibuja la imagen centrada dentro de un recuadro, sin deformarla.
 function dibujarContenida(
   ctx: CanvasRenderingContext2D,
@@ -99,9 +124,13 @@ function dibujarContenida(
 }
 
 function estadoStock(stock: number): { texto: string; color: string } {
-  if (stock <= 0) return { texto: 'SIN STOCK', color: RED };
-  if (stock < 5) return { texto: `ÚLTIMAS ${stock} U.`, color: AMBER };
-  return { texto: `EN STOCK · ${stock} U.`, color: BRAND_700 };
+  if (stock <= 0) return { texto: 'SIN STOCK', color: C.rojo };
+  if (stock < 5) return { texto: `ÚLTIMAS ${stock} U.`, color: C.ambar };
+  return { texto: `EN STOCK · ${stock} U.`, color: C.verdeMedio };
+}
+
+function textoVencimiento(vencimiento: string | null | undefined): string {
+  return vencimiento ? `VTO. ${formatMesAnio(vencimiento)}` : 'VTO. A CONSULTAR';
 }
 
 // Renderiza la tarjeta vertical de un producto y devuelve un PNG.
@@ -117,113 +146,103 @@ export async function renderProductoCard(producto: Producto): Promise<Blob> {
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas no disponible en este navegador');
 
-  // Fondo
-  ctx.fillStyle = '#ffffff';
+  // Fondo degradado
+  const fondo = ctx.createLinearGradient(0, 0, 0, CARD_H);
+  fondo.addColorStop(0, '#ffffff');
+  fondo.addColorStop(1, C.suave);
+  ctx.fillStyle = fondo;
   ctx.fillRect(0, 0, CARD_W, CARD_H);
 
-  // Encabezado
-  ctx.fillStyle = BRAND;
-  ctx.fillRect(0, 0, CARD_W, 140);
+  const cx = CARD_W / 2;
+
+  // Logo arriba
   if (logo) {
-    const lh = 80;
+    const lh = 150;
     const lw = (logo.naturalWidth / logo.naturalHeight) * lh;
-    ctx.fillStyle = '#ffffff';
-    roundRect(ctx, 50, 30, lw + 32, lh + 20, 16);
-    ctx.fill();
-    ctx.drawImage(logo, 66, 40, lw, lh);
+    ctx.drawImage(logo, cx - lw / 2, 150, lw, lh);
   } else {
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `bold 60px ${FONT}`;
-    ctx.textBaseline = 'middle';
-    ctx.fillText('INSUPEC', 60, 70);
+    texto(ctx, 'INSUPEC', cx, 225, `bold 120px ${FONT}`, C.verdeOscuro);
   }
+
+  // Filete dorado + subtítulo
+  ctx.fillStyle = C.oro;
+  ctx.fillRect(cx - 130, 340, 260, 3);
+  texto(ctx, 'CATÁLOGO DE PRODUCTOS', cx, 386, `600 27px ${FONT}`, C.gris, 'center', 6);
+
+  // Tarjeta de foto
+  ctx.save();
+  ctx.shadowColor = 'rgba(30, 77, 18, 0.20)';
+  ctx.shadowBlur = 60;
+  ctx.shadowOffsetY = 22;
   ctx.fillStyle = '#ffffff';
-  ctx.font = `bold 28px ${FONT}`;
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('PEDIDOS ONLINE', CARD_W - 50, 70);
-  ctx.textAlign = 'left';
-
-  // Laboratorio + categoría
-  const laboratorio = (producto.laboratorio || '').toUpperCase();
-  const categoria = producto.categoria?.trim() || '';
-  ctx.textBaseline = 'alphabetic';
-  ctx.fillStyle = BRAND_700;
-  ctx.font = `bold 32px ${FONT}`;
-  if (laboratorio) ctx.fillText(truncar(ctx, laboratorio, 620), 60, 215);
-  if (categoria) {
-    ctx.fillStyle = MUTED;
-    ctx.font = `28px ${FONT}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(truncar(ctx, categoria, 380), CARD_W - 60, 215);
-    ctx.textAlign = 'left';
-  }
-
-  // Recuadro de foto
-  const fx = 60, fy = 240, fw = CARD_W - 120, fh = 540;
-  ctx.fillStyle = BRAND_50;
-  roundRect(ctx, fx, fy, fw, fh, 28);
+  roundRect(ctx, 70, 440, CARD_W - 140, 760, 44);
   ctx.fill();
+  ctx.restore();
+
   if (foto) {
-    dibujarContenida(ctx, foto, fx + 30, fy + 30, fw - 60, fh - 60);
+    dibujarContenida(ctx, foto, 120, 490, CARD_W - 240, 660);
   } else {
-    ctx.fillStyle = MUTED;
-    ctx.font = `34px ${FONT}`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('Sin foto', fx + fw / 2, fy + fh / 2);
-    ctx.textAlign = 'left';
+    texto(ctx, 'Sin foto', cx, 820, `500 40px ${FONT}`, C.gris);
   }
 
-  // Nombre
-  ctx.fillStyle = INK;
-  ctx.font = `bold 56px ${FONT}`;
-  ctx.textBaseline = 'alphabetic';
-  const lineas = wrapLines(ctx, toTitleCase(producto.nombre), CARD_W - 120, 2);
-  lineas.forEach((linea, i) => ctx.fillText(linea, 60, 845 + i * 68));
+  // Laboratorio
+  const laboratorio = (producto.laboratorio || '').toUpperCase();
+  if (laboratorio) {
+    const txt = truncar(ctx, laboratorio, 900);
+    texto(ctx, txt, cx, 1262, `bold 34px ${FONT}`, C.verde, 'center', 4);
+  }
 
-  // Separador
-  const yDiv = 1000;
-  ctx.fillStyle = '#e5e7eb';
-  ctx.fillRect(60, yDiv, CARD_W - 120, 2);
+  // Nombre (hasta 2 líneas centradas)
+  ctx.font = `bold 66px ${FONT}`;
+  const lineas = wrapLines(ctx, toTitleCase(producto.nombre), 940, 2);
+  lineas.forEach((linea, i) => texto(ctx, linea, cx, 1342 + i * 74, `bold 66px ${FONT}`, C.tinta));
 
-  // Precio
-  ctx.fillStyle = MUTED;
-  ctx.font = `bold 26px ${FONT}`;
-  ctx.fillText('PRECIO', 60, yDiv + 50);
-  ctx.fillStyle = BRAND_700;
-  ctx.font = `bold 124px ${FONT}`;
-  ctx.fillText(`$ ${formatPrice(producto.precio)}`, 56, yDiv + 150);
-
-  // Stock + vencimiento
-  const stock = producto.stock ?? 0;
-  const estado = estadoStock(stock);
-  ctx.font = `bold 30px ${FONT}`;
-  const anchoPill = ctx.measureText(estado.texto).width + 56;
-  const yPill = 1176;
-  ctx.fillStyle = estado.color;
-  roundRect(ctx, 60, yPill, anchoPill, 60, 30);
+  // Bloque de precio
+  const py = 1472;
+  const phh = 168;
+  const pg = ctx.createLinearGradient(0, py, 0, py + phh);
+  pg.addColorStop(0, C.verdeMedio);
+  pg.addColorStop(1, C.verdeOscuro);
+  ctx.fillStyle = pg;
+  roundRect(ctx, 130, py, CARD_W - 260, phh, 36);
   ctx.fill();
-  ctx.fillStyle = '#ffffff';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(estado.texto, 88, yPill + 30);
+  ctx.strokeStyle = C.oro;
+  ctx.lineWidth = 3;
+  roundRect(ctx, 130, py, CARD_W - 260, phh, 36);
+  ctx.stroke();
+  texto(ctx, 'PRECIO', cx, py + 40, `bold 26px ${FONT}`, C.oro, 'center', 6);
+  texto(ctx, `$ ${formatPrice(producto.precio)}`, cx, py + 114, `bold 100px ${FONT}`, '#ffffff');
 
-  if (producto.vencimiento) {
-    ctx.fillStyle = MUTED;
-    ctx.font = `bold 30px ${FONT}`;
-    ctx.textAlign = 'right';
-    ctx.fillText(`Vto. ${formatMesAnio(producto.vencimiento)}`, CARD_W - 60, yPill + 30);
-    ctx.textAlign = 'left';
-  }
+  // Fila: stock + vencimiento (siempre visible)
+  const yRow = 1676;
+  const hRow = 86;
+  const estado = estadoStock(producto.stock ?? 0);
+
+  ctx.fillStyle = estado.color;
+  roundRect(ctx, 130, yRow, 410, hRow, hRow / 2);
+  ctx.fill();
+  texto(ctx, estado.texto, 335, yRow + hRow / 2, `bold 32px ${FONT}`, '#ffffff');
+
+  ctx.fillStyle = '#ffffff';
+  roundRect(ctx, 560, yRow, 390, hRow, hRow / 2);
+  ctx.fill();
+  ctx.strokeStyle = C.oro;
+  ctx.lineWidth = 3;
+  roundRect(ctx, 560, yRow, 390, hRow, hRow / 2);
+  ctx.stroke();
+  texto(ctx, textoVencimiento(producto.vencimiento), 755, yRow + hRow / 2, `bold 32px ${FONT}`, C.verdeOscuro);
 
   // Pie
-  ctx.fillStyle = FOOTER_BG;
-  ctx.fillRect(0, CARD_H - 100, CARD_W, 100);
-  ctx.fillStyle = INK;
-  ctx.font = `30px ${FONT}`;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('Consultá disponibilidad y hacé tu pedido · INSUPEC', CARD_W / 2, CARD_H - 50);
+  const fy = 1778;
+  const fg = ctx.createLinearGradient(0, fy, 0, CARD_H);
+  fg.addColorStop(0, C.verdeMedio);
+  fg.addColorStop(1, C.verdeOscuro);
+  ctx.fillStyle = fg;
+  ctx.fillRect(0, fy, CARD_W, CARD_H - fy);
+  ctx.fillStyle = C.oro;
+  ctx.fillRect(cx - 80, fy + 26, 160, 2);
+  texto(ctx, 'Consultá disponibilidad y hacé tu pedido', cx, fy + 62, `bold 36px ${FONT}`, '#ffffff');
+  texto(ctx, 'PEDIDOS ONLINE · INSUPEC', cx, fy + 110, `600 26px ${FONT}`, C.oro, 'center', 5);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(
