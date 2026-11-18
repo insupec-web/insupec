@@ -48,6 +48,9 @@ export default function AdminNav() {
             <Link href="/admin/control-stock" className="text-sm text-gray-700 hover:text-brand-600 transition-colors">
               Control Stock
             </Link>
+            <Link href="/admin/screenshots" className="text-sm text-gray-700 hover:text-brand-600 transition-colors">
+              Screenshots
+            </Link>
           </div>
 
           <div className="h-6 border-l border-gray-300"></div>
@@ -125,6 +128,13 @@ export default function AdminNav() {
                   onClick={handleNavClick}
                 >
                   Control Stock
+                </Link>
+                <Link
+                  href="/admin/screenshots"
+                  className="text-gray-700 hover:text-brand-600 transition-colors text-sm py-2"
+                  onClick={handleNavClick}
+                >
+                  Screenshots
                 </Link>
               </div>
             </div>
